@@ -1,0 +1,69 @@
+﻿Gonna see how over a years of professional experience has improved design skills
+its
+this right?
+Attachment file type: document
+game_idea.txt
+9.27 KB
+EchoAlpha — Today at 7:18 PM
+Yea
+It got sidetracked quickly but mostly just the idea of like a "papers please" but for a bathroom
+Zorb — Today at 7:19 PM
+Mmmmmmm So
+Like a yes/no for if they should even be allowed into the waiting area for the restroom?
+EchoAlpha — Today at 7:20 PM
+You only have a few urinals/stalls and it takes time for people to use one, you have a queue for you and a "waiting area" with a small capacity
+Zorb — Today at 7:20 PM
+Ye, Got that.
+Real time game, right? Not turn based?
+just gotta make sure
+EchoAlpha — Today at 7:21 PM
+So you have to decide for each arrival whether send them to one of your fixtures, send them to your waiting area/hotbar, or turn them away completely
+Yeah, like a timer in the background where people would pee themselves but you don't see it
+Zorb — Today at 7:21 PM
+Ye. Okay.
+EchoAlpha — Today at 7:21 PM
+So you have to guess bases on things
+And make decisions quickly because the clock is ticking for those in line
+And if someone arrives v desperate and you don't have a place for them to go right away it could run out of time and they wet themselves
+the goal being the game forcing you to withhold relief as much as possible so you don't get stuck without somewhere if one or more people more desperate arrive
+
+Zorb — Today at 7:25 PM
+Ye
+[7:25 PM]
+Always try to leave a toilet open, because someone about to lose it could hobble in and soak your floor if they have to wait even a minute
+
+EchoAlpha — Today at 7:25 PM
+Exactly!
+
+Zorb — Today at 7:26 PM
+so you could have two people squirming desperate in the waiting room, with an open toilet
+[7:26 PM]
+but they dont get to use it until the girl in the other toilet finishes up
+
+EchoAlpha — Today at 7:26 PM
+Exactly!
+[7:27 PM]
+Or you turn one away from the waiting room completely because you need the spots for people even more desperate than them
+
+Zorb — Today at 7:28 PM
+Automatically turn away everyone if the waiting rooms full
+[7:28 PM]
+anyone super desperate turned away will just wet themselves
+
+EchoAlpha — Today at 7:28 PM
+If your intake queue is full
+[7:28 PM]
+Which is v small and you can only do them first come first serve
+[7:29 PM]
+So if someone who looks extremely urgent is at the back of it you need to find a way to clear the queue
+
+Zorb — Today at 7:29 PM
+Oooh
+[7:29 PM]
+You can't reorganize the queue?
+NEW
+
+EchoAlpha — Today at 7:30 PM
+Yes, your queue is just like a you can only pull the first one for just one of three choices, assigning a stall, putting in the waiting area, or kicking them out
+[7:31 PM]
+So that the waiting area spots are more precious as a way to hold on to people who need to go but can wait for a stall
