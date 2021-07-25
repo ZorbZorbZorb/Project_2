@@ -76,9 +76,6 @@ public class GameController : MonoBehaviour {
     public Customer SpawnCustomerInBar(double metric) {
         throw new NotImplementedException();
     }
-    public Customer SpawnCustomerInDoorway(double metric) {
-        throw new NotImplementedException();
-    }
 
     public Customer CreateCustomer() {
         Customer newCustomer = Instantiate(templateCustomer);
@@ -87,10 +84,14 @@ public class GameController : MonoBehaviour {
         string logString2 = $"Customer {newCustomer.UID} created. bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}";
         Debug.Log(logString2);
         customers.Add(newCustomer);
+        newCustomer.Active = true;
+        Seat seat = Bar.Singleton.GetOpenSeat();
+        seat.MoveCustomerIntoSpot(newCustomer);
         return newCustomer;
     }
     public void RemoveCustomer(Customer customer) {
         Debug.LogWarning($"Deleted customer {customer.UID}");
+        customer.StopOccupyingAll();
         customers.Remove(customer);
         Destroy(customer.gameObject);
     }

@@ -13,7 +13,9 @@ public class Customer : MonoBehaviour {
 
     void Start() {
         WetSelfLeaveBathroomDelayRemaining = WetSelfLeaveBathroomDelay;
-        Destination = this.transform.position;
+        if (Destination == null) {
+            Destination = this.transform.position;
+        }
         UID = GameController.GetUid();
         Menu.enabled = false;
 
@@ -111,23 +113,28 @@ public class Customer : MonoBehaviour {
                 Leave();
             }
         }
+
         // If not in any bathroom and bladder is full, go to bathroom
         else if ( FeelsNeedToGo ) {
-            if (CanReenterBathroom) {
-                // Only if in bar and not recently dismissed by player
-                if ( position == Collections.Location.Bar) {
-                    if (!EnterDoorway()) {
-                        CanReenterBathroom = false;
-                        CanReenterBathroomIn = 60f;
-                    }
-                }
+
+            if (MinTimeBetweenChecksNow < MinTimeBetweenChecks) {
+                MinTimeBetweenChecksNow += Time.deltaTime;
+                return;
             }
             else {
-                if ( CanReenterBathroomIn < 0f) {
-                    CanReenterBathroom = true;
-                }
-                else {
-                    CanReenterBathroomIn -= Time.deltaTime;
+                MinTimeBetweenChecksNow = 0f;
+
+                if ( position == Collections.Location.Bar ) {
+                    if ( MinTimeAtBarNow < MinTimeAtBar ) {
+                        MinTimeAtBarNow += Time.deltaTime;
+                        return;
+                    }
+                    else {
+                        // Try to enter the bathroom
+                        if ( !EnterDoorway() ) {
+                            MinTimeAtBarNow = MinTimeAtBar / 2f;
+                        }
+                    }
                 }
             }
         }
@@ -181,7 +188,7 @@ public class Customer : MonoBehaviour {
     }
 
     private void PeeLogicUpdate() {
-        FeelsNeedToGo = bladder.FeltNeed > 0.33d;
+        FeelsNeedToGo = bladder.FeltNeed > 0.50d;
 
 
         // Can customer relieve themselves now?
@@ -250,6 +257,8 @@ public class Customer : MonoBehaviour {
     [SerializeField]
     public SpriteRenderer SRenderer;
 
+    public Bar Bar = Bar.Singleton;
+
     public bool Active = false;
     public int UID = GameController.GetUid();
     public Collections.CustomerDesperationState lastState;
@@ -278,6 +287,10 @@ public class Customer : MonoBehaviour {
     private double RemainingUrinateStopDelay;
     public float WetSelfLeaveBathroomDelay = 6f;
     public float WetSelfLeaveBathroomDelayRemaining;
+    public float MinTimeAtBar = 60f;
+    public float MinTimeAtBarNow = 0.0f;
+    public float MinTimeBetweenChecks = 8f;
+    public float MinTimeBetweenChecksNow = 0.0f;
 
     // Position
     public Collections.CustomerActionState ActionState = Collections.CustomerActionState.None;
@@ -407,15 +420,19 @@ public class Customer : MonoBehaviour {
         IsRelievingSelf = false;
         if ( IsWet ) {
             position = Collections.Location.Outside;
+            Occupying.OccupiedBy = null;
+            Occupying = null;
+            ActionState = Collections.CustomerActionState.None;
+            MoveToVector3(Collections.OffScreenBottom);
+        }
+        else {
+            ActionState = Collections.CustomerActionState.None;
+            Seat seat = Bar.GetOpenSeat();
+            seat.MoveCustomerIntoSpot(this);
         }
         if ( OccupyingReliefType == Collections.IReliefType.Toilet ) {
             ( (Toilet)Occupying ).SRenderer.sprite = Collections.spriteStallOpened;
         }
-        position = Collections.Location.Bar;
-        Occupying.OccupiedBy = null;
-        Occupying = null;
-        ActionState = Collections.CustomerActionState.None;
-        MoveToVector3(Collections.OffScreenBottom);
     }
     public void StartWettingSelf() {
         bladder.Emptying = true;
@@ -558,16 +575,16 @@ public class Customer : MonoBehaviour {
     #region MenuActions
     // Sends this customer back to the establishment unrelieved
     public void MenuOptionDismiss() {
-        // Get out of here stalker
-        StopOccupyingAll();
-        MoveToVector3(Collections.OffScreenBottom);
-        position = Collections.Location.Bar;
-        CanReenterBathroom = false;
-        CanReenterBathroomIn = 60f;
+        Seat seat = Bar.GetOpenSeat();
+        seat.MoveCustomerIntoSpot(this);
+        MinTimeAtBarNow = 0f;
+        MinTimeBetweenChecksNow = 0f;
     }
     // Sends this customer to the waiting room
     public WaitingSpot MenuOptionGotoWaiting() {
         if ( WaitingRoom.waitingRoom.HasOpenWaitingSpot() ) {
+            MinTimeAtBarNow = 0f;
+            MinTimeBetweenChecksNow = 0f;
             WaitingSpot waitingSpot = WaitingRoom.waitingRoom.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.WaitingRoom;
@@ -580,6 +597,8 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the toilets
     public bool MenuOptionGotoToilet() {
+        MinTimeAtBarNow = 0f;
+        MinTimeBetweenChecksNow = 0f;
         if (Bathroom.bathroom.HasToiletAvailable) {
             EnterRelief(Bathroom.bathroom.GetToilet());
             return true;
@@ -587,6 +606,8 @@ public class Customer : MonoBehaviour {
         return false;
     }
     public bool MenuOptionGotoUrinal() {
+        MinTimeAtBarNow = 0f;
+        MinTimeBetweenChecksNow = 0f;
         if (Bathroom.bathroom.HasUrinalAvailable) {
             EnterRelief(Bathroom.bathroom.GetUrinal());
             return true;
@@ -594,6 +615,8 @@ public class Customer : MonoBehaviour {
         return false;
     }
     public bool MenuOptionGotoSink() {
+        MinTimeAtBarNow = 0f;
+        MinTimeBetweenChecksNow = 0f;
         if (Bathroom.bathroom.HasSinkAvailable) {
             EnterRelief(Bathroom.bathroom.GetSink());
             return true;
