@@ -4,7 +4,7 @@ using UnityEngine;
 public class Toilet : Relief {
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 0, z = 1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -15, z = 1 };
-    public override Collections.IReliefType ReliefType => Collections.IReliefType.Toilet;
+    public override Collections.ReliefType ReliefType => Collections.ReliefType.Toilet;
     public override bool HidesCustomer => true;
     public override string DisplayName => "Toilet";
     public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.ToiletPantsDown;

@@ -57,13 +57,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Characters\Bladder.cs" />
+    <Compile Include="Assets\Scripts\Characters\Emotes.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaitingSpotQueue.cs" />
     <Compile Include="Assets\Scripts\Objects\WaitingSpot.cs" />
+    <Compile Include="Assets\Scripts\Objects\Seat.cs" />
     <Compile Include="Assets\Scripts\Objects\Relief.cs" />
     <Compile Include="Assets\Scripts\Objects\Urinal.cs" />
+    <Compile Include="Assets\Scripts\Bar.cs" />
     <Compile Include="Assets\Scripts\WaitingRoom.cs" />
     <Compile Include="Assets\Scripts\Characters\Customer.cs" />
     <Compile Include="Assets\Scripts\Objects\Sink.cs" />
+    <Compile Include="Assets\Scripts\Characters\Emote.cs" />
     <Compile Include="Assets\Scripts\Objects\CustomerInteractable.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\Objects\Toilet.cs" />
@@ -71,8 +75,6 @@
     <Compile Include="Assets\Scripts\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\DoorwayQueue.cs" />
-    <Compile Include="Assets\Scripts\Bar.cs" />
-    <Compile Include="Assets\Scripts\Objects\Seat.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Notes\Notes.txt" />

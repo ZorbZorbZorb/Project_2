@@ -100,7 +100,7 @@ public class Bladder {
         // Randomly give maximum bladder size from 550 to 1500
         Max = Random.Range(550, 1500);
         // Randomly give fullness of 40% to 100%
-        double fullness = 0.01d * Random.Range(40, 100);
+        double fullness = 0.01d * Random.Range(20, 60);
         Amount = fullness * Max;
         // Subtract some control depending on how full they already are
         if ( fullness > 0.8d ) {

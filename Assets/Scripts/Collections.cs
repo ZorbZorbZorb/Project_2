@@ -6,8 +6,11 @@ using System.Linq;
 
 public class Collections : MonoBehaviour {
     static public Collections collections = null;
+
     private void Awake() {
         collections = this;
+
+        Emote.LoadResources();
 
         spriteStallClosed = Resources.Load<Sprite>("Sprites/Entities/Stall_closed");
         spriteStallOpened = Resources.Load<Sprite>("Sprites/Entities/Stall_opened");
@@ -114,7 +117,7 @@ public class Collections : MonoBehaviour {
         State5,  // Wetting
         State6,  // Wet
     }
-    public enum IReliefType {
+    public enum ReliefType {
         None,
         Toilet,
         Urinal,

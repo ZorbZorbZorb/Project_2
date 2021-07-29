@@ -8,9 +8,9 @@ using Assets.Scripts.Interfaces;
 using System.Linq;
 using Assets.Scripts.Objects;
 using UnityEngine.EventSystems;
+using Assets.Scripts.Characters;
 
 public class Customer : MonoBehaviour {
-
     void Start() {
         WetSelfLeaveBathroomDelayRemaining = WetSelfLeaveBathroomDelay;
         if (Destination == null) {
@@ -19,20 +19,64 @@ public class Customer : MonoBehaviour {
         UID = GameController.GetUid();
         Menu.enabled = false;
 
-        InitializeCustomer();
-        SetupButtons();
-    }
-
-    public void InitializeCustomer() {
-
         bladder = new Bladder();
         bladder.SetupBladder();
 
         UrinateStartDelay = 4d;
         UrinateStopDelay = 6d;
+
+        Emotes = new Emotes(EmoteSpriteRenderer);
+
+        SetupButtons();
     }
 
-    private Collections.CustomerDesperationState CalculateState() {
+    void Update() {
+        // Fastest possible exit
+        if ( !Active ) {
+            return;
+        }
+
+        MinTimeAtBarNow += Time.deltaTime;
+        MinTimeBetweenChecksNow += Time.deltaTime;
+
+        // Update bladder
+        bladder.Update();
+
+        // Update peeing logic
+        PeeLogicUpdate();
+
+        // Calculate outward state to show to player
+        DesperationState = GetDesperationState();
+
+        // Think
+        Think();
+
+        // Update anim
+        SpriteUpdate();
+        // Emote think
+        Emotes.Update();
+
+        if (Menu.enabled) {
+            // Menu auto-close
+            if (!CanDisplayMenu()) {
+                MenuClose();
+            } 
+            // Menu update
+            else {
+                MenuUpdate();
+            }
+        }
+
+        // Move sprite
+        MoveUpdate();
+
+        // Debug logging
+        FrameActionDebug();
+    }
+
+    public delegate void NextAction();
+
+    private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
             return Collections.CustomerDesperationState.State5;
         }
@@ -56,49 +100,8 @@ public class Customer : MonoBehaviour {
         }
     }
 
-    void Update() {
-        // Fastest possible exit
-        if ( !Active ) {
-            return;
-        }
-
-        // Update bladder
-        bladder.Update();
-
-        // Update peeing logic
-        PeeLogicUpdate();
-
-        // Calculate outward state to show to player
-        DesperationState = CalculateState();
-
-        // Think
-        Think();
-
-        // Update anim
-        SpriteUpdate();
-        // Update bubble
-        ThoughtBubbleUpdate();
-
-        if (Menu.enabled) {
-            // Menu auto-close
-            if (!CanDisplayMenu()) {
-                MenuClose();
-            } 
-            // Menu update
-            else {
-                MenuUpdate();
-            }
-        }
-
-        // Move sprite
-        MoveUpdate();
-
-        // Debug logging
-        FrameActionDebug();
-        MiscDebug();
-    }
-
     void Think() {
+        // If about to leave or has left
         if ( position == Collections.Location.Outside ) {
             if (AtDestination()) {
                 GameController.controller.RemoveCustomer(this);
@@ -116,9 +119,7 @@ public class Customer : MonoBehaviour {
 
         // If not in any bathroom and bladder is full, go to bathroom
         else if ( FeelsNeedToGo ) {
-
             if (MinTimeBetweenChecksNow < MinTimeBetweenChecks) {
-                MinTimeBetweenChecksNow += Time.deltaTime;
                 return;
             }
             else {
@@ -126,7 +127,6 @@ public class Customer : MonoBehaviour {
 
                 if ( position == Collections.Location.Bar ) {
                     if ( MinTimeAtBarNow < MinTimeAtBar ) {
-                        MinTimeAtBarNow += Time.deltaTime;
                         return;
                     }
                     else {
@@ -137,17 +137,6 @@ public class Customer : MonoBehaviour {
                     }
                 }
             }
-        }
-    }
-
-    void MiscDebug() {
-        lastState = DesperationState;
-        if ( Time.frameCount % 2000 == 0 ) {
-            //string logString2 = $"state: {state} bladder: {Math.Round(bladder.Amount)} / {bladder.Max} control: {Math.Round(bladder.ControlRemaining)} losecontrol:{bladder.LosingControl} lossControlBuffer:{Math.Round(bladder.LossOfControlTimeRemaining)} emptying: {bladder.Emptying}";
-            //Debug.Log(logString2);
-        }
-        if ( bladder.StartedLosingControlThisFrame ) {
-            Debug.Log($"Customer {UID} started losing control at {Math.Round(bladder.Amount)} / {Math.Round(bladder.Max)} bladder");
         }
     }
 
@@ -190,22 +179,21 @@ public class Customer : MonoBehaviour {
     private void PeeLogicUpdate() {
         FeelsNeedToGo = bladder.FeltNeed > 0.50d;
 
-
         // Can customer relieve themselves now?
-        Collections.IReliefType reliefType = Occupying?.ReliefType ?? Collections.IReliefType.None;
+        Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
 
         // Get the relief the customer is occupying, if applicable
-        Relief relief = reliefType == Collections.IReliefType.None ? null : (Relief)Occupying;
+        Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
         
         // Behavior depending on if have reached an area they can relieve themselves
-        if (reliefType == Collections.IReliefType.None) {
+        if (reliefType == Collections.ReliefType.None) {
             // If should wet now
             if ( bladder.ShouldWetNow ) {
-                StartWettingSelf();
+                BeginPeeingSelf();
             }
             // If finishing wetting
             else if ( IsWetting && !bladder.Emptying ) {
-                StopWettingSelf();
+                EndPeeingSelf();
             }
         }
         else {
@@ -216,7 +204,7 @@ public class Customer : MonoBehaviour {
                     RemainingUrinateStopDelay -= 1 * Time.deltaTime;
                 }
                 else {
-                    ReliefEnd();
+                    EndPeeingWithThing();
                 }
             }
             // If bladder isnt emptying, set it to empty
@@ -233,8 +221,13 @@ public class Customer : MonoBehaviour {
             // Wait for bladder to empty.
             // Display emptying bladder animation
             else if ( bladder.Emptying ) {
-            }
             bladder.ShouldWetNow = false;
+                // Update pee stream emote
+                Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
+                if (Emotes.current != emote) {
+                    Emotes.Emote(emote);
+                }
+            }
         }
     }
 
@@ -270,6 +263,7 @@ public class Customer : MonoBehaviour {
     public float CanReenterBathroomIn = 0f;
     public bool IsRelievingSelf = false;
     public bool IsFinishedPeeing;
+    [SerializeField]
     public bool IsWetting = false;
     public bool CanWetNow = false;
     public bool IsWet = false;
@@ -303,19 +297,7 @@ public class Customer : MonoBehaviour {
     public double MoveSpeed;
 
     #region Sprites
-    [SerializeField]
-    public SpriteRenderer ThoughtBubbleSpriteRenderer;
     public void SpriteUpdate() {
-        // Sprite changing / sprite hiding
-        if ( Occupying != null && Occupying.HidesCustomer ) {
-            if ( AtDestination() ) {
-                //SRenderer.enabled = false;
-            }
-        }
-        else {
-            //SRenderer.enabled = true;
-        }
-
         // Set the sprite
         Sprite sprite = Collections.GetPersonSprite(this);
         if (sprite != SRenderer.sprite) {
@@ -342,25 +324,9 @@ public class Customer : MonoBehaviour {
         }
     }
 
-    private void ThoughtBubbleUpdate() {
-        if (ActionState == Collections.CustomerActionState.None) {
-            ThoughtBubbleSpriteRenderer.enabled = false;
-            return;
-        }
-
-        Sprite bubbleSprite = Collections.GetBubbleSprite(this);
-        if (bubbleSprite == null) {
-            ThoughtBubbleSpriteRenderer.enabled = false;
-        }
-        else {
-            ThoughtBubbleSpriteRenderer.enabled = true;
-            ThoughtBubbleSpriteRenderer.sprite = bubbleSprite;
-        }
-    }
-
-    private void BladderDisplayUpdate() {
-
-    }
+    // Class that contains all of the emotes / thought bubbles / etc for the person
+    [SerializeField] public SpriteRenderer EmoteSpriteRenderer;
+    public Emotes Emotes;
     #endregion
 
     #region Desperation/Wetting/Peeing
@@ -388,9 +354,11 @@ public class Customer : MonoBehaviour {
         }
         throw new NotImplementedException();
     }
-    private Collections.IReliefType OccupyingReliefType => Occupying?.ReliefType ?? Collections.IReliefType.None;
-    public void ReliefStart() {
+    private Collections.ReliefType ReliefType => Occupying?.ReliefType ?? Collections.ReliefType.None;
+
+    public void BeginPeeingWithThing() {
         IsRelievingSelf = true;
+        Emotes.Emote(Emote.PantsDown);
         // Add a delay between starting and stopping urination
         RemainingUrinateStartDelay = UrinateStartDelay;
         RemainingUrinateStopDelay = UrinateStopDelay;
@@ -399,27 +367,28 @@ public class Customer : MonoBehaviour {
             RemainingUrinateStopDelay = RemainingUrinateStopDelay * 2.5d;
             Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
         }
-        Collections.IReliefType reliefType = Occupying?.ReliefType ?? Collections.IReliefType.None;
+        Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
         switch ( reliefType ) {
-            case Collections.IReliefType.Toilet:
+            case Collections.ReliefType.Toilet:
             ActionState = Collections.CustomerActionState.ToiletPantsDown;
             break;
-            case Collections.IReliefType.Urinal:
+            case Collections.ReliefType.Urinal:
             ActionState = Collections.CustomerActionState.UrinalPantsDown;
             break;
-            case Collections.IReliefType.Sink:
+            case Collections.ReliefType.Sink:
             ActionState = Collections.CustomerActionState.SinkPantsDown;
             break;
-            case Collections.IReliefType.Towel:
+            case Collections.ReliefType.Towel:
             ActionState = Collections.CustomerActionState.TowelPantsDown;
             break;
         }
     }
-    public void ReliefEnd() {
+    public void EndPeeingWithThing() {
         Debug.Log($"Customer {UID} finished relieving themselves.");
         IsRelievingSelf = false;
         if ( IsWet ) {
             position = Collections.Location.Outside;
+            Emotes.Emote(null);
             Occupying.OccupiedBy = null;
             Occupying = null;
             ActionState = Collections.CustomerActionState.None;
@@ -430,18 +399,20 @@ public class Customer : MonoBehaviour {
             Seat seat = Bar.GetOpenSeat();
             seat.MoveCustomerIntoSpot(this);
         }
-        if ( OccupyingReliefType == Collections.IReliefType.Toilet ) {
+        if ( ReliefType == Collections.ReliefType.Toilet ) {
             ( (Toilet)Occupying ).SRenderer.sprite = Collections.spriteStallOpened;
         }
     }
-    public void StartWettingSelf() {
+    public void BeginPeeingSelf() {
         bladder.Emptying = true;
+        Emotes.Emote(Emote.GetPeeStreamEmote(bladder.Percentage));
         IsWet = true;
         IsWetting = true;
         ActionState = Collections.CustomerActionState.Wetting;
     }
-    public void StopWettingSelf() {
+    public void EndPeeingSelf() {
         Debug.Log("StopWettingSelf");
+        Emotes.Emote(null);
         IsWetting = false;
         ActionState = Collections.CustomerActionState.None;
     }
@@ -630,7 +601,7 @@ public class Customer : MonoBehaviour {
     public void EnterRelief(Relief relief) {
         position = Collections.Location.Relief;
         UseInteractable(relief);
-        ReliefStart();
+        BeginPeeingWithThing();
     }
     // Goes to the doorway queue
     public bool EnterDoorway() {

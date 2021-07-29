@@ -6,7 +6,7 @@ using UnityEngine;
 public class Urinal : Relief {
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = -5, z = -1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -10, z = -1 };
-    public override Collections.IReliefType ReliefType => Collections.IReliefType.Urinal;
+    public override Collections.ReliefType ReliefType => Collections.ReliefType.Urinal;
     public override bool HidesCustomer => false;
     public override string DisplayName => "Urinal";
     public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.UrinalPantsDown;
