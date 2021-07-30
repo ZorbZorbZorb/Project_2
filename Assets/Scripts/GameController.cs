@@ -83,11 +83,13 @@ public class GameController : MonoBehaviour {
         customers.Add(newCustomer);
 
         // Customer count changes range of bladder fullness for next customer to enter
-        int wiggleRoom = 20;
-        int min = 75 / ( customers.Count() + 1 );
-        min = Random.Range(min - wiggleRoom, min + wiggleRoom);
-        int max = 90 / ( (int)Math.Floor(customers.Count() / 2d) + 1 );
-        max = Random.Range(max - wiggleRoom, max + wiggleRoom);
+        int min = 20;
+        int max = 105;
+        if (customers.Count() > 5) {
+            min = 10;
+            max = 80;
+        }
+        Debug.LogWarning($"{min}, {max}");
 
         newCustomer.SetupCustomer(min, max);
         Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
@@ -97,7 +99,8 @@ public class GameController : MonoBehaviour {
         bool enteredDoorway = false;
         Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
         Debug.Log($"{newCustomer.bladder.FeltNeed}");
-        if (newCustomer.FeelsNeedToGo && 
+        if (newCustomer.FeelsNeedToGo &&
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 || 
             newCustomer.DesperationState == Collections.CustomerDesperationState.State5) {
 

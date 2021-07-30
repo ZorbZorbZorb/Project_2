@@ -22,6 +22,6 @@ public class Seat : CustomerInteractable {
         customer.StopOccupyingAll();
         customer.Occupying = this;
         OccupiedBy = customer;
-        customer.MoveToVector3(CustomerPositionF);
+        customer.MoveToVector3(customer.Gender == 'm' ? CustomerPositionM : CustomerPositionF);
     }
 }

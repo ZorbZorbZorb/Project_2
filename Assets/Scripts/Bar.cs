@@ -17,6 +17,7 @@ public class Bar : MonoBehaviour {
 
     private void Awake() {
         Singleton = this;
+        Customer.Bar = this;
     }
 
 }

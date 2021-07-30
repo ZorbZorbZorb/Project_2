@@ -12,6 +12,7 @@ using Assets.Scripts.Characters;
 
 public class Customer : MonoBehaviour {
     void Start() {
+
         WetSelfLeaveBathroomDelayRemaining = WetSelfLeaveBathroomDelay;
         if (Destination == null) {
             Destination = this.transform.position;
@@ -92,10 +93,10 @@ public class Customer : MonoBehaviour {
         else if ( bladder.FeltNeed > 0.80d ) {
             return Collections.CustomerDesperationState.State3;
         }
-        else if ( bladder.Percentage > 0.65d) {
+        else if ( bladder.FeltNeed > 0.55d) {
             return Collections.CustomerDesperationState.State2;
         }
-        else if ( bladder.Percentage > 0.40d ) {
+        else if ( FeelsNeedToGo ) {
             return Collections.CustomerDesperationState.State1;
         }
         else {
@@ -173,7 +174,7 @@ public class Customer : MonoBehaviour {
 
 
     private void PeeLogicUpdate() {
-        FeelsNeedToGo = bladder.FeltNeed > 0.50d;
+        FeelsNeedToGo = bladder.FeltNeed > 0.40d;
         DesperationState = GetDesperationState();
 
         // Can customer relieve themselves now?
@@ -247,7 +248,7 @@ public class Customer : MonoBehaviour {
     [SerializeField]
     public SpriteRenderer SRenderer;
 
-    public Bar Bar = Bar.Singleton;
+    public static Bar Bar;
 
     public bool Active = false;
     public int UID = GameController.GetUid();
@@ -544,8 +545,8 @@ public class Customer : MonoBehaviour {
     #region MenuActions
     // Sends this customer back to the establishment unrelieved
     public void MenuOptionDismiss() {
-        Seat seat = Bar.GetOpenSeat();
-        seat.MoveCustomerIntoSpot(this);
+        Seat seat = Bar.Singleton.GetOpenSeat();
+        EnterBar(seat);
     }
     // Sends this customer to the waiting room
     public WaitingSpot MenuOptionGotoWaiting() {
@@ -607,12 +608,10 @@ public class Customer : MonoBehaviour {
         }
     }
     // Goes back to the bar
-    public void EnterBar() {
-        StopOccupyingAll();
-        position = Collections.Location.Bar;
+    public void EnterBar(Seat seat) {
         MinTimeAtBarNow = 0f;
         MinTimeBetweenChecksNow = 0f;
-        MoveToVector3(Collections.OffScreenBottom);
+        seat.MoveCustomerIntoSpot(this);
     }
     // Fully leaves the area
     public void Leave() {
