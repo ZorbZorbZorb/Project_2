@@ -38,6 +38,7 @@ public class Customer : MonoBehaviour {
             return;
         }
 
+        TotalTimeAtBar += Time.deltaTime;
         MinTimeAtBarNow += Time.deltaTime;
         MinTimeBetweenChecksNow += Time.deltaTime;
 
@@ -273,6 +274,7 @@ public class Customer : MonoBehaviour {
     private double RemainingUrinateStopDelay;
     public float WetSelfLeaveBathroomDelay = 6f;
     public float WetSelfLeaveBathroomDelayRemaining;
+    public float TotalTimeAtBar = 0f;
     public float MinTimeAtBar = 60f;
     public float MinTimeAtBarNow = 70f;
     public float MinTimeBetweenChecks = 8f;
