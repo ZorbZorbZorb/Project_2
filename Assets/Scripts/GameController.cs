@@ -80,9 +80,6 @@ public class GameController : MonoBehaviour {
     public Customer CreateCustomer() {
         Customer newCustomer = Instantiate(templateCustomer);
         newCustomer.Gender = Random.Range(0,3) == 0 ? 'm' : 'f';
-        // Logging
-        string logString2 = $"Customer {newCustomer.UID} created. bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}";
-        Debug.Log(logString2);
         customers.Add(newCustomer);
 
         // Customer count changes range of bladder fullness for next customer to enter
@@ -93,10 +90,12 @@ public class GameController : MonoBehaviour {
         max = Random.Range(max - wiggleRoom, max + wiggleRoom);
 
         newCustomer.SetupCustomer(min, max);
-        newCustomer.AnnounceStateChange();
+        Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
         newCustomer.Active = true;
         Seat seat = Bar.Singleton.GetOpenSeat();
         seat.MoveCustomerIntoSpot(newCustomer);
+
+
         return newCustomer;
     }
     public void RemoveCustomer(Customer customer) {
