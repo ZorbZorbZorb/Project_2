@@ -144,6 +144,9 @@ public class Customer : MonoBehaviour {
 
     private Collections.CustomerActionState LastActionState;
     private void FrameActionDebug() {
+        if (!Active) {
+            return;
+        }
         if ( LastActionState != ActionState ) {
             LastActionState = ActionState;
             Debug.Log($"Customer {UID} new action: {ActionState}");
@@ -151,32 +154,19 @@ public class Customer : MonoBehaviour {
 
         // Desperation State Logging
         if ( lastState != DesperationState ) {
-            if ( Time.frameCount > 10 ) {
-                AnnounceStateChange();
-            }
-        }
-        else {
-            if ( Time.frameCount % 1000 == 0 ) {
-                AnnounceState();
-            }
-        }
-
-        void AnnounceStateChange() {
-            string logString = "";
-            logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(bladder.Amount)} / {bladder.Max} ({Math.Round(bladder.Percentage, 2)}%)";
-            logString += $"Control: {Math.Round(bladder.ControlRemaining)}";
-            logString += $"Need: {Math.Round(bladder.FeltNeed, 2)} Curve: {Math.Round(bladder.FeltNeedCurve, 2)}";
-            Debug.LogWarning(logString);
-        }
-        void AnnounceState() {
-            string logString = "";
-            logString += $"Customer {UID} {DesperationState} Bladder: {Math.Round(bladder.Amount)} / {bladder.Max} ({Math.Round(bladder.Percentage, 2)}%)";
-            logString += $"Control: {Math.Round(bladder.ControlRemaining)}";
-            logString += $"Need: {Math.Round(bladder.FeltNeed, 2)} Curve: {Math.Round(bladder.FeltNeedCurve, 2)}";
-            logString += $"Emptying: {bladder.Emptying} IsWetting: {IsWetting} IsWet: {IsWet} IsFinishedPeeing: {IsFinishedPeeing}";
-            Debug.Log(logString);
+            lastState = DesperationState;
+            AnnounceStateChange();
         }
     }
+    public void AnnounceStateChange() {
+        string logString = "";
+        logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(bladder.Amount)} / {bladder.Max} ({Math.Round(bladder.Percentage, 2)}%)";
+        logString += $"Control: {Math.Round(bladder.ControlRemaining)}";
+        logString += $"Need: {Math.Round(bladder.FeltNeed, 2)} Curve: {Math.Round(bladder.FeltNeedCurve, 2)}";
+        Debug.LogWarning(logString);
+    }
+
+
 
     private void PeeLogicUpdate() {
         FeelsNeedToGo = bladder.FeltNeed > 0.50d;

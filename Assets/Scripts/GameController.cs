@@ -93,6 +93,7 @@ public class GameController : MonoBehaviour {
         max = Random.Range(max - wiggleRoom, max + wiggleRoom);
 
         newCustomer.SetupCustomer(min, max);
+        newCustomer.AnnounceStateChange();
         newCustomer.Active = true;
         Seat seat = Bar.Singleton.GetOpenSeat();
         seat.MoveCustomerIntoSpot(newCustomer);
