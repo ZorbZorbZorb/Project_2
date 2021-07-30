@@ -30,6 +30,9 @@ public class Customer : MonoBehaviour {
 
         UrinateStartDelay = 4d;
         UrinateStopDelay = 6d;
+
+        bladder.Update();
+        PeeLogicUpdate();
     }
 
     void Update() {
@@ -47,9 +50,6 @@ public class Customer : MonoBehaviour {
 
         // Update peeing logic
         PeeLogicUpdate();
-
-        // Calculate outward state to show to player
-        DesperationState = GetDesperationState();
 
         // Think
         Think();
@@ -135,7 +135,10 @@ public class Customer : MonoBehaviour {
                     else {
                         // Try to enter the bathroom
                         if ( !EnterDoorway() ) {
-                            MinTimeAtBarNow = MinTimeAtBar / 2f;
+                            MinTimeAtBarNow = MinTimeAtBar / 1.5f;
+                        }
+                        else {
+                            MinTimeAtBarNow = 0f;
                         }
                     }
                 }
@@ -171,6 +174,7 @@ public class Customer : MonoBehaviour {
 
     private void PeeLogicUpdate() {
         FeelsNeedToGo = bladder.FeltNeed > 0.50d;
+        DesperationState = GetDesperationState();
 
         // Can customer relieve themselves now?
         Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
@@ -276,9 +280,9 @@ public class Customer : MonoBehaviour {
     public float WetSelfLeaveBathroomDelayRemaining;
     public float TotalTimeAtBar = 0f;
     public float MinTimeAtBar = 60f;
-    public float MinTimeAtBarNow = 70f;
+    public float MinTimeAtBarNow = 0f;
     public float MinTimeBetweenChecks = 8f;
-    public float MinTimeBetweenChecksNow = 9f;
+    public float MinTimeBetweenChecksNow = 0f;
 
     // Position
     public Collections.CustomerActionState ActionState = Collections.CustomerActionState.None;

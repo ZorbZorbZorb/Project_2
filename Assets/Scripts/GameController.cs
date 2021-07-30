@@ -92,9 +92,23 @@ public class GameController : MonoBehaviour {
         newCustomer.SetupCustomer(min, max);
         Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
         newCustomer.Active = true;
-        Seat seat = Bar.Singleton.GetOpenSeat();
-        seat.MoveCustomerIntoSpot(newCustomer);
 
+        // If customer enters bar and needs to go badly try to enter bathroom right away
+        bool enteredDoorway = false;
+        Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
+        Debug.Log($"{newCustomer.bladder.FeltNeed}");
+        if (newCustomer.FeelsNeedToGo && 
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State4 || 
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State5) {
+
+            enteredDoorway = newCustomer.EnterDoorway();
+        }
+
+        // Else sit right down at the bar and wait
+        if (!enteredDoorway) { 
+            Seat seat = Bar.Singleton.GetOpenSeat();
+            seat.MoveCustomerIntoSpot(newCustomer);
+        }
 
         return newCustomer;
     }
