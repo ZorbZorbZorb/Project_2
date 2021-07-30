@@ -284,9 +284,9 @@ public class Customer : MonoBehaviour {
     public float WetSelfLeaveBathroomDelay = 6f;
     public float WetSelfLeaveBathroomDelayRemaining;
     public float MinTimeAtBar = 60f;
-    public float MinTimeAtBarNow = 0.0f;
+    public float MinTimeAtBarNow = 70f;
     public float MinTimeBetweenChecks = 8f;
-    public float MinTimeBetweenChecksNow = 0.0f;
+    public float MinTimeBetweenChecksNow = 9f;
 
     // Position
     public Collections.CustomerActionState ActionState = Collections.CustomerActionState.None;
