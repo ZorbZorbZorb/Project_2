@@ -96,11 +96,11 @@ public class Bladder {
     private void ResetFrameStates() {
         StartedLosingControlThisFrame = false;
     }
-    public void SetupBladder() {
+    public void SetupBladder(int min, int max) {
         // Randomly give maximum bladder size from 550 to 1500
         Max = Random.Range(550, 1500);
-        // Randomly give fullness of 40% to 100%
-        double fullness = 0.01d * Random.Range(20, 60);
+        // Randomly give fullness of min% to max%
+        double fullness = 0.01d * Random.Range(min, max);
         Amount = fullness * Max;
         // Subtract some control depending on how full they already are
         if ( fullness > 0.8d ) {

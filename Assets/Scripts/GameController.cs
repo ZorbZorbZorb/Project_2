@@ -84,6 +84,15 @@ public class GameController : MonoBehaviour {
         string logString2 = $"Customer {newCustomer.UID} created. bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}";
         Debug.Log(logString2);
         customers.Add(newCustomer);
+
+        // Customer count changes range of bladder fullness for next customer to enter
+        int wiggleRoom = 20;
+        int min = 50 / ( customers.Count() + 1 );
+        min = Random.Range(min - wiggleRoom, min + wiggleRoom);
+        int max = 90 / ( (int)Math.Floor(customers.Count() / 2d) + 1 );
+        max = Random.Range(max - wiggleRoom, max + wiggleRoom);
+
+        newCustomer.SetupCustomer(min, max);
         newCustomer.Active = true;
         Seat seat = Bar.Singleton.GetOpenSeat();
         seat.MoveCustomerIntoSpot(newCustomer);

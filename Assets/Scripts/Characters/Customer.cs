@@ -19,15 +19,17 @@ public class Customer : MonoBehaviour {
         UID = GameController.GetUid();
         Menu.enabled = false;
 
-        bladder = new Bladder();
-        bladder.SetupBladder();
-
-        UrinateStartDelay = 4d;
-        UrinateStopDelay = 6d;
-
         Emotes = new Emotes(EmoteSpriteRenderer);
 
         SetupButtons();
+    }
+
+    public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        bladder = new Bladder();
+        bladder.SetupBladder(minBladderPercent, maxBladderPercent);
+
+        UrinateStartDelay = 4d;
+        UrinateStopDelay = 6d;
     }
 
     void Update() {
