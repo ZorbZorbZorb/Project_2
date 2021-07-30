@@ -542,14 +542,10 @@ public class Customer : MonoBehaviour {
     public void MenuOptionDismiss() {
         Seat seat = Bar.GetOpenSeat();
         seat.MoveCustomerIntoSpot(this);
-        MinTimeAtBarNow = 0f;
-        MinTimeBetweenChecksNow = 0f;
     }
     // Sends this customer to the waiting room
     public WaitingSpot MenuOptionGotoWaiting() {
         if ( WaitingRoom.waitingRoom.HasOpenWaitingSpot() ) {
-            MinTimeAtBarNow = 0f;
-            MinTimeBetweenChecksNow = 0f;
             WaitingSpot waitingSpot = WaitingRoom.waitingRoom.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.WaitingRoom;
@@ -562,8 +558,6 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the toilets
     public bool MenuOptionGotoToilet() {
-        MinTimeAtBarNow = 0f;
-        MinTimeBetweenChecksNow = 0f;
         if (Bathroom.bathroom.HasToiletAvailable) {
             EnterRelief(Bathroom.bathroom.GetToilet());
             return true;
@@ -571,8 +565,6 @@ public class Customer : MonoBehaviour {
         return false;
     }
     public bool MenuOptionGotoUrinal() {
-        MinTimeAtBarNow = 0f;
-        MinTimeBetweenChecksNow = 0f;
         if (Bathroom.bathroom.HasUrinalAvailable) {
             EnterRelief(Bathroom.bathroom.GetUrinal());
             return true;
@@ -580,8 +572,6 @@ public class Customer : MonoBehaviour {
         return false;
     }
     public bool MenuOptionGotoSink() {
-        MinTimeAtBarNow = 0f;
-        MinTimeBetweenChecksNow = 0f;
         if (Bathroom.bathroom.HasSinkAvailable) {
             EnterRelief(Bathroom.bathroom.GetSink());
             return true;
@@ -616,6 +606,8 @@ public class Customer : MonoBehaviour {
     public void EnterBar() {
         StopOccupyingAll();
         position = Collections.Location.Bar;
+        MinTimeAtBarNow = 0f;
+        MinTimeBetweenChecksNow = 0f;
         MoveToVector3(Collections.OffScreenBottom);
     }
     // Fully leaves the area
