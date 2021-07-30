@@ -38,13 +38,13 @@ public class GameController : MonoBehaviour {
         timeAcc += Time.deltaTime;
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
-            DespawnCustomerInBar();
+            DespawnCustomerOutside();
             Think();
         }
     }
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
-    private void DespawnCustomerInBar() {
-        Customer[] targets = customers.Where(x => x.position == Collections.Location.Bar && x.AtDestination() && x.bladder.Percentage < 0.15d && x.Active).ToArray();
+    private void DespawnCustomerOutside() {
+        Customer[] targets = customers.Where(x => x.position == Collections.Location.Outside && x.AtDestination() && x.Active).ToArray();
         foreach(Customer target in targets) {
             RemoveCustomer(target);
         }
@@ -87,7 +87,7 @@ public class GameController : MonoBehaviour {
 
         // Customer count changes range of bladder fullness for next customer to enter
         int wiggleRoom = 20;
-        int min = 50 / ( customers.Count() + 1 );
+        int min = 75 / ( customers.Count() + 1 );
         min = Random.Range(min - wiggleRoom, min + wiggleRoom);
         int max = 90 / ( (int)Math.Floor(customers.Count() / 2d) + 1 );
         max = Random.Range(max - wiggleRoom, max + wiggleRoom);
