@@ -83,11 +83,15 @@ public class GameController : MonoBehaviour {
         customers.Add(newCustomer);
 
         // Customer count changes range of bladder fullness for next customer to enter
-        int min = 20;
+        int min = 30;
         int max = 105;
-        if (customers.Count() > 5) {
+        if (customers.Count() > 8) {
             min = 10;
             max = 80;
+        }
+        if (customers.Count() == 1) {
+            min = 85;
+            max = 98;
         }
         Debug.LogWarning($"{min}, {max}");
 
@@ -97,8 +101,8 @@ public class GameController : MonoBehaviour {
 
         // If customer enters bar and needs to go badly try to enter bathroom right away
         bool enteredDoorway = false;
-        Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
-        Debug.Log($"{newCustomer.bladder.FeltNeed}");
+        //Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
+        //Debug.Log($"{newCustomer.bladder.FeltNeed}");
         if (newCustomer.FeelsNeedToGo &&
             newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 || 

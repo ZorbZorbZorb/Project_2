@@ -13,30 +13,28 @@ public class Emote {
     public static Emote PantsDown;
     public static Emote PantsUp;
 
-    public static Emote[] PeeStreamEmotes = new Emote[] {PeeWeak, PeeMedium, PeeStrong};
+    public static Emote[] PeeStreamEmotes;
 
     public static Emote GetPeeStreamEmote(double BladderPercentage) {
         // I mean, this is kinda a physical thing not a mental thing so percentage should be the best thing to use.
-        return PeeStreamEmotes[(int)(Math.Ceiling(BladderPercentage * PeeStreamEmotes.Length)) - 1];
-    }
-
-    public static void LoadResources() {
-        PeeStrong = new Emote("Sprites/Bubbles/Stream_3");
-        PeeMedium = new Emote("Sprites/Bubbles/Stream_2");
-        PeeWeak = new Emote("Sprites/Bubbles/Stream_1");
-        PantsDown = new Emote("Sprites/Bubbles/bubble_zipper_down");
-        PantsUp = new Emote("Sprites/Bubbles/bubble_ziper_up");
+        int index = (int)(Math.Round((BladderPercentage + 0.1d) * PeeStreamEmotes.Length));
+        Debug.Log(index);
+        index = Math.Max(index, 0);
+        index = Math.Min(index, PeeStreamEmotes.Length - 1);
+        return PeeStreamEmotes[index];
     }
     #endregion
 
     #region Instance
-    public Sprite Sprite {
-        get;
-        private set;
-    }
+    public Sprite Sprite;
+    public string Path;
 
     public Emote(string spritePath) {
+        Path = spritePath;
         Sprite = Resources.Load<Sprite>(spritePath);
+        if (Sprite == null) {
+            throw new System.IO.FileNotFoundException(spritePath);
+        }
     }
     #endregion
 }

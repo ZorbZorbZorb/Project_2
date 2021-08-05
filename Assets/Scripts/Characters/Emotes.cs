@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 
 namespace Assets.Scripts.Characters {
+    [System.Serializable]
     public class Emotes {
         // https://i.imgur.com/Zul9DoY_d.webp?maxwidth=760&fidelity=grand
         [SerializeField]
         public SpriteRenderer SpriteRenderer;
         public Emote current = null;
-        public float remaining = float.NaN;
+        public float? remaining = null;
         public void Update() {
             if ( current != null ) {
                 // Abort if emote is permanent
-                if ( remaining == float.NaN ) {
+                if ( remaining == null) {
                     return;
                 }
                 // Decrease timer if the timer isnt expired
@@ -19,25 +20,20 @@ namespace Assets.Scripts.Characters {
                 }
                 // Stop rendering, timer elapsed
                 else {
-                    Render(null);
+                    Emote(null);
                 }
             }
         }
-        public void Emote(Emote emote) => Emote(emote, float.NaN);
-        public void Emote(Emote emote, float time) {
-            Render(emote?.Sprite);
-            if ( time != float.NaN ) {
+        public void Emote(Emote emote) => Emote(emote, null);
+        public void Emote(Emote emote, float? time) {
+            Debug.Log("Rendering " + emote == null ? "[NULL]" : emote.Path);
+            current = emote;
+            SpriteRenderer.sprite = emote?.Sprite;
+            if ( time != null && emote != null ) {
                 remaining = time;
             }
-        }
-        private void Render(Sprite sprite) {
-            if ( sprite == null ) {
-                current = null;
-                SpriteRenderer.enabled = false;
-            }
             else {
-                SpriteRenderer.sprite = sprite;
-                SpriteRenderer.enabled = true;
+                remaining = null;
             }
         }
 

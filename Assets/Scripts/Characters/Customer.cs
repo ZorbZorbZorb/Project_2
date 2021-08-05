@@ -186,7 +186,8 @@ public class Customer : MonoBehaviour {
         // Behavior depending on if have reached an area they can relieve themselves
         if (reliefType == Collections.ReliefType.None) {
             // If should wet now
-            if ( bladder.ShouldWetNow ) {
+            if ( bladder.ShouldWetNow || CheatPeeNow ) {
+                CheatPeeNow = false;
                 BeginPeeingSelf();
             }
             // If finishing wetting
@@ -222,6 +223,11 @@ public class Customer : MonoBehaviour {
             bladder.ShouldWetNow = false;
                 // Update pee stream emote
                 Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
+                if (emote == null) {
+                    Debug.Break();
+                    throw new NullReferenceException();
+                }
+                Debug.Log(emote.Sprite.texture.ToString());
                 if (Emotes.current != emote) {
                     Emotes.Emote(emote);
                 }
@@ -247,6 +253,8 @@ public class Customer : MonoBehaviour {
 
     [SerializeField]
     public SpriteRenderer SRenderer;
+
+    public bool CheatPeeNow = false;
 
     public static Bar Bar;
 
@@ -404,7 +412,12 @@ public class Customer : MonoBehaviour {
     }
     public void BeginPeeingSelf() {
         bladder.Emptying = true;
-        Emotes.Emote(Emote.GetPeeStreamEmote(bladder.Percentage));
+        Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
+        if ( emote == null ) {
+            Debug.Break();
+            throw new NullReferenceException();
+        }
+        Emotes.Emote(emote);
         IsWet = true;
         IsWetting = true;
         ActionState = Collections.CustomerActionState.Wetting;
