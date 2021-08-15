@@ -9,14 +9,14 @@ namespace Assets.Scripts.Characters {
         public RectTransform BladderCircleTransform;
         [SerializeField]
         public SpriteRenderer EmoteSpriteRenderer;
-        [SerializeField] public double ws = -0.6d;
-        [SerializeField] public double wa = 1.3d;
-        [SerializeField] public double wd = 2d;
-        [SerializeField] public double hp = 0.2;
+        [SerializeField] public double bladderWidthCalculationFactor1 = -0.6d;
+        [SerializeField] public double bladderWidthCalculationFactor2 = 1.3d;
+        [SerializeField] public double bladderWidthCalculationFactor3 = 2d;
+        [SerializeField] public double bladderHeightCalculationFactor1 = 0.2;
 
         public Emote currentEmote = null;
         public float? remaining = null;
-        private bool bladderCircleActive = true;
+        private bool bladderCircleActive = false;
         public readonly Customer Customer;
         public void Update() {
             // Update emotes
@@ -43,40 +43,16 @@ namespace Assets.Scripts.Characters {
         }
         void BladderDisplayUpdate() {
             // Update bladder display
-            if ( true || bladderCircleActive ) {
+            if (bladderCircleActive) {
                 double width;
                 double height;
                 double value;
                 value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
 
-                width = (Math.Sin((value + ws ) * Math.PI) + wa) / wd;
-                height = Math.Max(0.15, Customer.bladder.Percentage / 1.3 + hp);
+                width = (Math.Sin((value + bladderWidthCalculationFactor1 ) * Math.PI) + bladderWidthCalculationFactor2) / bladderWidthCalculationFactor3;
+                height = Math.Max(0.15, Customer.bladder.Percentage / 1.3 + bladderHeightCalculationFactor1);
 
                 BladderCircleTransform.localScale = new Vector3((float)height * 80f, (float)width * 80f);
-
-                /*
-                value = Math.Max(0.1, Math.Min(1, Customer.bladder.Percentage));
-
-                width = (value - ( Math.PI / 6d )) * Math.PI;
-                width = Math.Sin(width);
-                width = ( width + 1.5d ) / 2d;
-                width = Math.Min(1.2, width);
-
-                height = Math.Max(0.1, Customer.bladder.Percentage * 1.5);
-
-                BladderCircleTransform.localScale = new Vector3((float)width * 60f, (float)height * 60f);
-                 */
-
-                //double value = Customer.bladder.Percentage * 80;
-                //if ( Customer.bladder.Percentage > 0.66 ) {
-                //    BladderCircleTransform.localScale = new Vector3((float)Customer.bladder.Percentage * 80f, (float)Customer.bladder.Percentage * 95f, 1);
-                //}
-                //else if ( Customer.bladder.Percentage > 0.33 ) {
-                //    BladderCircleTransform.localScale = new Vector3((float)Customer.bladder.Percentage * 80f, (float)Customer.bladder.Percentage * 80f, 1);
-                //}
-                //else {
-                //    BladderCircleTransform.localScale = new Vector3((float)Customer.bladder.Percentage * 80f, (float)Customer.bladder.Percentage * 60f, 1);
-                //}
             }
         }
         public void ShowBladderCircle(bool value) {

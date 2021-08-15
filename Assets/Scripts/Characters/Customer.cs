@@ -367,6 +367,7 @@ public class Customer : MonoBehaviour {
     public void BeginPeeingWithThing() {
         IsRelievingSelf = true;
         Emotes.Emote(Emote.PantsDown);
+        Emotes.ShowBladderCircle(true);
         // Add a delay between starting and stopping urination
         RemainingUrinateStartDelay = UrinateStartDelay;
         RemainingUrinateStopDelay = UrinateStopDelay;
@@ -394,9 +395,10 @@ public class Customer : MonoBehaviour {
     public void EndPeeingWithThing() {
         Debug.Log($"Customer {UID} finished relieving themselves.");
         IsRelievingSelf = false;
+        Emotes.Emote(null);
+        Emotes.ShowBladderCircle(false);
         if ( IsWet ) {
             position = Collections.Location.Outside;
-            Emotes.Emote(null);
             Occupying.OccupiedBy = null;
             Occupying = null;
             ActionState = Collections.CustomerActionState.None;
@@ -419,6 +421,7 @@ public class Customer : MonoBehaviour {
             throw new NullReferenceException();
         }
         Emotes.Emote(emote);
+        Emotes.ShowBladderCircle(true);
         IsWet = true;
         IsWetting = true;
         ActionState = Collections.CustomerActionState.Wetting;
@@ -426,6 +429,7 @@ public class Customer : MonoBehaviour {
     public void EndPeeingSelf() {
         Debug.Log("StopWettingSelf");
         Emotes.Emote(null);
+        Emotes.ShowBladderCircle(false);
         IsWetting = false;
         ActionState = Collections.CustomerActionState.None;
     }
