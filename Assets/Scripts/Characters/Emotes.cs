@@ -5,11 +5,16 @@ namespace Assets.Scripts.Characters {
     public class Emotes {
         // https://i.imgur.com/Zul9DoY_d.webp?maxwidth=760&fidelity=grand
         [SerializeField]
-        public SpriteRenderer SpriteRenderer;
-        public Emote current = null;
+        public RectTransform BladderCircleTransform;
+        [SerializeField]
+        public SpriteRenderer EmoteSpriteRenderer;
+        public Emote currentEmote = null;
         public float? remaining = null;
+        private bool bladderCircleActive = false;
+        public readonly Customer Customer;
         public void Update() {
-            if ( current != null ) {
+            // Update emotes
+            if ( currentEmote != null ) {
                 // Abort if emote is permanent
                 if ( remaining == null) {
                     return;
@@ -23,12 +28,29 @@ namespace Assets.Scripts.Characters {
                     Emote(null);
                 }
             }
+            // Update bladder display
+            if (bladderCircleActive) {
+                double value = Customer.bladder.Percentage * 80;
+                if (Customer.bladder.Percentage > 0.66) {
+                    BladderCircleTransform.localScale = new Vector3((float)Customer.bladder.Percentage * 80f, (float)Customer.bladder.Percentage * 95f, 1);
+                }
+                else if (Customer.bladder.Percentage > 0.33) {
+                    BladderCircleTransform.localScale = new Vector3((float)Customer.bladder.Percentage * 80f, (float)Customer.bladder.Percentage * 80f, 1);
+                }
+                else {
+                    BladderCircleTransform.localScale = new Vector3((float)Customer.bladder.Percentage * 80f, (float)Customer.bladder.Percentage * 60f, 1);
+                }
+            }
+        }
+        public void ShowBladderCircle(bool value) {
+            bladderCircleActive = value;
+            BladderCircleTransform.gameObject.SetActive(value);
         }
         public void Emote(Emote emote) => Emote(emote, null);
         public void Emote(Emote emote, float? time) {
             Debug.Log("Rendering " + emote == null ? "[NULL]" : emote.Path);
-            current = emote;
-            SpriteRenderer.sprite = emote?.Sprite;
+            currentEmote = emote;
+            EmoteSpriteRenderer.sprite = emote?.Sprite;
             if ( time != null && emote != null ) {
                 remaining = time;
             }
@@ -37,8 +59,10 @@ namespace Assets.Scripts.Characters {
             }
         }
 
-        public Emotes(SpriteRenderer spriteRenderer) {
-            SpriteRenderer = spriteRenderer;
+        public Emotes(Customer customer, SpriteRenderer emoteSpriteRenderer, RectTransform bladderCircleTransform) {
+            Customer = customer;
+            EmoteSpriteRenderer = emoteSpriteRenderer;
+            BladderCircleTransform = bladderCircleTransform;
         }
     }
 }

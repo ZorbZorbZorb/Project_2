@@ -20,7 +20,7 @@ public class Customer : MonoBehaviour {
         UID = GameController.GetUid();
         Menu.enabled = false;
 
-        Emotes = new Emotes(EmoteSpriteRenderer);
+        Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform);
 
         SetupButtons();
     }
@@ -228,7 +228,7 @@ public class Customer : MonoBehaviour {
                     throw new NullReferenceException();
                 }
                 Debug.Log(emote.Sprite.texture.ToString());
-                if (Emotes.current != emote) {
+                if (Emotes.currentEmote != emote) {
                     Emotes.Emote(emote);
                 }
             }
@@ -332,6 +332,7 @@ public class Customer : MonoBehaviour {
     }
 
     // Class that contains all of the emotes / thought bubbles / etc for the person
+    [SerializeField] public RectTransform BladderCircleTransform;
     [SerializeField] public SpriteRenderer EmoteSpriteRenderer;
     public Emotes Emotes;
     #endregion
