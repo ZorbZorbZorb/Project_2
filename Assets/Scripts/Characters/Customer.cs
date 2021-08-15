@@ -227,7 +227,6 @@ public class Customer : MonoBehaviour {
                     Debug.Break();
                     throw new NullReferenceException();
                 }
-                Debug.Log(emote.Sprite.texture.ToString());
                 if (Emotes.currentEmote != emote) {
                     Emotes.Emote(emote);
                 }

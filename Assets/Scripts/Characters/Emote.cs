@@ -18,7 +18,6 @@ public class Emote {
     public static Emote GetPeeStreamEmote(double BladderPercentage) {
         // I mean, this is kinda a physical thing not a mental thing so percentage should be the best thing to use.
         int index = (int)(Math.Round((BladderPercentage + 0.1d) * PeeStreamEmotes.Length));
-        Debug.Log(index);
         index = Math.Max(index, 0);
         index = Math.Min(index, PeeStreamEmotes.Length - 1);
         return PeeStreamEmotes[index];

@@ -15,9 +15,11 @@ public class Toilet : Relief {
         // Open or close the stall door
         if (OccupiedBy != null && !doorClosed && OccupiedBy.AtDestination()) {
             SRenderer.sprite = Collections.spriteStallClosed;
+            doorClosed = true;
         }
-        else if(doorClosed) {
+        else if(doorClosed && OccupiedBy == null) {
             SRenderer.sprite = Collections.spriteStallOpened;
+            doorClosed = false;
         }
     }
 
