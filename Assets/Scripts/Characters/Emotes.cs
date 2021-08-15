@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Assets.Scripts.Characters {
-    [System.Serializable]
+    [Serializable]
     public class Emotes {
         // https://i.imgur.com/Zul9DoY_d.webp?maxwidth=760&fidelity=grand
         [SerializeField]
@@ -10,7 +11,7 @@ namespace Assets.Scripts.Characters {
         public SpriteRenderer EmoteSpriteRenderer;
         public Emote currentEmote = null;
         public float? remaining = null;
-        private bool bladderCircleActive = false;
+        private bool bladderCircleActive = true;
         public readonly Customer Customer;
         public void Update() {
             // Update emotes
