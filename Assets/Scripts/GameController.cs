@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour {
 
     public static List<Customer> customers = new List<Customer>();
     public int ticksSinceLastSpawn = 0;
-    public int maxCustomers = Bar.Singleton.Seats.Length;
+    public int maxCustomers = 14;
 
     [SerializeField]
     public WaitingRoom waitingRoom;
