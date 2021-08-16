@@ -40,6 +40,25 @@ public class Collections : MonoBehaviour {
             { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/m/desp_state_6") }
         };
 
+        DesperationSeatSpriteLookupF = new Dictionary<CustomerDesperationState, Sprite>() {
+            { CustomerDesperationState.State0, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_0") },
+            { CustomerDesperationState.State1, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_1") },
+            { CustomerDesperationState.State2, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_2") },
+            { CustomerDesperationState.State3, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_3") },
+            { CustomerDesperationState.State4, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_4") },
+            { CustomerDesperationState.State5, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_5") },
+            { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_6") }
+        };
+        DesperationSeatSpriteLookupM = new Dictionary<CustomerDesperationState, Sprite>() {
+            { CustomerDesperationState.State0, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_0") },
+            { CustomerDesperationState.State1, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_1") },
+            { CustomerDesperationState.State2, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_2") },
+            { CustomerDesperationState.State3, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_3") },
+            { CustomerDesperationState.State4, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_4") },
+            { CustomerDesperationState.State5, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_5") },
+            { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_6") }
+        };
+
         ActionSpriteLookupF = new Dictionary<CustomerActionState, Sprite>() {
             { CustomerActionState.ToiletPeeing, Resources.Load<Sprite>("Sprites/People/f/peeing_toilet") },
             { CustomerActionState.UrinalPeeing, Resources.Load<Sprite>("Sprites/People/f/peeing_urinal") },
@@ -168,6 +187,8 @@ public class Collections : MonoBehaviour {
 
     public static Dictionary<CustomerDesperationState, Sprite> DesperationSpriteLookupF;
     public static Dictionary<CustomerDesperationState, Sprite> DesperationSpriteLookupM;
+    public static Dictionary<CustomerDesperationState, Sprite> DesperationSeatSpriteLookupF;
+    public static Dictionary<CustomerDesperationState, Sprite> DesperationSeatSpriteLookupM;
     public static Dictionary<CustomerActionState, Sprite> ActionSpriteLookupF;
     public static Dictionary<CustomerActionState, Sprite> ActionSpriteLookupM;
     public static Dictionary<CustomerActionState, Sprite> BubbleSpriteLookupF;
