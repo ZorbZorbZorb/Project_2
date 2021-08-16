@@ -28,6 +28,7 @@ public class GameController : MonoBehaviour {
             throw new InvalidOperationException("Only one game controller may exist");
         }
         controller = this;
+        maxCustomers = Bar.Singleton.Seats.Length;
         Customer firstCustomer = CreateCustomer();
         firstCustomer.Active = true;
     }
@@ -83,7 +84,7 @@ public class GameController : MonoBehaviour {
         customers.Add(newCustomer);
 
         // Customer count changes range of bladder fullness for next customer to enter
-        int min = 30;
+        int min = 35;
         int max = 105;
         if (customers.Count() > 8) {
             min = 10;
