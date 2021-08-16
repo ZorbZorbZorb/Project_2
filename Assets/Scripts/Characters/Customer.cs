@@ -235,19 +235,35 @@ public class Customer : MonoBehaviour {
     }
 
     public void MoveToVector3(Vector3 destination) {
+        Navigation.Add(destination);
         Destination = destination;
-        Debug.Log($"Customer {UID} moving to {destination}");
     }
     private void MoveUpdate() {
-        if ( transform.position.x != Destination.x || transform.position.y != Destination.y ) {
-            float distanceX = Math.Abs(transform.position.x - Destination.x);
-            float distanceY = Math.Abs(transform.position.y - Destination.y);
-            double moveAmount = Math.Max(( MoveSpeed * Time.deltaTime * ( distanceX + distanceY ) ) + 1, 1d);
-            transform.position = Vector3.MoveTowards(transform.position, Destination, (float)moveAmount);
+        if (Navigation.Count == 0) {
+            return;
         }
+        Vector3 next = Navigation.First();
+
+        if ( transform.position.x != next.x || transform.position.y != next.y ) {
+            float distanceX = Math.Abs(transform.position.x - next.x);
+            float distanceY = Math.Abs(transform.position.y - next.y);
+            double moveAmount = Math.Max(( MoveSpeed * Time.deltaTime * ( distanceX + distanceY ) ) + 1, 1d);
+            transform.position = Vector3.MoveTowards(transform.position, next, (float)moveAmount);
+        }
+        else {
+            Navigation.Remove(next);
+        }
+
+        //if ( transform.position.x != Destination.x || transform.position.y != Destination.y ) {
+        //    float distanceX = Math.Abs(transform.position.x - Destination.x);
+        //    float distanceY = Math.Abs(transform.position.y - Destination.y);
+        //    double moveAmount = Math.Max(( MoveSpeed * Time.deltaTime * ( distanceX + distanceY ) ) + 1, 1d);
+        //    transform.position = Vector3.MoveTowards(transform.position, Destination, (float)moveAmount);
+        //}
+
     }
     public bool AtDestination() {
-        return transform.position == Destination;
+        return transform.position == Destination && Navigation.Count() < 2;
     }
 
     [SerializeField]
@@ -299,6 +315,7 @@ public class Customer : MonoBehaviour {
 
     // Movement
     public Vector3 Destination;
+    public List<Vector3> Navigation = new List<Vector3>();
     [SerializeField]
     public double MoveSpeed;
 
@@ -397,11 +414,16 @@ public class Customer : MonoBehaviour {
         Emotes.Emote(null);
         Emotes.ShowBladderCircle(false);
         if ( IsWet ) {
+            if ( position != Collections.Location.Bar ) {
+                foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar) {
+                    MoveToVector3(keyframe);
+                }
+            }
+            MoveToVector3(Collections.OffScreenTop);
             position = Collections.Location.Outside;
             Occupying.OccupiedBy = null;
             Occupying = null;
             ActionState = Collections.CustomerActionState.None;
-            MoveToVector3(Collections.OffScreenBottom);
         }
         else {
             ActionState = Collections.CustomerActionState.None;
@@ -445,16 +467,17 @@ public class Customer : MonoBehaviour {
         if ( Occupying != null ) {
             Occupying.OccupiedBy = null;
         }
+        if (position == Collections.Location.Bar && thing.CustomerLocation != position) {
+            foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom) {
+                MoveToVector3(keyframe);
+            }
+        }
+        MoveToVector3(Gender == 'f' ? thing.CustomerPositionF : thing.CustomerPositionM);
+
         Occupying = thing;
         thing.OccupiedBy = this;
         position = thing.CustomerLocation;
         CanWetNow = thing.CanWetHere;
-        if (Gender == 'f') {
-            MoveToVector3(thing.CustomerPositionF);
-        }
-        else if (Gender == 'm') {
-            MoveToVector3(thing.CustomerPositionM);
-        }
     }
     #endregion
 
@@ -633,7 +656,12 @@ public class Customer : MonoBehaviour {
     // Fully leaves the area
     public void Leave() {
         StopOccupyingAll();
-        MoveToVector3(Collections.OffScreenBottom);
+        if ( position != Collections.Location.Bar) {
+            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom ) {
+                MoveToVector3(keyframe);
+            }
+        }
+        MoveToVector3(Collections.OffScreenTop);
         position = Collections.Location.Outside;
     }
     #endregion

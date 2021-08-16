@@ -18,10 +18,15 @@ public class Seat : CustomerInteractable {
     public override string DisplayName => "seat";
 
     public void MoveCustomerIntoSpot(Customer customer) {
-        customer.position = Collections.Location.Bar;
         customer.StopOccupyingAll();
+        if (customer.position != Collections.Location.Bar) {
+            foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar) {
+                customer.MoveToVector3(keyframe);
+            }
+        }
+        customer.MoveToVector3(customer.Gender == 'm' ? CustomerPositionM : CustomerPositionF);
         customer.Occupying = this;
         OccupiedBy = customer;
-        customer.MoveToVector3(customer.Gender == 'm' ? CustomerPositionM : CustomerPositionF);
+        customer.position = Collections.Location.Bar;
     }
 }

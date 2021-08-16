@@ -17,8 +17,13 @@ public class WaitingSpot : CustomerInteractable {
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
+        if ( customer.position == Collections.Location.Bar ) {
+            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom) {
+                customer.MoveToVector3(keyframe);
+            }
+        }
+        customer.MoveToVector3(CustomerPositionF);
         customer.Occupying = this;
         OccupiedBy = customer;
-        customer.MoveToVector3(CustomerPositionF);
     }
 }

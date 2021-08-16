@@ -62,7 +62,7 @@ namespace Assets.Scripts.Characters {
         public void Emote(Emote emote) => Emote(emote, null);
         public void Emote(Emote emote, float? time) {
             bool emoteNull = emote == null;
-            Debug.Log("Rendering " + (emoteNull ? "[NULL]" : emote.Path));
+            //Debug.Log("Rendering " + (emoteNull ? "[NULL]" : emote.Path));
             currentEmote = emote;
             EmoteSpriteRenderer.sprite = emote?.Sprite;
             if ( time != null && emote != null ) {
