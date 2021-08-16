@@ -122,13 +122,12 @@ public class Customer : MonoBehaviour {
         }
 
         // If not in any bathroom and bladder is full, go to bathroom
-        else if ( FeelsNeedToGo ) {
-            if (MinTimeBetweenChecksNow < MinTimeBetweenChecks) {
-                return;
-            }
-            else {
-                MinTimeBetweenChecksNow = 0f;
-
+        if ( MinTimeBetweenChecksNow < MinTimeBetweenChecks ) {
+            return;
+        }
+        else {
+            MinTimeBetweenChecksNow = 0f;
+            if (FeelsNeedToGo) {
                 if ( position == Collections.Location.Bar ) {
                     if ( MinTimeAtBarNow < MinTimeAtBar ) {
                         return;
@@ -144,7 +143,35 @@ public class Customer : MonoBehaviour {
                     }
                 }
             }
+            else {
+                if (Random.Range(0, 11) == 0) {
+                    Leave();
+                }
+            }
         }
+        //else if ( FeelsNeedToGo ) {
+        //    if (MinTimeBetweenChecksNow < MinTimeBetweenChecks) {
+        //        return;
+        //    }
+        //    else {
+        //        MinTimeBetweenChecksNow = 0f;
+
+        //        if ( position == Collections.Location.Bar ) {
+        //            if ( MinTimeAtBarNow < MinTimeAtBar ) {
+        //                return;
+        //            }
+        //            else {
+        //                // Try to enter the bathroom
+        //                if ( !EnterDoorway() ) {
+        //                    MinTimeAtBarNow = MinTimeAtBar / 1.5f;
+        //                }
+        //                else {
+        //                    MinTimeAtBarNow = 0f;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     private Collections.CustomerActionState LastActionState;
@@ -170,8 +197,6 @@ public class Customer : MonoBehaviour {
         logString += $"Need: {Math.Round(bladder.FeltNeed, 2)} Curve: {Math.Round(bladder.FeltNeedCurve, 2)}";
         Debug.LogWarning(logString);
     }
-
-
 
     private void PeeLogicUpdate() {
         FeelsNeedToGo = bladder.FeltNeed > 0.40d;
