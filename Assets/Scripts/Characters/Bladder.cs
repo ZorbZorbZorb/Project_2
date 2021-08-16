@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 // Pee is stored in the balls
 [System.Serializable]
 public class Bladder {
+    [SerializeField]
+    public double AverageMax = 800;
     public double Stomach;  // The stomach is stored in the bladder
     public double Amount;
     public double Max;

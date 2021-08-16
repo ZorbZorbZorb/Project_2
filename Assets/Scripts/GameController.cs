@@ -93,7 +93,7 @@ public class GameController : MonoBehaviour {
             min = 85;
             max = 98;
         }
-        Debug.LogWarning($"{min}, {max}");
+        //Debug.LogWarning($"{min}, {max}");
 
         newCustomer.SetupCustomer(min, max);
         Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
