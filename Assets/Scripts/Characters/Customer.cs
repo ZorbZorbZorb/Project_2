@@ -125,21 +125,19 @@ public class Customer : MonoBehaviour {
         if ( MinTimeBetweenChecksNow < MinTimeBetweenChecks ) {
             return;
         }
-        else {
+        else if (position == Collections.Location.Bar) {
             MinTimeBetweenChecksNow = 0f;
             if (FeelsNeedToGo) {
-                if ( position == Collections.Location.Bar ) {
-                    if ( MinTimeAtBarNow < MinTimeAtBar ) {
-                        return;
+                if ( MinTimeAtBarNow < MinTimeAtBar ) {
+                    return;
+                }
+                else {
+                    // Try to enter the bathroom
+                    if ( !EnterDoorway() ) {
+                        MinTimeAtBarNow = MinTimeAtBar / 1.5f;
                     }
                     else {
-                        // Try to enter the bathroom
-                        if ( !EnterDoorway() ) {
-                            MinTimeAtBarNow = MinTimeAtBar / 1.5f;
-                        }
-                        else {
-                            MinTimeAtBarNow = 0f;
-                        }
+                        MinTimeAtBarNow = 0f;
                     }
                 }
             }

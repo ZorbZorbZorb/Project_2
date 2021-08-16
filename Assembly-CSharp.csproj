@@ -75,6 +75,7 @@
     <Compile Include="Assets\Scripts\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\DoorwayQueue.cs" />
+    <Compile Include="Assets\Scripts\Sinks.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Notes\Notes.txt" />
