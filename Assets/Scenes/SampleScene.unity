@@ -2435,7 +2435,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Toilets:
-  - {fileID: 1485279668}
   - {fileID: 1248710655}
   Urinals:
   - {fileID: 197159131}
