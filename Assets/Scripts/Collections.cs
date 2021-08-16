@@ -175,9 +175,9 @@ public class Collections : MonoBehaviour {
         Relief
     }
 
-    static readonly public Vector3 OffScreenBottom = new Vector3() {
-        x = -1000,
-        y = -900,
+    static readonly public Vector3 OffScreenTop = new Vector3() {
+        x = 600,
+        y = 750,
         z = 0
     };
 
