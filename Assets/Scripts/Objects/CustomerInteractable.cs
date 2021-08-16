@@ -8,6 +8,15 @@ using UnityEngine;
 
 namespace Assets.Scripts.Objects {
     public abstract class CustomerInteractable : MonoBehaviour {
+        public enum InteractableType {
+            WaitingSpot,
+            Seat,
+            Toilet,
+            Urinal,
+            Ourinal,
+            Sink
+        };
+        public abstract InteractableType Type { get; }
         public abstract Vector3 CustomerPositionF { get; }
         public abstract Vector3 CustomerPositionM { get; }
         public abstract Collections.Location CustomerLocation { get; }

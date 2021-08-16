@@ -116,7 +116,7 @@ public class Customer : MonoBehaviour {
             if (WetSelfLeaveBathroomDelayRemaining > 0) {
                 WetSelfLeaveBathroomDelayRemaining -= Time.deltaTime;
             }
-            else {
+            else if (position != Collections.Location.Outside) {
                 Leave();
             }
         }
@@ -682,7 +682,7 @@ public class Customer : MonoBehaviour {
     public void Leave() {
         StopOccupyingAll();
         if ( position != Collections.Location.Bar) {
-            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom ) {
+            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar ) {
                 MoveToVector3(keyframe);
             }
         }

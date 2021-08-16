@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Urinal : Relief {
+    public override InteractableType Type => InteractableType.Urinal;
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = -5, z = -1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -10, z = -1 };
     public override Collections.ReliefType ReliefType => Collections.ReliefType.Urinal;

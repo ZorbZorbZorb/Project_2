@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Seat : CustomerInteractable {
+    public override InteractableType Type => InteractableType.Seat;
+    public override string DisplayName => "seat";
     public override Vector3 CustomerPositionF => transform.position + new Vector3(0, 0, -1);
     public override Vector3 CustomerPositionM => transform.position + new Vector3(0, 0, -1);
 
@@ -15,7 +17,6 @@ public class Seat : CustomerInteractable {
 
     public override Collections.ReliefType ReliefType => Collections.ReliefType.None;
 
-    public override string DisplayName => "seat";
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();

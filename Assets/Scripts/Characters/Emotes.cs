@@ -10,8 +10,8 @@ namespace Assets.Scripts.Characters {
         [SerializeField]
         public SpriteRenderer EmoteSpriteRenderer;
         [SerializeField] public double bladderWidthCalculationFactor1 = -0.6d;
-        [SerializeField] public double bladderWidthCalculationFactor2 = 1.3d;
-        [SerializeField] public double bladderWidthCalculationFactor3 = 2d;
+        [SerializeField] public double bladderWidthCalculationFactor2 = 1.2d;
+        [SerializeField] public double bladderWidthCalculationFactor3 = 1.8d;
         [SerializeField] public double bladderHeightCalculationFactor1 = 0.2;
 
         public Emote currentEmote = null;
@@ -58,9 +58,13 @@ namespace Assets.Scripts.Characters {
                 multiplier = ( ( (factor / 2) * Math.PI ) - Math.PI / 2 ) * 0.5;
                 multiplier = Math.Max(0.5, Math.Min(1.5, factor));
 
+                //value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
+                //width = (Math.Sin((value + bladderWidthCalculationFactor1 ) * Math.PI) + bladderWidthCalculationFactor2) / bladderWidthCalculationFactor3;
+                //height = Math.Max(0.15, Customer.bladder.Percentage / 1.3 + bladderHeightCalculationFactor1);
+
                 value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
-                width = (Math.Sin((value + bladderWidthCalculationFactor1 ) * Math.PI) + bladderWidthCalculationFactor2) / bladderWidthCalculationFactor3;
-                height = Math.Max(0.15, Customer.bladder.Percentage / 1.3 + bladderHeightCalculationFactor1);
+                width = ( Math.Sin(( (value * 1.2d )+ bladderWidthCalculationFactor1 ) * 2.5) + bladderWidthCalculationFactor2 ) / bladderWidthCalculationFactor3;
+                height = Math.Max(0.15, Customer.bladder.Percentage / 1.1 + bladderHeightCalculationFactor1);
 
                 double x = height * multiplier * scaleX;
                 double y = width * multiplier * scaleY;

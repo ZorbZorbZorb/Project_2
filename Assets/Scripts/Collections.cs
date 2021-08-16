@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using static Assets.Scripts.Objects.CustomerInteractable;
 
 public class Collections : MonoBehaviour {
     static public Collections collections = null;
@@ -41,22 +42,22 @@ public class Collections : MonoBehaviour {
         };
 
         DesperationSeatSpriteLookupF = new Dictionary<CustomerDesperationState, Sprite>() {
-            { CustomerDesperationState.State0, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_0") },
-            { CustomerDesperationState.State1, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_1") },
-            { CustomerDesperationState.State2, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_2") },
-            { CustomerDesperationState.State3, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_3") },
-            { CustomerDesperationState.State4, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_4") },
-            { CustomerDesperationState.State5, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_5") },
-            { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/f/DespStateStool_6") }
+            { CustomerDesperationState.State0, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_0") },
+            { CustomerDesperationState.State1, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_1") },
+            { CustomerDesperationState.State2, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_2") },
+            { CustomerDesperationState.State3, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_3") },
+            { CustomerDesperationState.State4, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_4") },
+            { CustomerDesperationState.State5, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_5") },
+            { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/Bar/f/DespStateStool_6") }
         };
         DesperationSeatSpriteLookupM = new Dictionary<CustomerDesperationState, Sprite>() {
-            { CustomerDesperationState.State0, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_0") },
-            { CustomerDesperationState.State1, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_1") },
-            { CustomerDesperationState.State2, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_2") },
-            { CustomerDesperationState.State3, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_3") },
-            { CustomerDesperationState.State4, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_4") },
-            { CustomerDesperationState.State5, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_5") },
-            { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/m/DespStateStool_6") }
+            { CustomerDesperationState.State0, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_0") },
+            { CustomerDesperationState.State1, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_1") },
+            { CustomerDesperationState.State2, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_2") },
+            { CustomerDesperationState.State3, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_3") },
+            { CustomerDesperationState.State4, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_4") },
+            { CustomerDesperationState.State5, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_5") },
+            { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_6") }
         };
 
         ActionSpriteLookupF = new Dictionary<CustomerActionState, Sprite>() {
@@ -125,7 +126,10 @@ public class Collections : MonoBehaviour {
             {'f', BubbleSpriteLookupF },
             {'m', BubbleSpriteLookupM }
         };
-
+        GenderedSeatDesperationSpriteLookup = new Dictionary<char, Dictionary<CustomerDesperationState, Sprite>>() {
+            {'m', DesperationSeatSpriteLookupM },
+            {'f', DesperationSeatSpriteLookupF }
+        };
     }
     public enum BladderControlState {
         Normal,
@@ -184,6 +188,7 @@ public class Collections : MonoBehaviour {
     public static Dictionary<char, Dictionary<CustomerActionState, Sprite>> GenderedBubbleSpriteLookup;
     public static Dictionary<char, Dictionary<CustomerActionState, Sprite>> GenderedActionSpriteLookup;
     public static Dictionary<char, Dictionary<CustomerDesperationState, Sprite>> GenderedDesperationSpriteLookup;
+    public static Dictionary<char, Dictionary<CustomerDesperationState, Sprite>> GenderedSeatDesperationSpriteLookup;
 
     public static Dictionary<CustomerDesperationState, Sprite> DesperationSpriteLookupF;
     public static Dictionary<CustomerDesperationState, Sprite> DesperationSpriteLookupM;
@@ -213,10 +218,15 @@ public class Collections : MonoBehaviour {
     };
 
     public static Sprite GetPersonSprite(Customer customer) {
+        bool atDestination = customer.AtDestination();
         CustomerActionState[] ValidSpriteActionStates = customer.Gender == 'm' ? ValidSpriteActionStatesM : ValidSpriteActionStatesF;
-        if (customer.AtDestination() && ValidSpriteActionStates.Contains(customer.ActionState)) {
+        if ( atDestination && ValidSpriteActionStates.Contains(customer.ActionState)) {
             var genderedSpritePool = GenderedActionSpriteLookup[customer.Gender];
             return genderedSpritePool[customer.ActionState];
+        }
+        else if ( atDestination && customer?.Occupying?.Type == InteractableType.Seat) {
+            var genderedSpritePool = GenderedSeatDesperationSpriteLookup[customer.Gender];
+            return genderedSpritePool[customer.DesperationState];
         }
         else {
             var genderedSpritePool = GenderedDesperationSpriteLookup[customer.Gender];

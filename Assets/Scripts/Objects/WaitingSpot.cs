@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WaitingSpot : CustomerInteractable {
+
+    public override InteractableType Type => InteractableType.WaitingSpot;
     public override Collections.Location CustomerLocation => Collections.Location.WaitingRoom;
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 100, z = 0 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = 100, z = 0 };

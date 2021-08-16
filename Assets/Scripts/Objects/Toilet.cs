@@ -2,6 +2,7 @@ using Assets.Scripts.Objects;
 using UnityEngine;
 
 public class Toilet : Relief {
+    public override InteractableType Type => InteractableType.Toilet;
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 0, z = 1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -15, z = 1 };
     public override Collections.ReliefType ReliefType => Collections.ReliefType.Toilet;
