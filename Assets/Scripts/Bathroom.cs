@@ -12,10 +12,9 @@ public class Bathroom : MonoBehaviour {
     public Urinal GetUrinal() {
         return Urinals.Where(x => x.OccupiedBy == null).First();
     }
-    public Sink GetSink() {
-        return Sinks.Where(x => x.OccupiedBy == null).First();
-    }
 
+    public Sinks Sinks;
+    
     // These three are checked once per tick by each customer. Have them as public bools that are not calculated to save ups.
     public bool HasToiletAvailable { get; private set; }
     public bool HasUrinalAvailable { get; private set; }
@@ -23,7 +22,6 @@ public class Bathroom : MonoBehaviour {
 
     public List<Toilet> Toilets;
     public List<Urinal> Urinals;
-    public List<Sink> Sinks;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +33,6 @@ public class Bathroom : MonoBehaviour {
     void Update() {
         HasToiletAvailable = Toilets.Where(x => x.OccupiedBy == null).Any();
         HasUrinalAvailable = Urinals.Where(x => x.OccupiedBy == null).Any();
-        HasSinkAvailable = Sinks.Where(x => x.OccupiedBy == null).Any();
+        HasSinkAvailable = Sinks.AnyUnoccupied();
     }
 }

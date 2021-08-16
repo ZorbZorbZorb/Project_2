@@ -2,7 +2,7 @@ using Assets.Scripts.Objects;
 using UnityEngine;
 
 public class Sink : Relief {
-
+    public Sinks Sinks;
     public override InteractableType Type => InteractableType.Sink;
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 10, z = -1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -5, z = -1 };

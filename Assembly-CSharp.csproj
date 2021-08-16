@@ -61,6 +61,7 @@
     <Compile Include="Assets\Scripts\Interfaces\IWaitingSpotQueue.cs" />
     <Compile Include="Assets\Scripts\Objects\WaitingSpot.cs" />
     <Compile Include="Assets\Scripts\Objects\Seat.cs" />
+    <Compile Include="Assets\Scripts\Sinks.cs" />
     <Compile Include="Assets\Scripts\Objects\Relief.cs" />
     <Compile Include="Assets\Scripts\Objects\Urinal.cs" />
     <Compile Include="Assets\Scripts\Bar.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="Assets\Scripts\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\DoorwayQueue.cs" />
-    <Compile Include="Assets\Scripts\Sinks.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Notes\Notes.txt" />

@@ -641,7 +641,7 @@ public class Customer : MonoBehaviour {
     }
     public bool MenuOptionGotoSink() {
         if (Bathroom.bathroom.HasSinkAvailable) {
-            EnterRelief(Bathroom.bathroom.GetSink());
+            EnterRelief(Bathroom.bathroom.Sinks.FirstUnoccupied());
             return true;
         }
         return false;
