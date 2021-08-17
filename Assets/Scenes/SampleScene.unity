@@ -1010,8 +1010,9 @@ MonoBehaviour:
   InUseBy: {fileID: 0}
   ReservedBy: {fileID: 0}
   Sinks:
+    Line:
+      Items: []
     Items: []
-    Queue: []
 --- !u!1 &406074934
 GameObject:
   m_ObjectHideFlags: 0
@@ -1888,7 +1889,7 @@ GameObject:
   m_Component:
   - component: {fileID: 606749378}
   m_Layer: 0
-  m_Name: Queue
+  m_Name: Line
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2682,11 +2683,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Sinks:
+    Line:
+      Items:
+      - {fileID: 978614711}
+      - {fileID: 1652432302}
     Items:
     - {fileID: 398154297}
-    Queue:
-    - {fileID: 978614711}
-    - {fileID: 1652432302}
   Toilets:
   - {fileID: 1248710655}
   Urinals:
@@ -4874,6 +4876,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63c76700ee2b2d34785005c065239de2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HasNext: 0
+  NextDelay: 0
   SRenderer: {fileID: 1907411329}
   CheatPeeNow: 0
   Active: 0
