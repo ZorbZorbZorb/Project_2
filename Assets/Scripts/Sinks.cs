@@ -23,6 +23,9 @@ public class Sinks {
             }
         }
     }
+    public bool AllSinksBeingPeedIn() {
+        return Items.Where(x => x.OccupiedBy != null && x.OccupiedBy.IsRelievingSelf).Count() == Items.Count();
+    }
     public bool CanUseForReliefNow() {
         return !( Items.Where(x => x.OccupiedBy != null).Any() || Line.Any() );
     }

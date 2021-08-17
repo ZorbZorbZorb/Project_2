@@ -437,7 +437,7 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
-        else if (Bathroom.bathroom.Sinks.Line.HasOpenWaitingSpot()) {
+        else if (Bathroom.bathroom.Sinks.Line.HasOpenWaitingSpot() && !Bathroom.bathroom.Sinks.AllSinksBeingPeedIn()) {
             Bathroom.bathroom.Sinks.EnterLine(this);
         }
         else {
