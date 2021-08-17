@@ -12,4 +12,12 @@ public class Sink : Relief {
     public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.SinkPantsDown;
     public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.SinkPeeing;
     public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.SinkPantsUp;
+    public void Use(Customer customer) {
+        customer.ActionState = Collections.CustomerActionState.SinkPantsUp;
+        customer.NextDelay = 6f;
+        customer.Next = () => {
+            customer.ActionState = Collections.CustomerActionState.None;
+            customer.EnterBar();
+        };
+    }
 }

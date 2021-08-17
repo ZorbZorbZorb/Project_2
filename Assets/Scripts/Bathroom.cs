@@ -13,12 +13,13 @@ public class Bathroom : MonoBehaviour {
         return Urinals.Where(x => x.OccupiedBy == null).First();
     }
 
-    public Sinks Sinks;
+    [SerializeField]
+    public Sinks Sinks = new Sinks();
     
     // These three are checked once per tick by each customer. Have them as public bools that are not calculated to save ups.
     public bool HasToiletAvailable { get; private set; }
     public bool HasUrinalAvailable { get; private set; }
-    public bool HasSinkAvailable { get; private set; }
+    public bool HasSinkForRelief { get; private set; }
 
     public List<Toilet> Toilets;
     public List<Urinal> Urinals;
@@ -31,8 +32,9 @@ public class Bathroom : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        Sinks.Update();
         HasToiletAvailable = Toilets.Where(x => x.OccupiedBy == null).Any();
         HasUrinalAvailable = Urinals.Where(x => x.OccupiedBy == null).Any();
-        HasSinkAvailable = Sinks.AnyUnoccupied();
+        HasSinkForRelief = Sinks.CanUseForReliefNow();
     }
 }

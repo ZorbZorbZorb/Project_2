@@ -45,6 +45,7 @@ public class Customer : MonoBehaviour {
         TotalTimeAtBar += Time.deltaTime;
         MinTimeAtBarNow += Time.deltaTime;
         MinTimeBetweenChecksNow += Time.deltaTime;
+        NextDelay -= Time.deltaTime;
 
         // Update bladder
         bladder.Update();
@@ -78,7 +79,10 @@ public class Customer : MonoBehaviour {
         FrameActionDebug();
     }
 
+    public bool HasNext = false;
     public delegate void NextAction();
+    public NextAction Next;
+    public float NextDelay = 0f;
 
     private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
@@ -105,6 +109,21 @@ public class Customer : MonoBehaviour {
     }
 
     void Think() {
+        // Next action delegate code
+        if (Next != null) {
+            if ( NextDelay > 0f) {
+                return;
+            }
+            else {
+                NextAction last = Next;
+                Next();
+                // Clear if not updated
+                if (Next.Method == last.Method) {
+                    Next = null;
+                }
+            }
+        }
+
         // If about to leave or has left
         if ( position == Collections.Location.Outside ) {
             if (AtDestination()) {
@@ -147,29 +166,6 @@ public class Customer : MonoBehaviour {
                 }
             }
         }
-        //else if ( FeelsNeedToGo ) {
-        //    if (MinTimeBetweenChecksNow < MinTimeBetweenChecks) {
-        //        return;
-        //    }
-        //    else {
-        //        MinTimeBetweenChecksNow = 0f;
-
-        //        if ( position == Collections.Location.Bar ) {
-        //            if ( MinTimeAtBarNow < MinTimeAtBar ) {
-        //                return;
-        //            }
-        //            else {
-        //                // Try to enter the bathroom
-        //                if ( !EnterDoorway() ) {
-        //                    MinTimeAtBarNow = MinTimeAtBar / 1.5f;
-        //                }
-        //                else {
-        //                    MinTimeAtBarNow = 0f;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
     }
 
     private Collections.CustomerActionState LastActionState;
@@ -226,7 +222,10 @@ public class Customer : MonoBehaviour {
                     RemainingUrinateStopDelay -= 1 * Time.deltaTime;
                 }
                 else {
-                    EndPeeingWithThing();
+                    if (!HasNext) {
+                        HasNext = true;
+                        Next = EndPeeingWithThing;
+                    }
                 }
             }
             // If bladder isnt emptying, set it to empty
@@ -276,14 +275,6 @@ public class Customer : MonoBehaviour {
         else {
             Navigation.Remove(next);
         }
-
-        //if ( transform.position.x != Destination.x || transform.position.y != Destination.y ) {
-        //    float distanceX = Math.Abs(transform.position.x - Destination.x);
-        //    float distanceY = Math.Abs(transform.position.y - Destination.y);
-        //    double moveAmount = Math.Max(( MoveSpeed * Time.deltaTime * ( distanceX + distanceY ) ) + 1, 1d);
-        //    transform.position = Vector3.MoveTowards(transform.position, Destination, (float)moveAmount);
-        //}
-
     }
     public bool AtDestination() {
         return transform.position == Destination && Navigation.Count() < 2;
@@ -314,8 +305,6 @@ public class Customer : MonoBehaviour {
     public Collections.CustomerDesperationState DesperationState = Collections.CustomerDesperationState.State0;
     public Collections.BladderControlState CustomerState = Collections.BladderControlState.Normal;
     public Bladder bladder = new Bladder();
-    //private int minutesSinceLastRelief;
-    //public string LastReliefAt => $"{minutesSinceLastRelief % 60}";
     public int Shyness { get; set; }
 
     // Times
@@ -436,6 +425,7 @@ public class Customer : MonoBehaviour {
         IsRelievingSelf = false;
         Emotes.Emote(null);
         Emotes.ShowBladderCircle(false);
+        ActionState = Collections.CustomerActionState.None;
         if ( IsWet ) {
             if ( position != Collections.Location.Bar ) {
                 foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar) {
@@ -446,13 +436,16 @@ public class Customer : MonoBehaviour {
             position = Collections.Location.Outside;
             Occupying.OccupiedBy = null;
             Occupying = null;
-            ActionState = Collections.CustomerActionState.None;
+        }
+        else if (Bathroom.bathroom.Sinks.Line.HasOpenWaitingSpot()) {
+            Bathroom.bathroom.Sinks.EnterLine(this);
         }
         else {
             ActionState = Collections.CustomerActionState.None;
             Seat seat = Bar.GetOpenSeat();
             seat.MoveCustomerIntoSpot(this);
         }
+
         if ( ReliefType == Collections.ReliefType.Toilet ) {
             ( (Toilet)Occupying ).SRenderer.sprite = Collections.spriteStallOpened;
         }
@@ -640,8 +633,8 @@ public class Customer : MonoBehaviour {
         return false;
     }
     public bool MenuOptionGotoSink() {
-        if (Bathroom.bathroom.HasSinkAvailable) {
-            EnterRelief(Bathroom.bathroom.Sinks.FirstUnoccupied());
+        if (Bathroom.bathroom.HasSinkForRelief) {
+            EnterRelief(Bathroom.bathroom.Sinks.FirstUnoccupiedSink());
             return true;
         }
         return false;
@@ -675,6 +668,14 @@ public class Customer : MonoBehaviour {
         MinTimeAtBarNow = 0f;
         MinTimeBetweenChecksNow = 0f;
         seat.MoveCustomerIntoSpot(this);
+        HasNext = false;
+    }
+    public void EnterBar() {
+        Seat seat = Bar.Singleton.GetOpenSeat();
+        MinTimeAtBarNow = 0f;
+        MinTimeBetweenChecksNow = 0f;
+        seat.MoveCustomerIntoSpot(this);
+        HasNext = false;
     }
     // Fully leaves the area
     public void Leave() {
