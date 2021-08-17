@@ -2,13 +2,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
     // Unique Id System
     static private int uid = 0;
     static public int GetUid() => uid++;
+
+    [SerializeField]
+    public float runTime = 0f;
+    [SerializeField]
+    public int timeIncrementsElapsed = 0;
+    [SerializeField]
+    public DateTime barTime;
+    [SerializeField]
+    public Text barTimeDisplay;
+    [SerializeField]
+    public int AdvanceBarTimeEveryXSeconds;
+    [SerializeField]
+    public int AdvanceBarTimeByXMinutes;
 
     public Customer templateCustomer;
 
@@ -29,19 +44,25 @@ public class GameController : MonoBehaviour {
         }
         controller = this;
         maxCustomers = Bar.Singleton.Seats.Length;
+
+        barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
+
         Customer firstCustomer = CreateCustomer();
         firstCustomer.Active = true;
     }
 
-    // Think once a second. Performance optimization because Unity poo-poo.
+    // Think only once a second for better game performance.
     float timeAcc = 0f;
     void Update() {
+        runTime += Time.deltaTime;
         timeAcc += Time.deltaTime;
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             DespawnCustomerOutside();
             Think();
         }
+
+        barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
     private void DespawnCustomerOutside() {
@@ -66,6 +87,13 @@ public class GameController : MonoBehaviour {
                 ticksSinceLastSpawn = 0;
             }
         }
+
+        // Update the bar time
+        if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeIncrementsElapsed ) {
+            timeIncrementsElapsed++;
+            barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
+        }
+        barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
 
     // Closes any open menu
