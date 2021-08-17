@@ -269,8 +269,8 @@ public class Customer : MonoBehaviour {
         if ( transform.position.x != next.x || transform.position.y != next.y ) {
             float distanceX = Math.Abs(transform.position.x - next.x);
             float distanceY = Math.Abs(transform.position.y - next.y);
-            double moveAmount = Math.Max(( MoveSpeed * Time.deltaTime * ( distanceX + distanceY ) ) + 1, 1d);
-            transform.position = Vector3.MoveTowards(transform.position, next, (float)moveAmount);
+            float moveAmount = Math.Max(2.1f * (distanceX + distanceY), (float)MoveSpeed);
+            transform.position = Vector3.MoveTowards(transform.position, next, moveAmount * Time.deltaTime);
         }
         else {
             Navigation.Remove(next);
