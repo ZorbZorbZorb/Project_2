@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Characters {
     [Serializable]
@@ -9,6 +10,8 @@ namespace Assets.Scripts.Characters {
         public RectTransform BladderCircleTransform;
         [SerializeField]
         public SpriteRenderer EmoteSpriteRenderer;
+        [SerializeField]
+        public Text BladderAmountText;
         [SerializeField] public double bladderWidthCalculationFactor1 = -0.6d;
         [SerializeField] public double bladderWidthCalculationFactor2 = 1.2d;
         [SerializeField] public double bladderWidthCalculationFactor3 = 1.8d;
@@ -70,6 +73,9 @@ namespace Assets.Scripts.Characters {
                 double y = width * multiplier * scaleY;
 
                 BladderCircleTransform.localScale = new Vector3((float)x, (float)y);
+
+                // Update text display
+                BladderAmountText.text = $"{Math.Round(Customer.bladder.Amount / 1000d, 1)}L";
             }
         }
         public void ShowBladderCircle(bool value) {
@@ -90,10 +96,11 @@ namespace Assets.Scripts.Characters {
             }
         }
 
-        public Emotes(Customer customer, SpriteRenderer emoteSpriteRenderer, RectTransform bladderCircleTransform) {
+        public Emotes(Customer customer, SpriteRenderer emoteSpriteRenderer, RectTransform bladderCircleTransform, Text bladderAmountText) {
             Customer = customer;
             EmoteSpriteRenderer = emoteSpriteRenderer;
             BladderCircleTransform = bladderCircleTransform;
+            BladderAmountText = bladderAmountText;
         }
     }
 }

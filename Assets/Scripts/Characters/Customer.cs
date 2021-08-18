@@ -20,7 +20,7 @@ public class Customer : MonoBehaviour {
         UID = GameController.GetUid();
         Menu.enabled = false;
 
-        Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform);
+        Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
 
         SetupButtons();
     }
@@ -282,6 +282,9 @@ public class Customer : MonoBehaviour {
 
     [SerializeField]
     public SpriteRenderer SRenderer;
+
+    [SerializeField]
+    public Text EmotesBladderAmountText;
 
     public bool CheatPeeNow = false;
 

@@ -71,22 +71,66 @@ public class GameController : MonoBehaviour {
             RemoveCustomer(target);
         }
     }
+    private int CustomersInBarNotDesperate() {
+        return customers
+            .Where(x => x.DesperationState == Collections.CustomerDesperationState.State0 || x.DesperationState == Collections.CustomerDesperationState.State1)
+            .Count();
+    }
+    private int CustomersInBarDesperate() {
+        return customers
+            .Where(x => 
+            x.DesperationState == Collections.CustomerDesperationState.State3 || 
+                x.DesperationState != Collections.CustomerDesperationState.State4)
+            .Count();
+    }
+    private int GetCustomersAboutToWetCount() {
+        return customers
+            .Where(x =>
+                x.bladder.Percentage > 1d ||
+                x.bladder.LosingControl)
+            .Count();
+    }
+    private int GetReliefAvailableCount() {
+        return Bathroom.bathroom.Toilets.Count() + Bathroom.bathroom.Urinals.Count() + Bathroom.bathroom.Sinks.Items.Count();
+    }
+    private int GetCustomersPeeingCOunt() {
+        return customers.Where(x => x.bladder.Emptying).Count();
+    }
 
     // Thinks about what should happen next, spawning customers
     private void Think() {
-        ticksSinceLastSpawn++;
         // Customer spawning
-        if ( customers.Count < 10 ) {
-            if ( ticksSinceLastSpawn < 2) {
-                return;
-            }
-            int random = Random.Range(0, 6);
-            if ( random == 1 || ticksSinceLastSpawn > 10 ) {
-                Customer customer = CreateCustomer();
-                customer.Active = true;
+        if ( customers.Count < maxCustomers ) {
+            ticksSinceLastSpawn++;
+            bool spawnNow = Random.Range(0, 6) == 0;
+            if ((spawnNow && ticksSinceLastSpawn > 1) || ticksSinceLastSpawn > 6) {
                 ticksSinceLastSpawn = 0;
+                //int customersDesperateCount = CustomersInBarDesperate();
+                //int customersNotDesperateCount = CustomersInBarNotDesperate();
+                int reliefCount = GetReliefAvailableCount();
+                int aboutToWetCount = GetCustomersAboutToWetCount();
+                int customersPeeing = GetCustomersPeeingCOunt();
+                //if (((customersNotDesperateCount / 2) > customersDesperateCount) && (aboutToWetCount < reliefCount)) {
+                if (aboutToWetCount + customersPeeing <= reliefCount) {
+                    Customer customer = SpawnCustomerInBar(desperate: true);
+                }
+                else {
+                    Customer customer = SpawnCustomerInBar(desperate: false);
+                }
             }
         }
+
+        //if ( customers.Count < 10 ) {
+        //    if ( ticksSinceLastSpawn < 2) {
+        //        return;
+        //    }
+        //    int random = Random.Range(0, 6);
+        //    if ( random == 1 || ticksSinceLastSpawn > 10 ) {
+        //        Customer customer = CreateCustomer();
+        //        customer.Active = true;
+        //        ticksSinceLastSpawn = 0;
+        //    }
+        //}
 
         // Update the bar time
         if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeIncrementsElapsed ) {
@@ -104,6 +148,34 @@ public class GameController : MonoBehaviour {
 
     public Customer SpawnCustomerInBar(double metric) {
         throw new NotImplementedException();
+    }
+    public Customer SpawnCustomerInBar(bool desperate) {
+        Customer newCustomer = Instantiate(templateCustomer);
+        newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
+        customers.Add(newCustomer);
+        if (desperate) {
+            newCustomer.SetupCustomer(80, 100);
+        }
+        else {
+            newCustomer.SetupCustomer(30, 92);
+        }
+        Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
+        newCustomer.Active = true;
+        bool enteredDoorway = false;
+        if ( newCustomer.FeelsNeedToGo &&
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) {
+
+            enteredDoorway = newCustomer.EnterDoorway();
+        }
+        // Else sit right down at the bar and wait
+        if ( !enteredDoorway ) {
+            Seat seat = Bar.Singleton.GetOpenSeat();
+            seat.MoveCustomerIntoSpot(newCustomer);
+        }
+
+        return newCustomer;
     }
 
     public Customer CreateCustomer() {
