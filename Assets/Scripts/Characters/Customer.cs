@@ -620,7 +620,7 @@ public class Customer : MonoBehaviour {
             return null;
         }
     }
-    // Sends this customer to the toilets
+    // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
         if (Bathroom.bathroom.HasToiletAvailable) {
             EnterRelief(Bathroom.bathroom.GetToilet());
