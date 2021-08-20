@@ -44,6 +44,7 @@ public class Sinks {
             Sink sink = (Sink)customer.Occupying;
             customer.UseInteractable(sink);
             sink.Use(customer);
+            return;
         }
         else {
             customer.Occupying.OccupiedBy = null;
