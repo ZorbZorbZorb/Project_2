@@ -12,6 +12,9 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     public bool spawningEnabled = true;
 
+    [SerializeField]
+    public double funds = 0d;
+
     // Unique Id System
     static private int uid = 0;
     static public int GetUid() => uid++;
@@ -24,6 +27,8 @@ public class GameController : MonoBehaviour {
     public DateTime barTime;
     [SerializeField]
     public Text barTimeDisplay;
+    [SerializeField]
+    public Text fundsDisplay;
     [SerializeField]
     public int AdvanceBarTimeEveryXSeconds;
     [SerializeField]
@@ -97,8 +102,30 @@ public class GameController : MonoBehaviour {
     private int GetReliefAvailableCount() {
         return Bathroom.bathroom.Toilets.Count() + Bathroom.bathroom.Urinals.Count() + Bathroom.bathroom.Sinks.Items.Count();
     }
-    private int GetCustomersPeeingCOunt() {
+    private int GetCustomersPeeingCount() {
         return customers.Where(x => x.bladder.Emptying).Count();
+    }
+
+    private void AddFunds() {
+        var c = customers.Where(x => 
+        x.position == Collections.Location.Bar &&
+        x.DesperationState != Collections.CustomerDesperationState.State6 &&
+        x.DesperationState != Collections.CustomerDesperationState.State5 &&
+        x.DesperationState != Collections.CustomerDesperationState.State4).Count();
+        
+        funds += c * 10d;
+        UpdateFundsDisplay();
+    }
+    public void UpdateFundsDisplay() {
+        fundsDisplay.text = "$" + Math.Round(funds, 0).ToString();
+    }
+
+    private void AdvanceTime() {
+        timeIncrementsElapsed++;
+        barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
+        barTimeDisplay.text = barTime.ToString("hh:mm tt");
+        
+        AddFunds();
     }
 
     // Thinks about what should happen next, spawning customers
@@ -113,7 +140,7 @@ public class GameController : MonoBehaviour {
                 //int customersNotDesperateCount = CustomersInBarNotDesperate();
                 int reliefCount = GetReliefAvailableCount();
                 int aboutToWetCount = GetCustomersAboutToWetCount();
-                int customersPeeing = GetCustomersPeeingCOunt();
+                int customersPeeing = GetCustomersPeeingCount();
                 //if (((customersNotDesperateCount / 2) > customersDesperateCount) && (aboutToWetCount < reliefCount)) {
                 if (aboutToWetCount + customersPeeing <= reliefCount) {
                     Customer customer = SpawnCustomerInBar(desperate: true);
@@ -124,25 +151,12 @@ public class GameController : MonoBehaviour {
             }
         }
 
-        //if ( customers.Count < 10 ) {
-        //    if ( ticksSinceLastSpawn < 2) {
-        //        return;
-        //    }
-        //    int random = Random.Range(0, 6);
-        //    if ( random == 1 || ticksSinceLastSpawn > 10 ) {
-        //        Customer customer = CreateCustomer();
-        //        customer.Active = true;
-        //        ticksSinceLastSpawn = 0;
-        //    }
-        //}
-
         // Update the bar time
         if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeIncrementsElapsed ) {
-            timeIncrementsElapsed++;
-            barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
+            AdvanceTime();
         }
-        barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
+
 
     // Closes any open menu
     public void CloseOpenMenus() {
