@@ -237,6 +237,7 @@ public class Customer : MonoBehaviour {
             // When finished peeing
             if ( !bladder.Emptying && bladder.Percentage < 0.1 ) {
                 ActionState = relief.StatePantsUp;
+                Emotes.Emote(Emote.PantsUp);
                 if ( RemainingUrinateStopDelay > 0 ) {
                     RemainingUrinateStopDelay -= 1 * Time.deltaTime;
                 }
