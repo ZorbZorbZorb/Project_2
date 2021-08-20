@@ -1,14 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Random = UnityEngine.Random;
-using UnityEngine.UI;
-using Assets.Scripts.Interfaces;
-using System.Linq;
-using Assets.Scripts.Objects;
-using UnityEngine.EventSystems;
 using Assets.Scripts.Characters;
+using Assets.Scripts.Objects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Customer : MonoBehaviour {
     void Start() {
@@ -210,6 +208,10 @@ public class Customer : MonoBehaviour {
     }
 
     private void PeeLogicUpdate() {
+        if ( Next != null && !bladder.ShouldWetNow ) {
+            return;
+        }
+
         FeelsNeedToGo = bladder.FeltNeed > 0.40d;
         DesperationState = GetDesperationState();
 

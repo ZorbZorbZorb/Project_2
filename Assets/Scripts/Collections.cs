@@ -70,6 +70,7 @@ public class Collections : MonoBehaviour {
             { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/People/f/pants_up") },
             { CustomerActionState.ToiletPantsUp, Resources.Load<Sprite>("Sprites/People/f/pants_up") },
             { CustomerActionState.UrinalPantsUp, Resources.Load<Sprite>("Sprites/People/f/pants_up") },
+            { CustomerActionState.SinkWashingHands, Resources.Load<Sprite>("Sprites/People/f/wash") },
         };
         ActionSpriteLookupM = new Dictionary<CustomerActionState, Sprite>() {
             { CustomerActionState.ToiletPeeing, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
@@ -81,6 +82,7 @@ public class Collections : MonoBehaviour {
             { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
             { CustomerActionState.ToiletPantsUp, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
             { CustomerActionState.UrinalPantsUp, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
+            { CustomerActionState.SinkWashingHands, Resources.Load<Sprite>("Sprites/People/m/wash") },
         };
 
         BubbleSpriteLookupM = new Dictionary<CustomerActionState, Sprite>() {

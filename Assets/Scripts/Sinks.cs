@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Assets.Scripts.Objects;
 
 [Serializable]
 public class Sinks {
@@ -39,7 +40,7 @@ public class Sinks {
         return Line.HasOpenWaitingSpot();
     }
     public void EnterLine(Customer customer) {
-        if (customer.Occupying.Type == Assets.Scripts.Objects.CustomerInteractable.InteractableType.Sink) {
+        if (customer.Occupying.Type == CustomerInteractable.InteractableType.Sink) {
             Sink sink = (Sink)customer.Occupying;
             customer.UseInteractable(sink);
             sink.Use(customer);
