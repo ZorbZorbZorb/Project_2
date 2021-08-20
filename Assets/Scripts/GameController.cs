@@ -8,6 +8,10 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
+
+    [SerializeField]
+    public bool spawningEnabled = true;
+
     // Unique Id System
     static private int uid = 0;
     static public int GetUid() => uid++;
@@ -100,7 +104,7 @@ public class GameController : MonoBehaviour {
     // Thinks about what should happen next, spawning customers
     private void Think() {
         // Customer spawning
-        if ( customers.Count < maxCustomers ) {
+        if ( spawningEnabled && customers.Count < maxCustomers ) {
             ticksSinceLastSpawn++;
             bool spawnNow = Random.Range(0, 6) == 0;
             if ((spawnNow && ticksSinceLastSpawn > 1) || ticksSinceLastSpawn > 6) {
