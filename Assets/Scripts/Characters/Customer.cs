@@ -130,6 +130,7 @@ public class Customer : MonoBehaviour {
                 GameController.controller.RemoveCustomer(this);
             }
         }
+
         // If wet self and finished wetting self
         if (IsWet && !IsWetting) {
             if (WetSelfLeaveBathroomDelayRemaining > 0) {
@@ -140,17 +141,31 @@ public class Customer : MonoBehaviour {
             }
         }
 
-        // If not in any bathroom and bladder is full, go to bathroom
-        if ( MinTimeBetweenChecksNow < MinTimeBetweenChecks ) {
+        if (IsWetting) {
             return;
         }
-        else if (position == Collections.Location.Bar) {
+
+        // If not min time between thinking
+        bool minCheckTime = bladder.ControlRemaining > 90d ?
+            MinTimeBetweenChecksNow >= MinTimeBetweenChecks
+            : MinTimeBetweenChecksNow * 2 >= MinTimeBetweenChecks;
+        if (!minCheckTime ) {
+            return;
+        }
+        else {
             MinTimeBetweenChecksNow = 0f;
+        }
+
+        // If not in any bathroom and bladder is full, go to bathroom
+        if (position == Collections.Location.Bar) {
             if (FeelsNeedToGo) {
-                if ( MinTimeAtBarNow < MinTimeAtBar ) {
-                    return;
-                }
-                else {
+                // Min check at bar time halved if they're desperate to go.
+                var minCheckTimeBar = bladder.ControlRemaining > 90d ?
+                    MinTimeAtBarNow >= MinTimeAtBar
+                    : MinTimeAtBarNow * 2 >= MinTimeAtBar;
+                // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
+                var bladderTooFull = bladder.ControlRemaining <= 0d;
+                if (minCheckTimeBar && !bladderTooFull) {
                     // Try to enter the bathroom
                     if ( !EnterDoorway() ) {
                         MinTimeAtBarNow = MinTimeAtBar / 1.5f;
@@ -160,6 +175,8 @@ public class Customer : MonoBehaviour {
                     }
                 }
             }
+
+            // Else check to leave.
             else {
                 if (Random.Range(0, 11) == 0) {
                     Leave();
@@ -620,7 +637,7 @@ public class Customer : MonoBehaviour {
             return null;
         }
     }
-    // Sends this customer to the toilets
+    // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
         if (Bathroom.bathroom.HasToiletAvailable) {
             EnterRelief(Bathroom.bathroom.GetToilet());
