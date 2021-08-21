@@ -60,6 +60,14 @@ public class GameController : MonoBehaviour {
         firstCustomer.Active = true;
     }
 
+    public int nightMaxTime = 30;
+    public int nightMaxCustomerSpawnTime = 20;
+    public double GetCustomerSpawnFactor(int currentTime, int endTime) {
+        return currentTime >= endTime
+            ? 0d
+            : Math.Sin(( currentTime / endTime ) * Math.PI);
+    }
+
     // Think only once a second for better game performance.
     float timeAcc = 0f;
     void Update() {
