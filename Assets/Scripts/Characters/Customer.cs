@@ -160,7 +160,7 @@ public class Customer : MonoBehaviour {
                     MinTimeAtBarNow >= MinTimeAtBar
                     : MinTimeAtBarNow * 2 >= MinTimeAtBar;
                 // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
-                var bladderTooFull = bladder.ControlRemaining <= 0d;
+                var bladderTooFull = bladder.ControlRemaining <= 0d || bladder.LossOfControlTimeNow < bladder.LossOfControlTime;
                 if (minCheckTimeBar && !bladderTooFull && !IsWetting && !IsWet) {
                     // Try to enter the bathroom
                     if ( !EnterDoorway() ) {
@@ -672,6 +672,8 @@ public class Customer : MonoBehaviour {
     // Goes to the doorway queue
     public bool EnterDoorway() {
         if ( DoorwayQueue.doorwayQueue.HasOpenWaitingSpot() ) {
+            // Makes customer hold on for a while longer when entering doorway.
+            bladder.ResetLossOfControlTime();
             WaitingSpot waitingSpot = DoorwayQueue.doorwayQueue.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.Doorway;

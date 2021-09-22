@@ -18,7 +18,7 @@ public class Bladder {
     public double FeltNeed;  // How badly this customer thinks they need to go, 0.0 to 1.0
     public double ControlRemaining;
     public double LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
-    public double LossOfControlTimeRemaining;
+    public double LossOfControlTimeNow;
     
     public DateTime LastPeedAt;
     public int DrinksHad;
@@ -32,6 +32,14 @@ public class Bladder {
     public bool StartedLosingControlThisFrame;
 
     public double Percentage => Amount / Max;
+
+    /// <summary>
+    /// Forces bladder to hold on a bit longer by resetting loss of control time.
+    /// <para>does not reset state for wetting or control remaining.</para>
+    /// </summary>
+    public void ResetLossOfControlTime() {
+        LossOfControlTimeNow = LossOfControlTime;
+    }
 
     public void Update() {
         // Set all started/stopped x this frame bools to false
@@ -49,8 +57,8 @@ public class Bladder {
         else if (LosingControl) {
             DoBladderFill();
             double timeToSubtract = 1 * Time.deltaTime;
-            LossOfControlTimeRemaining -= timeToSubtract;
-            if (LossOfControlTimeRemaining <= 0) {
+            LossOfControlTimeNow -= timeToSubtract;
+            if (LossOfControlTimeNow <= 0) {
                 LosingControl = false;
                 ShouldWetNow = true;
             }
@@ -136,7 +144,7 @@ public class Bladder {
         FillRate = fillRate;
         ControlRemaining = controlRemaining;
         LossOfControlTime = lossOfControlTime;
-        LossOfControlTimeRemaining = lossOfControlTime;
+        LossOfControlTimeNow = lossOfControlTime;
         LastPeedAt = DateTime.Now;
 
         ResetFrameStates();
