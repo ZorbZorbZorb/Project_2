@@ -47,6 +47,16 @@ public class GameController : MonoBehaviour {
 
     public static GameController controller = null;
 
+    public static bool menuOpen = false;
+
+    void PauseGame() {
+        Time.timeScale = 0;
+    }
+
+    void ResumeGame() {
+        Time.timeScale = 1;
+    }
+
     void Start() {
         if ( controller != null ) {
             throw new InvalidOperationException("Only one game controller may exist");
@@ -80,7 +90,31 @@ public class GameController : MonoBehaviour {
         }
 
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
+
+        HandleKeypresses();
     }
+
+    private void HandleKeypresses() {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            ToggleMenu();
+        }
+    }
+    private void OpenMenu() {
+        PauseGame();
+    }
+    private void CloseMenu() {
+        ResumeGame();
+    }
+    private void ToggleMenu() {
+        if (menuOpen) {
+            CloseMenu();
+        }
+        else {
+            OpenMenu();
+        }
+    }
+
+
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
     private void DespawnCustomerOutside() {
         Customer[] targets = customers.Where(x => x.position == Collections.Location.Outside && x.AtDestination() && x.Active).ToArray();
