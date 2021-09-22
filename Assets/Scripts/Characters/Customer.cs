@@ -123,10 +123,8 @@ public class Customer : MonoBehaviour {
         }
 
         // If about to leave or has left
-        if ( position == Collections.Location.Outside ) {
-            if (AtDestination()) {
-                GameController.controller.RemoveCustomer(this);
-            }
+        if ( position == Collections.Location.Outside && AtDestination() && transform.position == Collections.OffScreenTop ) {
+            GameController.controller.RemoveCustomer(this);
         }
 
         // If wet self and finished wetting self
@@ -163,7 +161,7 @@ public class Customer : MonoBehaviour {
                     : MinTimeAtBarNow * 2 >= MinTimeAtBar;
                 // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
                 var bladderTooFull = bladder.ControlRemaining <= 0d;
-                if (minCheckTimeBar && !bladderTooFull) {
+                if (minCheckTimeBar && !bladderTooFull && !IsWetting && !IsWet) {
                     // Try to enter the bathroom
                     if ( !EnterDoorway() ) {
                         MinTimeAtBarNow = MinTimeAtBar / 1.5f;
