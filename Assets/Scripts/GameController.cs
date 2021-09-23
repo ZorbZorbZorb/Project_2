@@ -51,10 +51,12 @@ public class GameController : MonoBehaviour {
 
     void PauseGame() {
         Time.timeScale = 0;
+        Debug.Log("Game paused.");
     }
 
     void ResumeGame() {
         Time.timeScale = 1;
+        Debug.Log("Game resumed.");
     }
 
     void Start() {
@@ -100,9 +102,11 @@ public class GameController : MonoBehaviour {
         }
     }
     private void OpenMenu() {
+        menuOpen = true;
         PauseGame();
     }
     private void CloseMenu() {
+        menuOpen = false;
         ResumeGame();
     }
     private void ToggleMenu() {
