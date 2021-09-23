@@ -89,7 +89,7 @@ public class Customer : MonoBehaviour {
     public NextAction Next;
     public float NextDelay = 0f;
     public double Funds = 0d;
-    public float LastDrinkAt = -20f;
+    public float LastDrinkAt = -25f;
     public float DrinkInterval = 30f;
 
     private Collections.CustomerDesperationState GetDesperationState() {

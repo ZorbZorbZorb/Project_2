@@ -23,6 +23,7 @@ namespace Assets.Scripts.Objects {
         public Customer OccupiedBy;
         public abstract bool HidesCustomer { get; }
         public abstract bool CanWetHere { get; }
+        public bool IsWet { get; set; }
         public abstract Collections.ReliefType ReliefType { get; }
         public int UID { get => uid; }
         private readonly int uid = GameController.GetUid();

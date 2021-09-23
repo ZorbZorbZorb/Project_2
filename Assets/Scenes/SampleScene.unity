@@ -1688,8 +1688,6 @@ MonoBehaviour:
   timeIncrementsElapsed: 0
   barTimeDisplay: {fileID: 248144060}
   fundsDisplay: {fileID: 1030702937}
-  AdvanceBarTimeEveryXSeconds: 30
-  AdvanceBarTimeByXMinutes: 5
   templateCustomer: {fileID: 1592566869}
   ticksSinceLastSpawn: 0
   maxCustomers: 0
@@ -5887,6 +5885,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HasNext: 0
   NextDelay: 0
+  Funds: 0
+  LastDrinkAt: -20
+  DrinkInterval: 30
   SRenderer: {fileID: 1907411329}
   EmotesBladderAmountText: {fileID: 1318797695}
   CheatPeeNow: 0
@@ -8199,7 +8200,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2085692878
 RectTransform:
   m_ObjectHideFlags: 0

@@ -167,16 +167,6 @@ public class GameController : MonoBehaviour {
         return customers.Where(x => x.bladder.Emptying).Count();
     }
 
-    //private void AddFunds() {
-    //    var c = customers.Where(x => 
-    //    x.position == Collections.Location.Bar &&
-    //    x.DesperationState != Collections.CustomerDesperationState.State6 &&
-    //    x.DesperationState != Collections.CustomerDesperationState.State5 &&
-    //    x.DesperationState != Collections.CustomerDesperationState.State4).Count();
-        
-    //    funds += c * 10d;
-    //    UpdateFundsDisplay();
-    //}
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(funds, 0).ToString();
     }

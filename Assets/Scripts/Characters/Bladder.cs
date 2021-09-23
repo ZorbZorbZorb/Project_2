@@ -75,7 +75,7 @@ public class Bladder {
         double amountToAdd = FillRate * Time.deltaTime;
         Amount += amountToAdd;
         if (Stomach > 0) {
-            amountToAdd = Time.deltaTime * (2 + (Stomach/100));
+            amountToAdd = Time.deltaTime * (2 + (Stomach/200));
             Stomach -= amountToAdd;
             Amount += amountToAdd;
         }
