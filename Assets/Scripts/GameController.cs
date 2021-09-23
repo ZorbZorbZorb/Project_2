@@ -55,6 +55,7 @@ public class GameController : MonoBehaviour {
 
     void PauseGame() {
         Time.timeScale = 0;
+        CloseOpenInPlayMenus();
         Debug.Log("Game paused.");
     }
 
@@ -209,7 +210,7 @@ public class GameController : MonoBehaviour {
 
 
     // Closes any open menu
-    public void CloseOpenMenus() {
+    public void CloseOpenInPlayMenus() {
         // Close customer menus
         customers.Where(x => x.Menu.enabled == true).ToList().ForEach(x => x.MenuClose());
     }

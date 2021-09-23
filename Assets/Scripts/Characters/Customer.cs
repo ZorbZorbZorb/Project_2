@@ -59,14 +59,19 @@ public class Customer : MonoBehaviour {
         // Emote think
         Emotes.Update();
 
-        if (Menu.enabled) {
-            // Menu auto-close
-            if (!CanDisplayMenu()) {
-                MenuClose();
-            } 
-            // Menu update
-            else {
-                MenuUpdate();
+        if (GameController.GamePaused && Menu.enabled) {
+            MenuClose();
+        }
+        else {
+            if (Menu.enabled) {
+                // Menu auto-close
+                if (!CanDisplayMenu()) {
+                    MenuClose();
+                } 
+                // Menu update
+                else {
+                    MenuUpdate();
+                }
             }
         }
 
@@ -356,27 +361,30 @@ public class Customer : MonoBehaviour {
     public void SpriteUpdate() {
         // Set the sprite
         Sprite sprite = Collections.GetPersonSprite(this);
-        if (sprite != SRenderer.sprite) {
+        if ( sprite != SRenderer.sprite ) {
             SRenderer.sprite = sprite;
         }
 
         // Sprite shaking to show desperation
         // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
         // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
-        switch ( DesperationState ) {
-            case Collections.CustomerDesperationState.State4:
-            if ( Time.frameCount % 2 == 0 ) {
-                SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 5), Random.Range(0, 5), 0);
+        // Do not run if paused.
+        if ( !GameController.GamePaused ) {
+            switch ( DesperationState ) {
+                case Collections.CustomerDesperationState.State4:
+                if ( Time.frameCount % 2 == 0 ) {
+                    SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 5), Random.Range(0, 5), 0);
+                }
+                break;
+                case Collections.CustomerDesperationState.State3:
+                if ( Time.frameCount % 20 == 0 ) {
+                    SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 4), 0, 0);
+                }
+                break;
+                default:
+                SRenderer.transform.position = this.gameObject.transform.position;
+                break;
             }
-            break;
-            case Collections.CustomerDesperationState.State3:
-            if ( Time.frameCount % 20 == 0 ) {
-                SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 4), 0, 0);
-            }
-            break;
-            default:
-            SRenderer.transform.position = this.gameObject.transform.position;
-            break;
         }
     }
 
@@ -526,6 +534,11 @@ public class Customer : MonoBehaviour {
             return;
         }
 
+        // Can't open menu when game paused.
+        if (GameController.GamePaused) {
+            return;
+        }
+
         // Toggle closed
         if (Menu.enabled) {
             MenuClose();
@@ -534,7 +547,7 @@ public class Customer : MonoBehaviour {
         // Toggle opened
         else if ( CanDisplayMenu() ) {
             // Close any open customer menus
-            GameController.controller.CloseOpenMenus();
+            GameController.controller.CloseOpenInPlayMenus();
             // Open this customers menu
             MenuOpen();
         }
