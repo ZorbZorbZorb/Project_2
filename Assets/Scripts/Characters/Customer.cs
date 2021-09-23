@@ -24,6 +24,8 @@ public class Customer : MonoBehaviour {
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        Funds = Random.Range(20f, 100f);
+
         bladder = new Bladder();
         bladder.SetupBladder(minBladderPercent, maxBladderPercent);
 
@@ -86,6 +88,9 @@ public class Customer : MonoBehaviour {
     public delegate void NextAction();
     public NextAction Next;
     public float NextDelay = 0f;
+    public double Funds = 0d;
+    public float LastDrinkAt = -20f;
+    public float DrinkInterval = 30f;
 
     private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
@@ -113,15 +118,15 @@ public class Customer : MonoBehaviour {
 
     void Think() {
         // Next action delegate code
-        if (Next != null) {
-            if ( NextDelay > 0f) {
+        if ( Next != null ) {
+            if ( NextDelay > 0f ) {
                 return;
             }
             else {
                 NextAction last = Next;
                 Next();
                 // Clear if not updated
-                if (Next.Method == last.Method) {
+                if ( Next.Method == last.Method ) {
                     Next = null;
                 }
             }
@@ -133,16 +138,20 @@ public class Customer : MonoBehaviour {
         }
 
         // If wet self and finished wetting self
-        if (IsWet && !IsWetting) {
-            if (WetSelfLeaveBathroomDelayRemaining > 0) {
+        if ( IsWet && !IsWetting ) {
+            if ( WetSelfLeaveBathroomDelayRemaining > 0 ) {
                 WetSelfLeaveBathroomDelayRemaining -= Time.deltaTime;
             }
-            else if (position != Collections.Location.Outside) {
+            else if ( position != Collections.Location.Outside ) {
                 Leave();
             }
         }
 
-        if (IsWetting) {
+        if ( IsWetting ) {
+            return;
+        }
+
+        if (!AtDestination()) {
             return;
         }
 
@@ -150,40 +159,70 @@ public class Customer : MonoBehaviour {
         bool minCheckTime = bladder.ControlRemaining > 90d ?
             MinTimeBetweenChecksNow >= MinTimeBetweenChecks
             : MinTimeBetweenChecksNow * 2 >= MinTimeBetweenChecks;
-        if (!minCheckTime ) {
+        if ( !minCheckTime ) {
             return;
         }
         else {
             MinTimeBetweenChecksNow = 0f;
         }
 
-        // If not in any bathroom and bladder is full, go to bathroom
-        if (position == Collections.Location.Bar) {
-            if (FeelsNeedToGo) {
-                // Min check at bar time halved if they're desperate to go.
-                var minCheckTimeBar = bladder.ControlRemaining > 90d ?
-                    MinTimeAtBarNow >= MinTimeAtBar
-                    : MinTimeAtBarNow * 2 >= MinTimeAtBar;
-                // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
-                var bladderTooFull = bladder.ControlRemaining <= 0d || bladder.LossOfControlTimeNow < bladder.LossOfControlTime;
-                if (minCheckTimeBar && !bladderTooFull && !IsWetting && !IsWet) {
-                    // Try to enter the bathroom
-                    if ( !EnterDoorway() ) {
-                        MinTimeAtBarNow = MinTimeAtBar / 1.5f;
-                    }
-                    else {
-                        MinTimeAtBarNow = 0f;
-                    }
-                }
-            }
+        // If in bar...
+        if ( position == Collections.Location.Bar ) {
+            ThinkAboutThingsInBar();
+        }
+    }
 
-            // Else check to leave.
-            else {
-                if (Random.Range(0, 11) == 0) {
-                    Leave();
+    private void ThinkAboutThingsInBar() {
+        // Should get up to pee?
+        if ( FeelsNeedToGo ) {
+            // Min check at bar time halved if they're desperate to go.
+            var minCheckTimeBar = bladder.ControlRemaining > 90d ?
+                MinTimeAtBarNow >= MinTimeAtBar
+                : MinTimeAtBarNow * 2 >= MinTimeAtBar;
+            // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
+            var bladderTooFull = bladder.ControlRemaining <= 0d || bladder.LossOfControlTimeNow < bladder.LossOfControlTime;
+            if ( minCheckTimeBar && !bladderTooFull && !IsWetting && !IsWet ) {
+                // Try to enter the bathroom
+                if ( !EnterDoorway() ) {
+                    MinTimeAtBarNow = MinTimeAtBar / 1.5f;
+                }
+                else {
+                    MinTimeAtBarNow = 0f;
                 }
             }
         }
+        // Check to leave.
+        else if ( WantsToLeaveBar() ) {
+            Leave();
+        }
+        // Check to buy drink?
+        else {
+            if ( Funds >= Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > DrinkInterval ) {
+                BuyDrink();
+            }
+        }
+    }
+
+    public void BuyDrink() {
+        Debug.Log($"Customer {UID} bought a drink");
+        LastDrinkAt = TotalTimeAtBar;
+        Funds -= Bar.DrinkCost;
+        GameController.AddFunds(Bar.DrinkCost);
+    }
+
+    public bool WantsToLeaveBar() {
+        Collections.CustomerDesperationState[] tooDesperateStates = {
+            Collections.CustomerDesperationState.State4,
+            Collections.CustomerDesperationState.State3
+        };
+        bool tooDesperate = tooDesperateStates.Contains(DesperationState);
+
+        return
+            ( IsWet && !IsWetting ) ||
+
+            !tooDesperate &&
+            ((TotalTimeAtBar / GameController.AdvanceBarTimeEveryXSeconds ) * GameController.AdvanceBarTimeByXMinutes > 120 || 
+                Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f);
     }
 
     private Collections.CustomerActionState LastActionState;

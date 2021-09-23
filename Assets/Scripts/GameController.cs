@@ -30,9 +30,9 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     public Text fundsDisplay;
     [SerializeField]
-    public int AdvanceBarTimeEveryXSeconds;
+    public static int AdvanceBarTimeEveryXSeconds;
     [SerializeField]
-    public int AdvanceBarTimeByXMinutes;
+    public static int AdvanceBarTimeByXMinutes;
 
     public Customer templateCustomer;
 
@@ -68,6 +68,11 @@ public class GameController : MonoBehaviour {
         Debug.Log("Game resumed.");
     }
 
+    public static void AddFunds(double amount) {
+        controller.funds += amount;
+        controller.UpdateFundsDisplay();
+    }
+
     void Start() {
         if ( controller != null ) {
             throw new InvalidOperationException("Only one game controller may exist");
@@ -98,9 +103,10 @@ public class GameController : MonoBehaviour {
             timeAcc -= 1;
             DespawnCustomerOutside();
             Think();
-        }
 
-        barTimeDisplay.text = barTime.ToString("hh:mm tt");
+            // Update time and funds display once per second.
+            barTimeDisplay.text = barTime.ToString("hh:mm tt");
+        }
 
         HandleKeypresses();
     }
@@ -161,16 +167,16 @@ public class GameController : MonoBehaviour {
         return customers.Where(x => x.bladder.Emptying).Count();
     }
 
-    private void AddFunds() {
-        var c = customers.Where(x => 
-        x.position == Collections.Location.Bar &&
-        x.DesperationState != Collections.CustomerDesperationState.State6 &&
-        x.DesperationState != Collections.CustomerDesperationState.State5 &&
-        x.DesperationState != Collections.CustomerDesperationState.State4).Count();
+    //private void AddFunds() {
+    //    var c = customers.Where(x => 
+    //    x.position == Collections.Location.Bar &&
+    //    x.DesperationState != Collections.CustomerDesperationState.State6 &&
+    //    x.DesperationState != Collections.CustomerDesperationState.State5 &&
+    //    x.DesperationState != Collections.CustomerDesperationState.State4).Count();
         
-        funds += c * 10d;
-        UpdateFundsDisplay();
-    }
+    //    funds += c * 10d;
+    //    UpdateFundsDisplay();
+    //}
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(funds, 0).ToString();
     }
@@ -179,8 +185,6 @@ public class GameController : MonoBehaviour {
         timeIncrementsElapsed++;
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
-        
-        AddFunds();
     }
 
     // Thinks about what should happen next, spawning customers
