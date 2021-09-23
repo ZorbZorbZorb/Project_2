@@ -48,7 +48,7 @@ public class GameController : MonoBehaviour {
     public static GameController controller = null;
 
     [SerializeField]
-    public GameObject PauseMenuSprite;
+    public Canvas PauseMenuCanvas;
     private static bool gamePaused = false;
     public static bool GamePaused {
         get => gamePaused;
@@ -58,13 +58,13 @@ public class GameController : MonoBehaviour {
     void PauseGame() {
         Time.timeScale = 0;
         CloseOpenInPlayMenus();
-        PauseMenuSprite.SetActive(true);
+        PauseMenuCanvas.gameObject.SetActive(true);
         Debug.Log("Game paused.");
     }
 
     void ResumeGame() {
         Time.timeScale = 1;
-        PauseMenuSprite.SetActive(false);
+        PauseMenuCanvas.gameObject.SetActive(false);
         Debug.Log("Game resumed.");
     }
 
