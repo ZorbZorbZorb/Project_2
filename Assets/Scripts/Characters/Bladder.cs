@@ -74,6 +74,11 @@ public class Bladder {
     private void DoBladderFill() {
         double amountToAdd = FillRate * Time.deltaTime;
         Amount += amountToAdd;
+        if (Stomach > 0) {
+            amountToAdd = Time.deltaTime * (2 + (Stomach/100));
+            Stomach -= amountToAdd;
+            Amount += amountToAdd;
+        }
         double percentFull = Percentage;
         if (percentFull > 0.8d && percentFull < 1.0d) {
             ControlRemaining -= 0.5 * Time.deltaTime;

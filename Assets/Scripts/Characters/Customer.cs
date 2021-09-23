@@ -206,8 +206,10 @@ public class Customer : MonoBehaviour {
     public void BuyDrink() {
         Debug.Log($"Customer {UID} bought a drink");
         LastDrinkAt = TotalTimeAtBar;
+        bladder.Stomach += Bar.DrinkAmount;
         Funds -= Bar.DrinkCost;
         GameController.AddFunds(Bar.DrinkCost);
+
     }
 
     public bool WantsToLeaveBar() {
