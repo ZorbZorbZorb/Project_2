@@ -47,7 +47,11 @@ public class GameController : MonoBehaviour {
 
     public static GameController controller = null;
 
-    public static bool menuOpen = false;
+    private static bool gamePaused = false;
+    public static bool GamePaused {
+        get => gamePaused;
+        private set => gamePaused = value;
+    }
 
     void PauseGame() {
         Time.timeScale = 0;
@@ -102,15 +106,15 @@ public class GameController : MonoBehaviour {
         }
     }
     private void OpenMenu() {
-        menuOpen = true;
+        gamePaused = true;
         PauseGame();
     }
     private void CloseMenu() {
-        menuOpen = false;
+        gamePaused = false;
         ResumeGame();
     }
     private void ToggleMenu() {
-        if (menuOpen) {
+        if (gamePaused) {
             CloseMenu();
         }
         else {
