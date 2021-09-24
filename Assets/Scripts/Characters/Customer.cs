@@ -257,16 +257,17 @@ public class Customer : MonoBehaviour {
         }
 
         FeelsNeedToGo = bladder.FeltNeed > 0.40d;
-        DesperationState = GetDesperationState();
+
+        UpdateDesperationState();
 
         // Can customer relieve themselves now?
         Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
 
         // Get the relief the customer is occupying, if applicable
         Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
-        
+
         // Behavior depending on if have reached an area they can relieve themselves
-        if (reliefType == Collections.ReliefType.None) {
+        if ( reliefType == Collections.ReliefType.None ) {
             // If should wet now
             if ( bladder.ShouldWetNow || CheatPeeNow ) {
                 CheatPeeNow = false;
@@ -286,7 +287,7 @@ public class Customer : MonoBehaviour {
                     RemainingUrinateStopDelay -= 1 * Time.deltaTime;
                 }
                 else {
-                    if (!HasNext) {
+                    if ( !HasNext ) {
                         HasNext = true;
                         Next = EndPeeingWithThing;
                     }
@@ -306,18 +307,27 @@ public class Customer : MonoBehaviour {
             // Wait for bladder to empty.
             // Display emptying bladder animation
             else if ( bladder.Emptying ) {
-            bladder.ShouldWetNow = false;
+                bladder.ShouldWetNow = false;
                 // Update pee stream emote
                 Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
-                if (emote == null) {
+                if ( emote == null ) {
                     Debug.Break();
                     throw new NullReferenceException();
                 }
-                if (Emotes.currentEmote != emote) {
+                if ( Emotes.currentEmote != emote ) {
                     Emotes.Emote(emote);
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Updates the customers desperation state and state machine
+    /// </summary>
+    private void UpdateDesperationState() {
+        DesperationState = GetDesperationState();
+        DesperationStateChangeThisUpdate = DesperationState != LastDesperationState;
+        LastDesperationState = DesperationState;
     }
 
     public void MoveToVector3(Vector3 destination) {
@@ -373,6 +383,9 @@ public class Customer : MonoBehaviour {
     public Collections.BladderControlState CustomerState = Collections.BladderControlState.Normal;
     public Bladder bladder = new Bladder();
     public int Shyness { get; set; }
+    // State machine for desperation state
+    private Collections.CustomerDesperationState LastDesperationState = Collections.CustomerDesperationState.State0;
+    public bool DesperationStateChangeThisUpdate = false;
 
     // Times
     public double UrinateStartDelay;
