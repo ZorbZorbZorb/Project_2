@@ -40,6 +40,10 @@ public class GameController : MonoBehaviour {
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
 
+    public void SetMaxCustomers(int max) {
+        maxCustomers = max;
+    }
+
     [SerializeField]
     public WaitingRoom waitingRoom;
     [SerializeField]

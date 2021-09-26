@@ -575,6 +575,10 @@ public class Customer : MonoBehaviour {
         Emotes.ShowBladderCircle(true);
         IsWet = true;
         IsWetting = true;
+        // If using something while wetting, it is now soiled.
+        if (AtDestination() && Occupying != null && Occupying.CanBeSoiled) {
+            Occupying.IsSoiled = true;
+        }
         ActionState = Collections.CustomerActionState.Wetting;
     }
     public void EndPeeingSelf() {

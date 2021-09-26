@@ -17,6 +17,7 @@ public class Seat : CustomerInteractable {
 
     public override Collections.ReliefType ReliefType => Collections.ReliefType.None;
 
+    public override bool CanBeSoiled => true;
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
