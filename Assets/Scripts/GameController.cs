@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -183,6 +182,11 @@ public class GameController : MonoBehaviour {
 
     // Thinks about what should happen next, spawning customers
     private void Think() {
+        // Update max seating in bar
+        maxCustomers = Bar.Singleton.Seats
+            .Where(x => !x.IsSoiled)
+            .Count();
+
         // Customer spawning
         if ( spawningEnabled && customers.Count < maxCustomers ) {
             ticksSinceLastSpawn++;
