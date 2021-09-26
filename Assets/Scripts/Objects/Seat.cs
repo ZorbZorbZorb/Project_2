@@ -19,6 +19,12 @@ public class Seat : CustomerInteractable {
 
     public override bool CanBeSoiled => true;
 
+    private void Update() {
+        if (IsSoiled) {
+            transform.Rotate(new Vector3(10, 0));
+        }
+    }
+
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
         if (customer.position != Collections.Location.Bar) {

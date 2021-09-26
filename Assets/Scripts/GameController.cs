@@ -38,6 +38,7 @@ public class GameController : MonoBehaviour {
     public static List<Customer> customers = new List<Customer>();
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
+    public bool gameEnd = false;
 
     public void SetMaxCustomers(int max) {
         maxCustomers = max;
@@ -58,6 +59,8 @@ public class GameController : MonoBehaviour {
         private set => gamePaused = value;
     }
 
+    public Text GameOverText;
+
     void PauseGame() {
         Time.timeScale = 0;
         CloseOpenInPlayMenus();
@@ -66,9 +69,18 @@ public class GameController : MonoBehaviour {
     }
 
     void ResumeGame() {
+        if (gameEnd) {
+            Debug.LogWarning("Player wants to resume game but game has ended.");
+            return;
+        }
         Time.timeScale = 1;
         PauseMenuCanvas.gameObject.SetActive(false);
         Debug.Log("Game resumed.");
+    }
+
+    void LoseGame() {
+        PauseGame();
+        GameOverText.gameObject.SetActive(true);
     }
 
     public static void AddFunds(double amount) {
@@ -100,6 +112,10 @@ public class GameController : MonoBehaviour {
     // Think only once a second for better game performance.
     float timeAcc = 0f;
     void Update() {
+        if (gameEnd && !GamePaused) {
+            LoseGame();
+        }
+
         runTime += Time.deltaTime;
         timeAcc += Time.deltaTime;
         if ( timeAcc >= 1 ) {
@@ -186,6 +202,12 @@ public class GameController : MonoBehaviour {
         maxCustomers = Bar.Singleton.Seats
             .Where(x => !x.IsSoiled)
             .Count();
+
+        // End the game if too many seats are soiled
+        if (maxCustomers <= 10) {
+            gameEnd = true;
+            return;
+        }
 
         // Customer spawning
         if ( spawningEnabled && customers.Count < maxCustomers ) {
