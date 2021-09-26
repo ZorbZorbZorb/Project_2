@@ -13,4 +13,5 @@ public class Urinal : Relief {
     public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.UrinalPantsDown;
     public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.UrinalPeeing;
     public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.UrinalPantsUp;
+    public override bool CanBeSoiled => false;
 }
