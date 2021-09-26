@@ -229,10 +229,10 @@ public class GameController : MonoBehaviour {
         Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
         newCustomer.Active = true;
         bool enteredDoorway = false;
-        if ( newCustomer.FeelsNeedToGo &&
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
+        if ( newCustomer.WantsToEnterBathroom() &&
+            (newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) {
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State5) ) {
 
             enteredDoorway = newCustomer.EnterDoorway();
         }
@@ -271,7 +271,7 @@ public class GameController : MonoBehaviour {
         bool enteredDoorway = false;
         //Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
         //Debug.Log($"{newCustomer.bladder.FeltNeed}");
-        if (newCustomer.FeelsNeedToGo &&
+        if (newCustomer.WantsToEnterBathroom() &&
             newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 || 
             newCustomer.DesperationState == Collections.CustomerDesperationState.State5) {

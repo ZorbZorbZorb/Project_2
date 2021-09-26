@@ -67,10 +67,16 @@ public class Bladder {
         else {
             DoBladderFill();
             if ( ControlRemaining <= 0d ) {
+                if (LosingControl == false) {
+                    StartedLosingControlThisFrame = true;
+                }
                 LosingControl = true;
             }
         }
     }
+    /// <summary>
+    /// Fill a customers bladder. Called once per update
+    /// </summary>
     private void DoBladderFill() {
         double amountToAdd = FillRate * Time.deltaTime;
         Amount += amountToAdd;
@@ -93,6 +99,9 @@ public class Bladder {
             }
         }
     }
+    /// <summary>
+    /// Empty a customers bladder. Called once per update
+    /// </summary>
     private void DoBladderEmpty() {
         double amountToRemove = Math.Min(DrainRate * Time.deltaTime, Amount);
         Amount -= amountToRemove;

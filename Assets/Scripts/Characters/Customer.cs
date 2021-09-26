@@ -108,7 +108,7 @@ public class Customer : MonoBehaviour {
         else if ( bladder.FeltNeed > 0.55d) {
             return Collections.CustomerDesperationState.State2;
         }
-        else if ( FeelsNeedToGo ) {
+        else if ( WantsToEnterBathroom() ) {
             return Collections.CustomerDesperationState.State1;
         }
         else {
@@ -155,17 +155,6 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        // If not min time between thinking
-        bool minCheckTime = bladder.ControlRemaining > 90d ?
-            MinTimeBetweenChecksNow >= MinTimeBetweenChecks
-            : MinTimeBetweenChecksNow * 2 >= MinTimeBetweenChecks;
-        if ( !minCheckTime ) {
-            return;
-        }
-        else {
-            MinTimeBetweenChecksNow = 0f;
-        }
-
         // If in bar...
         if ( position == Collections.Location.Bar ) {
             ThinkAboutThingsInBar();
@@ -173,32 +162,66 @@ public class Customer : MonoBehaviour {
     }
 
     private void ThinkAboutThingsInBar() {
+
         // Should get up to pee?
-        if ( FeelsNeedToGo ) {
-            // Min check at bar time halved if they're desperate to go.
-            var minCheckTimeBar = bladder.ControlRemaining > 90d ?
-                MinTimeAtBarNow >= MinTimeAtBar
-                : MinTimeAtBarNow * 2 >= MinTimeAtBar;
+        if ( WantsToEnterBathroom() ) {
+
+            // If they just got sent away don't let them rejoin the line at all.
+            if ( MinTimeAtBarNow < 8d ) {
+                return;
+            }
+
+            // If they're about to wet and werent just turned away, have them try to go to the bathroom
+            if ( bladder.StartedLosingControlThisFrame ) {
+                Debug.Log($"Customer {UID} trying to enter bathroom because they are losing control.");
+                bladder.ResetLossOfControlTime();
+                TryEnterBathroom();
+            }
+
             // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
             var bladderTooFull = bladder.ControlRemaining <= 0d || bladder.LossOfControlTimeNow < bladder.LossOfControlTime;
-            if ( minCheckTimeBar && !bladderTooFull && !IsWetting && !IsWet ) {
+            if (bladderTooFull) {
+                return;
+            }
+
+            if ( MinTimeAtBarNow >= MinTimeAtBar && !bladderTooFull && !IsWetting && !IsWet ) {
                 // Try to enter the bathroom
-                if ( !EnterDoorway() ) {
-                    MinTimeAtBarNow = MinTimeAtBar / 1.5f;
+                TryEnterBathroom();
+                return;
+            }
+
+            // If they got more desperate this frame and have waited at least a third the required time, should they run to the bathroom right now?
+            if (DesperationStateChangeThisUpdate && (MinTimeAtBarNow * 3d) > MinTimeAtBar) {
+                if (DesperationState == Collections.CustomerDesperationState.State3) {
+                    Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
+                    TryEnterBathroom();
                 }
-                else {
-                    MinTimeAtBarNow = 0f;
+                if (DesperationState == Collections.CustomerDesperationState.State4) {
+                    Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
+                    TryEnterBathroom();
                 }
             }
+
         }
-        // Check to leave.
+
+        // Should leave?
         else if ( WantsToLeaveBar() ) {
             Leave();
         }
-        // Check to buy drink?
+
+        // Should buy drink?
         else {
             if ( Funds >= Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > DrinkInterval ) {
                 BuyDrink();
+            }
+        }
+
+        void TryEnterBathroom() {
+            if ( !EnterDoorway() ) {
+                MinTimeAtBarNow = MinTimeAtBar / 1.5f;
+            }
+            else {
+                MinTimeAtBarNow = 0f;
             }
         }
     }
@@ -212,6 +235,17 @@ public class Customer : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Customer wants to enter the bathroom right now.
+    /// </summary>
+    /// <returns></returns>
+    public bool WantsToEnterBathroom() {
+        return bladder.FeltNeed > 0.40d;
+    }
+    /// <summary>
+    /// Customer wants to buy a drink right now.
+    /// </summary>
+    /// <returns></returns>
     public bool WantsToLeaveBar() {
         Collections.CustomerDesperationState[] tooDesperateStates = {
             Collections.CustomerDesperationState.State4,
@@ -255,8 +289,6 @@ public class Customer : MonoBehaviour {
         if ( Next != null && !bladder.ShouldWetNow ) {
             return;
         }
-
-        FeelsNeedToGo = bladder.FeltNeed > 0.40d;
 
         UpdateDesperationState();
 
@@ -370,7 +402,6 @@ public class Customer : MonoBehaviour {
     public string DisplayName { get; set; }
     public char Gender { get; set; }
     // Enum for behavior types
-    public bool FeelsNeedToGo = false;
     public bool CanReenterBathroom = true;
     public float CanReenterBathroomIn = 0f;
     public bool IsRelievingSelf = false;
