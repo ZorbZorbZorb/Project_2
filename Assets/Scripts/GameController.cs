@@ -29,9 +29,9 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     public Text fundsDisplay;
     [SerializeField]
-    public static int AdvanceBarTimeEveryXSeconds;
+    public int AdvanceBarTimeEveryXSeconds;
     [SerializeField]
-    public static int AdvanceBarTimeByXMinutes;
+    public int AdvanceBarTimeByXMinutes;
 
     public Customer templateCustomer;
 

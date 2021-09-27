@@ -256,7 +256,7 @@ public class Customer : MonoBehaviour {
             ( IsWet && !IsWetting ) ||
 
             !tooDesperate &&
-            ((TotalTimeAtBar / GameController.AdvanceBarTimeEveryXSeconds ) * GameController.AdvanceBarTimeByXMinutes > 120 || 
+            ((TotalTimeAtBar / GameController.controller.AdvanceBarTimeEveryXSeconds ) * GameController.controller.AdvanceBarTimeByXMinutes > 120 || 
                 Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f);
     }
 
