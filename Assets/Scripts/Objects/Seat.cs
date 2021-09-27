@@ -19,9 +19,26 @@ public class Seat : CustomerInteractable {
 
     public override bool CanBeSoiled => true;
 
+    public SpriteRenderer Renderer;
+
+    private void Start() {
+        Renderer = gameObject.GetComponent<SpriteRenderer>();
+    }
+
     private void Update() {
-        if (IsSoiled) {
-            transform.Rotate(new Vector3(10, 0));
+        if (OccupiedBy != null && OccupiedBy.AtDestination()) {
+            Renderer.enabled = false;
+            return;
+        }
+        else {
+            Renderer.enabled = true;
+        }
+        if ( IsSoiled ) {
+            //transform.Rotate(new Vector3(10, 0));
+            Renderer.sprite = Collections.SpriteStoolWet;
+        }
+        else {
+            Renderer.sprite = Collections.SpriteStoolNormal;
         }
     }
 
