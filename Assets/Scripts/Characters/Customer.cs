@@ -11,7 +11,6 @@ using Random = UnityEngine.Random;
 public class Customer : MonoBehaviour {
     void Start() {
 
-        WetSelfLeaveBathroomDelayRemaining = WetSelfLeaveBathroomDelay;
         if (Destination == null) {
             Destination = this.transform.position;
         }
@@ -88,6 +87,11 @@ public class Customer : MonoBehaviour {
     public delegate void NextAction();
     public NextAction Next;
     public float NextDelay = 0f;
+    void SetNext(float delay, NextAction d) {
+        HasNext = true;
+        NextDelay = delay;
+        Next = d;
+    }
     public double Funds = 0d;
     public float LastDrinkAt = -25f;
     public float DrinkInterval = 30f;
@@ -139,12 +143,7 @@ public class Customer : MonoBehaviour {
 
         // If wet self and finished wetting self
         if ( IsWet && !IsWetting ) {
-            if ( WetSelfLeaveBathroomDelayRemaining > 0 ) {
-                WetSelfLeaveBathroomDelayRemaining -= Time.deltaTime;
-            }
-            else if ( position != Collections.Location.Outside ) {
-                Leave();
-            }
+            SetNext(WetSelfLeaveBathroomDelay, () => { Leave(); });
         }
 
         if ( IsWetting ) {
@@ -424,7 +423,6 @@ public class Customer : MonoBehaviour {
     private double RemainingUrinateStartDelay;
     private double RemainingUrinateStopDelay;
     public float WetSelfLeaveBathroomDelay = 6f;
-    public float WetSelfLeaveBathroomDelayRemaining;
     public float TotalTimeAtBar = 0f;
     public float MinTimeAtBar = 60f;
     public float MinTimeAtBarNow = 0f;
