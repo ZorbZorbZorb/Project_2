@@ -11,11 +11,12 @@ public class Collections : MonoBehaviour {
     private void Awake() {
         collections = this;
 
-        Emote.PeeStrong =   new Emote("Sprites/Bubbles/Stream_3");
-        Emote.PeeMedium =   new Emote("Sprites/Bubbles/Stream_2");
-        Emote.PeeWeak =     new Emote("Sprites/Bubbles/Stream_1");
-        Emote.PantsDown =   new Emote("Sprites/Bubbles/bubble_zipper_down");
-        Emote.PantsUp =     new Emote("Sprites/Bubbles/bubble_zipper_up");
+        Emote.PeeStrong =       new Emote("Sprites/Bubbles/Stream_3");
+        Emote.PeeMedium =       new Emote("Sprites/Bubbles/Stream_2");
+        Emote.PeeWeak =         new Emote("Sprites/Bubbles/Stream_1");
+        Emote.PantsDown =       new Emote("Sprites/Bubbles/bubble_zipper_down");
+        Emote.PantsUp =         new Emote("Sprites/Bubbles/bubble_zipper_up");
+        Emote.StruggleStop =    new Emote("Sprites/Bubbles/bubble_struggle_stop");
         Emote.PeeStreamEmotes = new Emote[] { Emote.PeeWeak, Emote.PeeWeak, Emote.PeeWeak, Emote.PeeMedium, Emote.PeeMedium, Emote.PeeStrong, Emote.PeeStrong };
         // maybe add a null to the start so it looks like they took a second between peeing and pants up?
 

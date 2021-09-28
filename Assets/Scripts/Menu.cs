@@ -17,8 +17,18 @@ namespace Assets.Scripts {
         /// Closes all opened menus and clears the opened menus list.
         /// </summary>
         public static void CloseAllOpenMenus() {
-            OpenMenus.ForEach(x => x.Close());
-            OpenMenus.Clear();
+            int c = OpenMenus.Count();
+            if (OpenMenus.Count > 0) {
+                for ( int i = 0; i < c; i++ ) {
+                    try {
+                        OpenMenus[i].Close();
+                    }
+                    catch {
+
+                    }
+                }
+                OpenMenus.Clear();
+            }
         }
 
         /// <summary>

@@ -86,9 +86,12 @@ public class Customer : MonoBehaviour {
     public delegate void NextAction();
     public NextAction Next;
     public float NextDelay = 0f;
-    void SetNext(float delay, NextAction d) {
+    /// <summary>Next will wait to trigger until this function returns true</summary>
+    public Func<bool> NextWhenTrue = null;
+    void SetNext(float delay, NextAction d, Func<bool> whenTrue = null) {
         HasNext = true;
         NextDelay = delay;
+        NextWhenTrue = whenTrue;
         Next = d;
     }
     public double Funds = 0d;
@@ -120,18 +123,21 @@ public class Customer : MonoBehaviour {
     }
 
     void Think() {
-        // Next action delegate code
+        // Next action handler
         if ( Next != null ) {
             if ( NextDelay > 0f ) {
                 return;
             }
-            else {
+            else if (NextWhenTrue == null || NextWhenTrue()) {
                 NextAction last = Next;
                 Next();
                 // Clear if not updated
                 if ( Next.Method == last.Method ) {
                     Next = null;
                 }
+            }
+            else {
+                return;
             }
         }
 
@@ -285,6 +291,7 @@ public class Customer : MonoBehaviour {
 
     private void PeeLogicUpdate() {
         if ( Next != null && !bladder.ShouldWetNow ) {
+            // TODO: If bladder should wet now, issue inturrupt on actions by clearing next
             return;
         }
 
@@ -648,6 +655,9 @@ public class Customer : MonoBehaviour {
     // Button to use sink
     [SerializeField]
     public Button ButtonSink;
+    // Button to stop peeing
+    [SerializeField]
+    public Button ButtonStop;
     /// <summary>This menu is available when the customer is the restroom</summary>
     [SerializeField]
     public Menu BathroomMenu;
@@ -685,7 +695,7 @@ public class Customer : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     public bool CanDisplayReliefMenu() {
-        return IsRelievingSelf && bladder.Percentage > 0.1d && ReliefType != Collections.ReliefType.Toilet && ReliefType != Collections.ReliefType.Towel;
+        return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && (ReliefType == Collections.ReliefType.Urinal || ReliefType == Collections.ReliefType.Sink);
     }
 
 
@@ -707,6 +717,9 @@ public class Customer : MonoBehaviour {
         });
         ButtonSink.onClick.AddListener(delegate {
             MenuOptionGotoSink();
+        });
+        ButtonStop.onClick.AddListener(delegate {
+            MenuOptionStopPeeing();
         });
     }
     #endregion
@@ -751,6 +764,19 @@ public class Customer : MonoBehaviour {
             return true;
         }
         return false;
+    }
+    /// <summary>
+    /// This option commands the customer to stop relief with object
+    /// </summary>
+    /// <returns></returns>
+    public bool MenuOptionStopPeeing() {
+        // TODO: Make them wet themselves if they are still very full or have no control remaining and are commanded to stop
+        bladder.StopPeeingEarly();
+        Emotes.Emote(Emote.StruggleStop);
+        SetNext(0f, () => {
+            EndPeeingWithThing();
+        }, () => !bladder.Emptying);
+        return true;
     }
     #endregion
 

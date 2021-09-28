@@ -13,12 +13,14 @@ public class Bladder {
     public double Amount;
     public double Max;
     public double DrainRate;
+    public double DrainRateNow;
     public double FillRate;
     public double FeltNeedCurve;  // Changes how badly this customer feels the need to go. multiplier.
     public double FeltNeed;  // How badly this customer thinks they need to go, 0.0 to 1.0
     public double ControlRemaining;
     public double LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
     public double LossOfControlTimeNow;
+    public bool StruggleStopPeeing;
     
     public DateTime LastPeedAt;
     public int DrinksHad;
@@ -50,8 +52,24 @@ public class Bladder {
 
         // If Emptying
         if (Emptying) {
-            DoBladderEmpty();
-            return;
+            if (StruggleStopPeeing) {
+                // If finished struggling to stop peeing
+                if (DrainRateNow <= 0d) {
+                    Emptying = false;
+                    StruggleStopPeeing = false;
+                    DrainRateNow = DrainRate;
+                }
+                // Struggle to stop peeing
+                else {
+                    //DrainRateNow -= ((DrainRateNow * 0.1) + 3d) * Time.deltaTime;
+                    DrainRateNow -= 3d * Time.deltaTime;
+                    // TODO add possability for wetting by reducing control here?
+                }
+            }
+            else {
+                DoBladderEmpty();
+                return;
+            }
         }
         // If Losing Control
         else if (LosingControl) {
@@ -103,7 +121,7 @@ public class Bladder {
     /// Empty a customers bladder. Called once per update
     /// </summary>
     private void DoBladderEmpty() {
-        double amountToRemove = Math.Min(DrainRate * Time.deltaTime, Amount);
+        double amountToRemove = Math.Min(DrainRateNow * Time.deltaTime, Amount);
         Amount -= amountToRemove;
         if (Percentage < 0.9d) {
             LosingControl = false;
@@ -120,6 +138,9 @@ public class Bladder {
     }
     private void ResetFrameStates() {
         StartedLosingControlThisFrame = false;
+    }
+    public void StopPeeingEarly() {
+        StruggleStopPeeing = true;
     }
     public void SetupBladder(int min, int max) {
         // Randomly give maximum bladder size from 550 to 1500
@@ -154,6 +175,7 @@ public class Bladder {
         Amount = amount;
         Max = max;
         DrainRate = drainRate;
+        DrainRateNow = DrainRate;
         // 1d seems good.
         FillRate = fillRate;
         ControlRemaining = controlRemaining;

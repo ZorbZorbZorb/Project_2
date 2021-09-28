@@ -12,6 +12,7 @@ public class Emote {
     public static Emote PeeWeak;
     public static Emote PantsDown;
     public static Emote PantsUp;
+    public static Emote StruggleStop;
 
     public static Emote[] PeeStreamEmotes;
 
