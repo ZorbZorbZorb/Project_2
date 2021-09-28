@@ -64,30 +64,28 @@ public class Bladder {
                 // Struggle to stop peeing
                 else {
                     if (StruggleStopSpurtNow) {
-                        if ( DrainRateNow > DrainRate * 2.5d ) {
+                        if ( DrainRateNow > DrainRate * 1.5d) {
                             StruggleStopSpurtNow = false;
                         }
                         else {
-                            DrainRateNow += (10d * Time.deltaTime);
+                            DrainRateNow += (15d * Time.deltaTime);
                         }
                     }
                     else {
-                        DrainRateNow -= (5d * Time.deltaTime);
+                        DrainRateNow -= (8d * Time.deltaTime);
                     }
                     // To make it more interesting heres some naiev for spurting when stopping
                     if (!StruggleStopSpurtNow && !StruggleStopSpurt && DrainRateNow < DrainRate / 2) {
                         StruggleStopSpurt = true;
-                        if (Random.Range(0, 2) == 1) {  // 50/50 for this behavior to trigger
+                        if (Random.Range(0, 2) == 1 || true) {  // 50/50 for this behavior to trigger
                             StruggleStopSpurtNow = true;
                         }
                     }
                     // TODO add posibility for wetting by reducing control here?
                 }
             }
-            else {
-                DoBladderEmpty();
-                return;
-            }
+            DoBladderEmpty();
+            return;
         }
         // If Losing Control
         else if (LosingControl) {
