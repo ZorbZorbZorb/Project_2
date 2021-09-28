@@ -34,7 +34,7 @@ public class Seat : CustomerInteractable {
             Renderer.enabled = true;
         }
         if ( IsSoiled ) {
-            transform.Rotate(new Vector3(10, 0));
+            //transform.Rotate(new Vector3(10, 0));
             Renderer.sprite = Collections.SpriteStoolWet;
         }
         else {
