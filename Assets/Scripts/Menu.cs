@@ -38,6 +38,9 @@ namespace Assets.Scripts {
         /// </summary>
         public bool Enabled;
         public void Open() {
+            if ( !canOpenNow() ) {
+                return;
+            }
             // Close other open menus
             CloseAllOpenMenus();
             // Open this menu and track it as open
@@ -49,6 +52,14 @@ namespace Assets.Scripts {
             OpenMenus.Remove(this);
             Enabled = false;
             canvas.gameObject.SetActive(false);
+        }
+        public void Toggle() {
+            if ( Enabled ) {
+                Close();
+            }
+            else {
+                Open();
+            }
         }
         public void Update() {
             // If the menu is open and can't be opened now, close it.

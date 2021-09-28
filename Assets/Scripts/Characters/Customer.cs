@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using Assets.Scripts.Characters;
 using Assets.Scripts.Objects;
 using System;
@@ -15,11 +16,17 @@ public class Customer : MonoBehaviour {
             Destination = this.transform.position;
         }
         UID = GameController.GetUid();
-        BathroomMenu.enabled = false;
+
+        // Set up the buttons for this customers menus
+        SetupButtons();
+
+        // Create the menus for this customer.
+        BathroomMenu = new Menu(BathroomMenuCanvas, new Button[] { ButtonDecline, ButtonSink, ButtonToilet, ButtonUrinal, ButtonWaitingRoom });
+        BathroomMenu.canOpenNow = CanDisplayMenu;
+        ReliefMenu = new Menu(ReliefMenuCanvas, new Button[] { });
+        ReliefMenu.canOpenNow = () => false;  // nyi
 
         Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
-
-        SetupButtons();
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
@@ -60,21 +67,9 @@ public class Customer : MonoBehaviour {
         // Emote think
         Emotes.Update();
 
-        if (GameController.GamePaused && BathroomMenu.enabled) {
-            MenuClose();
-        }
-        else {
-            if (BathroomMenu.enabled) {
-                // Menu auto-close
-                if (!CanDisplayMenu()) {
-                    MenuClose();
-                } 
-                // Menu update
-                else {
-                    MenuUpdate();
-                }
-            }
-        }
+        // Menu updates
+        BathroomMenu.Update();
+        ReliefMenu.Update();
 
         // Move sprite
         MoveUpdate();
@@ -626,18 +621,7 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        // Toggle closed
-        if (BathroomMenu.enabled) {
-            MenuClose();
-        }
-
-        // Toggle opened
-        else if ( CanDisplayMenu() ) {
-            // Close any open customer menus
-            GameController.controller.CloseOpenInPlayMenus();
-            // Open this customers menu
-            MenuOpen();
-        }
+        BathroomMenu.Toggle();
     }
 
     // Button for sending away
@@ -657,10 +641,12 @@ public class Customer : MonoBehaviour {
     public Button ButtonSink;
     /// <summary>This menu is available when the customer is the restroom</summary>
     [SerializeField]
-    public Canvas BathroomMenu;
+    public Menu BathroomMenu;
+    public Canvas BathroomMenuCanvas;
     /// <summary>This menu is only available when the customer is relieving themselves</summary>
     [SerializeField]
-    public Canvas ReliefMenu;
+    public Menu ReliefMenu;
+    public Canvas ReliefMenuCanvas;
 
     // Can the menu be displayed?
     public bool CanDisplayMenu() {
@@ -681,15 +667,6 @@ public class Customer : MonoBehaviour {
             return DoorwayQueue.doorwayQueue.IsNextInLine(this);
         }
         return false;
-    }
-    // TODO: Close menu when a button is clicked
-    // Menu Open
-    public void MenuOpen() {
-        BathroomMenu.enabled = true;
-    }
-    // Menu Close
-    public void MenuClose() {
-        BathroomMenu.enabled = false;
     }
     private void MenuUpdate() {
         ButtonUrinal.interactable = WillUseUrinal();
@@ -760,7 +737,7 @@ public class Customer : MonoBehaviour {
     }
     #endregion
 
-    #region Movements
+    #region CustomerPhysicalActions
     // Sends this customer to relief
     public void EnterRelief(Relief relief) {
         position = Collections.Location.Relief;
@@ -810,4 +787,5 @@ public class Customer : MonoBehaviour {
         position = Collections.Location.Outside;
     }
     #endregion
+
 }

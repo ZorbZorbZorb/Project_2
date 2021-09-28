@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -61,9 +62,14 @@ public class GameController : MonoBehaviour {
 
     public Text GameOverText;
 
+    /// <summary>
+    /// Pauses the game.
+    /// <para>Closes all open menus and enables the game paused canvas</para>
+    /// </summary>
     void PauseGame() {
         Time.timeScale = 0;
-        CloseOpenInPlayMenus();
+        // Close all open menus.
+        Menu.CloseAllOpenMenus();
         PauseMenuCanvas.gameObject.SetActive(true);
         Debug.Log("Game paused.");
     }
@@ -234,13 +240,6 @@ public class GameController : MonoBehaviour {
         if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeIncrementsElapsed ) {
             AdvanceTime();
         }
-    }
-
-
-    // Closes any open menu
-    public void CloseOpenInPlayMenus() {
-        // Close customer menus
-        customers.Where(x => x.BathroomMenu.enabled == true).ToList().ForEach(x => x.MenuClose());
     }
 
     public Customer SpawnCustomerInBar(double metric) {
