@@ -1938,7 +1938,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519473188}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -328, y: 124.593, z: 3965.5076}
+  m_LocalPosition: {x: -328, y: 124.593, z: 4000}
   m_LocalScale: {x: 35.48908, y: 1072.4178, z: 1}
   m_Children: []
   m_Father: {fileID: 344064164}
@@ -6109,12 +6109,14 @@ MonoBehaviour:
     Amount: 0
     Max: 650
     DrainRate: 30
+    DrainRateNow: 30
     FillRate: 0.8
     FeltNeedCurve: 0
     FeltNeed: 0
     ControlRemaining: 130
     LossOfControlTime: 10
     LossOfControlTimeNow: 10
+    StruggleStopPeeing: 0
     DrinksHad: 0
     Emptying: 0
     LosingControl: 0
@@ -6151,6 +6153,7 @@ MonoBehaviour:
   ButtonToilet: {fileID: 1742517714}
   ButtonUrinal: {fileID: 1208568130}
   ButtonSink: {fileID: 406074936}
+  ButtonStop: {fileID: 2017757652}
   BathroomMenu:
     canvas: {fileID: 0}
     Enabled: 0

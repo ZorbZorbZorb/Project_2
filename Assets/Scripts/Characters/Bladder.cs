@@ -21,6 +21,8 @@ public class Bladder {
     public double LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
     public double LossOfControlTimeNow;
     public bool StruggleStopPeeing;
+    public bool StruggleStopSpurt = false;
+    public bool StruggleStopSpurtNow = false;
     
     public DateTime LastPeedAt;
     public int DrinksHad;
@@ -61,9 +63,25 @@ public class Bladder {
                 }
                 // Struggle to stop peeing
                 else {
-                    //DrainRateNow -= ((DrainRateNow * 0.1) + 3d) * Time.deltaTime;
-                    DrainRateNow -= 3d * Time.deltaTime;
-                    // TODO add possability for wetting by reducing control here?
+                    if (StruggleStopSpurtNow) {
+                        if ( DrainRateNow > DrainRate * 2.5d ) {
+                            StruggleStopSpurtNow = false;
+                        }
+                        else {
+                            DrainRateNow += (10d * Time.deltaTime);
+                        }
+                    }
+                    else {
+                        DrainRateNow -= (5d * Time.deltaTime);
+                    }
+                    // To make it more interesting heres some naiev for spurting when stopping
+                    if (!StruggleStopSpurtNow && !StruggleStopSpurt && DrainRateNow < DrainRate / 2) {
+                        StruggleStopSpurt = true;
+                        if (Random.Range(0, 2) == 1) {  // 50/50 for this behavior to trigger
+                            StruggleStopSpurtNow = true;
+                        }
+                    }
+                    // TODO add posibility for wetting by reducing control here?
                 }
             }
             else {
