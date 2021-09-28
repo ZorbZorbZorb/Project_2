@@ -22,9 +22,9 @@ public class Customer : MonoBehaviour {
 
         // Create the menus for this customer.
         BathroomMenu = new Menu(BathroomMenuCanvas, new Button[] { ButtonDecline, ButtonSink, ButtonToilet, ButtonUrinal, ButtonWaitingRoom });
-        BathroomMenu.canOpenNow = CanDisplayMenu;
+        BathroomMenu.canOpenNow = CanDisplayBathroomMenu;
         ReliefMenu = new Menu(ReliefMenuCanvas, new Button[] { });
-        ReliefMenu.canOpenNow = () => false;  // nyi
+        ReliefMenu.canOpenNow = CanDisplayReliefMenu;
 
         Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
     }
@@ -625,7 +625,12 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        BathroomMenu.Toggle();
+        if (IsRelievingSelf) {
+            ReliefMenu.Toggle();
+        }
+        else {
+            BathroomMenu.Toggle();
+        }
     }
 
     // Button for sending away
@@ -652,8 +657,11 @@ public class Customer : MonoBehaviour {
     public Menu ReliefMenu;
     public Canvas ReliefMenuCanvas;
 
-    // Can the menu be displayed?
-    public bool CanDisplayMenu() {
+    /// <summary>
+    /// Code for if bathroom menu can be displayed
+    /// </summary>
+    /// <returns></returns>
+    public bool CanDisplayBathroomMenu() {
         // Cannot be wetting or wet
         if (IsWetting || IsWet) {
             return false;
@@ -672,6 +680,14 @@ public class Customer : MonoBehaviour {
         }
         return false;
     }
+    /// <summary>
+    /// Code for if relief menu can be displayed
+    /// </summary>
+    /// <returns></returns>
+    public bool CanDisplayReliefMenu() {
+        return IsRelievingSelf && bladder.Percentage > 0.1d && ReliefType != Collections.ReliefType.Toilet && ReliefType != Collections.ReliefType.Towel;
+    }
+
 
     /// <summary>
     /// Adds the listeners for buttons. Makes them do stuff when you click them
