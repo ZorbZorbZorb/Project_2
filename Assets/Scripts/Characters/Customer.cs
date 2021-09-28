@@ -71,6 +71,10 @@ public class Customer : MonoBehaviour {
         BathroomMenu.Update();
         ReliefMenu.Update();
 
+        // TODO: Create a button class like menu class
+        ButtonUrinal.interactable = WillUseUrinal();
+        ButtonSink.interactable = WillUseSink();
+
         // Move sprite
         MoveUpdate();
 
@@ -668,10 +672,7 @@ public class Customer : MonoBehaviour {
         }
         return false;
     }
-    private void MenuUpdate() {
-        ButtonUrinal.interactable = WillUseUrinal();
-        ButtonSink.interactable = WillUseSink();
-    }
+
     /// <summary>
     /// Adds the listeners for buttons. Makes them do stuff when you click them
     /// </summary>
