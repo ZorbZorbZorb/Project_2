@@ -77,7 +77,7 @@ public class Bladder {
                     // To make it more interesting heres some naiev for spurting when stopping
                     if (!StruggleStopSpurtNow && !StruggleStopSpurt && DrainRateNow < DrainRate / 2) {
                         StruggleStopSpurt = true;
-                        if (Random.Range(0, 2) == 1 || true) {  // 50/50 for this behavior to trigger
+                        if (Random.Range(0, 2) == 1) {  // 50/50 for this behavior to trigger
                             StruggleStopSpurtNow = true;
                         }
                     }
