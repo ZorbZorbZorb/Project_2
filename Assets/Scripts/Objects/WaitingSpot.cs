@@ -16,6 +16,7 @@ public class WaitingSpot : CustomerInteractable {
     public override string DisplayName => "Queuing spot";  // How Bri-ish'
     public bool Wet = false;
     public Collections.Location CustomerState = Collections.Location.WaitingRoom;
+    public override bool CanBeSoiled => false;
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();

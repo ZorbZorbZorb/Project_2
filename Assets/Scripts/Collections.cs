@@ -110,6 +110,9 @@ public class Collections : MonoBehaviour {
             { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };
 
+        SpriteStoolNormal = Resources.Load<Sprite>("Sprites/Entities/Stool_normal");
+        SpriteStoolWet = Resources.Load<Sprite>("Sprites/Entities/Stool_wet");
+
         // Are ya pissin son?
         ValidSpriteActionStatesF = ActionSpriteLookupF.Keys.ToArray();
         ValidBubbleActionStatesF = BubbleSpriteLookupF.Keys.ToArray();
@@ -186,6 +189,9 @@ public class Collections : MonoBehaviour {
 
     public static Sprite spriteStallClosed;
     public static Sprite spriteStallOpened;
+
+    public static Sprite SpriteStoolNormal;
+    public static Sprite SpriteStoolWet;
 
     public static Dictionary<char, Dictionary<CustomerActionState, Sprite>> GenderedBubbleSpriteLookup;
     public static Dictionary<char, Dictionary<CustomerActionState, Sprite>> GenderedActionSpriteLookup;

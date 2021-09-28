@@ -8,6 +8,11 @@ public class Bar : MonoBehaviour {
     public static Bar Singleton = null;
 
     [SerializeField]
+    public static double DrinkCost = 5d;
+    [SerializeField]
+    public static double DrinkAmount = 360d;
+
+    [SerializeField]
     public Seat[] Seats;
 
     public Seat GetOpenSeat() {

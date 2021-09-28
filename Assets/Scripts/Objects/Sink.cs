@@ -12,6 +12,7 @@ public class Sink : Relief {
     public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.SinkPantsDown;
     public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.SinkPeeing;
     public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.SinkPantsUp;
+    public override bool CanBeSoiled => false;
     public void Use(Customer customer) {
         customer.ActionState = Collections.CustomerActionState.SinkWashingHands;
         customer.NextDelay = 6f;

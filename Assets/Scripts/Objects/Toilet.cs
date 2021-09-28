@@ -11,6 +11,8 @@ public class Toilet : Relief {
     public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.ToiletPantsDown;
     public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.ToiletPeeing;
     public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.ToiletPantsUp;
+    public override bool CanBeSoiled => false;
+
     private bool doorClosed = false;
     private void Update() {
         // Open or close the stall door

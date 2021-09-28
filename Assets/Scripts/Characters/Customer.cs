@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using Assets.Scripts.Characters;
 using Assets.Scripts.Objects;
 using System;
@@ -11,19 +12,26 @@ using Random = UnityEngine.Random;
 public class Customer : MonoBehaviour {
     void Start() {
 
-        WetSelfLeaveBathroomDelayRemaining = WetSelfLeaveBathroomDelay;
         if (Destination == null) {
             Destination = this.transform.position;
         }
         UID = GameController.GetUid();
-        Menu.enabled = false;
+
+        // Set up the buttons for this customers menus
+        SetupButtons();
+
+        // Create the menus for this customer.
+        BathroomMenu = new Menu(BathroomMenuCanvas, new Button[] { ButtonDecline, ButtonSink, ButtonToilet, ButtonUrinal, ButtonWaitingRoom });
+        BathroomMenu.canOpenNow = CanDisplayMenu;
+        ReliefMenu = new Menu(ReliefMenuCanvas, new Button[] { });
+        ReliefMenu.canOpenNow = () => false;  // nyi
 
         Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
-
-        SetupButtons();
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        Funds = Random.Range(20f, 100f);
+
         bladder = new Bladder();
         bladder.SetupBladder(minBladderPercent, maxBladderPercent);
 
@@ -59,16 +67,9 @@ public class Customer : MonoBehaviour {
         // Emote think
         Emotes.Update();
 
-        if (Menu.enabled) {
-            // Menu auto-close
-            if (!CanDisplayMenu()) {
-                MenuClose();
-            } 
-            // Menu update
-            else {
-                MenuUpdate();
-            }
-        }
+        // Menu updates
+        BathroomMenu.Update();
+        ReliefMenu.Update();
 
         // Move sprite
         MoveUpdate();
@@ -81,6 +82,14 @@ public class Customer : MonoBehaviour {
     public delegate void NextAction();
     public NextAction Next;
     public float NextDelay = 0f;
+    void SetNext(float delay, NextAction d) {
+        HasNext = true;
+        NextDelay = delay;
+        Next = d;
+    }
+    public double Funds = 0d;
+    public float LastDrinkAt = -25f;
+    public float DrinkInterval = 30f;
 
     private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
@@ -98,7 +107,7 @@ public class Customer : MonoBehaviour {
         else if ( bladder.FeltNeed > 0.55d) {
             return Collections.CustomerDesperationState.State2;
         }
-        else if ( FeelsNeedToGo ) {
+        else if ( WantsToEnterBathroom() ) {
             return Collections.CustomerDesperationState.State1;
         }
         else {
@@ -108,79 +117,142 @@ public class Customer : MonoBehaviour {
 
     void Think() {
         // Next action delegate code
-        if (Next != null) {
-            if ( NextDelay > 0f) {
+        if ( Next != null ) {
+            if ( NextDelay > 0f ) {
                 return;
             }
             else {
                 NextAction last = Next;
                 Next();
                 // Clear if not updated
-                if (Next.Method == last.Method) {
+                if ( Next.Method == last.Method ) {
                     Next = null;
                 }
             }
         }
 
         // If about to leave or has left
-        if ( position == Collections.Location.Outside ) {
-            if (AtDestination()) {
-                GameController.controller.RemoveCustomer(this);
-            }
+        if ( position == Collections.Location.Outside && AtDestination() && transform.position == Collections.OffScreenTop ) {
+            GameController.controller.RemoveCustomer(this);
         }
 
         // If wet self and finished wetting self
-        if (IsWet && !IsWetting) {
-            if (WetSelfLeaveBathroomDelayRemaining > 0) {
-                WetSelfLeaveBathroomDelayRemaining -= Time.deltaTime;
-            }
-            else if (position != Collections.Location.Outside) {
-                Leave();
-            }
+        if ( IsWet && !IsWetting ) {
+            SetNext(WetSelfLeaveBathroomDelay, () => { Leave(); });
         }
 
-        if (IsWetting) {
+        if ( IsWetting ) {
             return;
         }
 
-        // If not min time between thinking
-        bool minCheckTime = bladder.ControlRemaining > 90d ?
-            MinTimeBetweenChecksNow >= MinTimeBetweenChecks
-            : MinTimeBetweenChecksNow * 2 >= MinTimeBetweenChecks;
-        if (!minCheckTime ) {
+        if (!AtDestination()) {
             return;
         }
+
+        // If in bar...
+        if ( position == Collections.Location.Bar ) {
+            ThinkAboutThingsInBar();
+        }
+    }
+
+    private void ThinkAboutThingsInBar() {
+
+        // Should get up to pee?
+        if ( WantsToEnterBathroom() ) {
+
+            // If they just got sent away don't let them rejoin the line at all.
+            if ( MinTimeAtBarNow < 8d ) {
+                return;
+            }
+
+            // If they're about to wet and werent just turned away, have them try to go to the bathroom
+            if ( bladder.StartedLosingControlThisFrame ) {
+                Debug.Log($"Customer {UID} trying to enter bathroom because they are losing control.");
+                bladder.ResetLossOfControlTime();
+                TryEnterBathroom();
+            }
+
+            // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
+            var bladderTooFull = bladder.ControlRemaining <= 0d || bladder.LossOfControlTimeNow < bladder.LossOfControlTime;
+            if (bladderTooFull) {
+                return;
+            }
+
+            if ( MinTimeAtBarNow >= MinTimeAtBar && !bladderTooFull && !IsWetting && !IsWet ) {
+                // Try to enter the bathroom
+                TryEnterBathroom();
+                return;
+            }
+
+            // If they got more desperate this frame and have waited at least a third the required time, should they run to the bathroom right now?
+            if (DesperationStateChangeThisUpdate && (MinTimeAtBarNow * 3d) > MinTimeAtBar) {
+                if (DesperationState == Collections.CustomerDesperationState.State3) {
+                    Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
+                    TryEnterBathroom();
+                }
+                if (DesperationState == Collections.CustomerDesperationState.State4) {
+                    Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
+                    TryEnterBathroom();
+                }
+            }
+
+        }
+
+        // Should leave?
+        else if ( WantsToLeaveBar() ) {
+            Leave();
+        }
+
+        // Should buy drink?
         else {
-            MinTimeBetweenChecksNow = 0f;
+            if ( Funds >= Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > DrinkInterval ) {
+                BuyDrink();
+            }
         }
 
-        // If not in any bathroom and bladder is full, go to bathroom
-        if (position == Collections.Location.Bar) {
-            if (FeelsNeedToGo) {
-                // Min check at bar time halved if they're desperate to go.
-                var minCheckTimeBar = bladder.ControlRemaining > 90d ?
-                    MinTimeAtBarNow >= MinTimeAtBar
-                    : MinTimeAtBarNow * 2 >= MinTimeAtBar;
-                // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
-                var bladderTooFull = bladder.ControlRemaining <= 0d;
-                if (minCheckTimeBar && !bladderTooFull) {
-                    // Try to enter the bathroom
-                    if ( !EnterDoorway() ) {
-                        MinTimeAtBarNow = MinTimeAtBar / 1.5f;
-                    }
-                    else {
-                        MinTimeAtBarNow = 0f;
-                    }
-                }
+        void TryEnterBathroom() {
+            if ( !EnterDoorway() ) {
+                MinTimeAtBarNow = MinTimeAtBar / 1.5f;
             }
-
-            // Else check to leave.
             else {
-                if (Random.Range(0, 11) == 0) {
-                    Leave();
-                }
+                MinTimeAtBarNow = 0f;
             }
         }
+    }
+
+    public void BuyDrink() {
+        Debug.Log($"Customer {UID} bought a drink");
+        LastDrinkAt = TotalTimeAtBar;
+        bladder.Stomach += Bar.DrinkAmount;
+        Funds -= Bar.DrinkCost;
+        GameController.AddFunds(Bar.DrinkCost);
+
+    }
+
+    /// <summary>
+    /// Customer wants to enter the bathroom right now.
+    /// </summary>
+    /// <returns></returns>
+    public bool WantsToEnterBathroom() {
+        return bladder.FeltNeed > 0.40d;
+    }
+    /// <summary>
+    /// Customer wants to buy a drink right now.
+    /// </summary>
+    /// <returns></returns>
+    public bool WantsToLeaveBar() {
+        Collections.CustomerDesperationState[] tooDesperateStates = {
+            Collections.CustomerDesperationState.State4,
+            Collections.CustomerDesperationState.State3
+        };
+        bool tooDesperate = tooDesperateStates.Contains(DesperationState);
+
+        return
+            ( IsWet && !IsWetting ) ||
+
+            !tooDesperate &&
+            ((TotalTimeAtBar / GameController.controller.AdvanceBarTimeEveryXSeconds ) * GameController.controller.AdvanceBarTimeByXMinutes > 120 || 
+                Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f);
     }
 
     private Collections.CustomerActionState LastActionState;
@@ -212,17 +284,16 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        FeelsNeedToGo = bladder.FeltNeed > 0.40d;
-        DesperationState = GetDesperationState();
+        UpdateDesperationState();
 
         // Can customer relieve themselves now?
         Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
 
         // Get the relief the customer is occupying, if applicable
         Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
-        
+
         // Behavior depending on if have reached an area they can relieve themselves
-        if (reliefType == Collections.ReliefType.None) {
+        if ( reliefType == Collections.ReliefType.None ) {
             // If should wet now
             if ( bladder.ShouldWetNow || CheatPeeNow ) {
                 CheatPeeNow = false;
@@ -242,7 +313,7 @@ public class Customer : MonoBehaviour {
                     RemainingUrinateStopDelay -= 1 * Time.deltaTime;
                 }
                 else {
-                    if (!HasNext) {
+                    if ( !HasNext ) {
                         HasNext = true;
                         Next = EndPeeingWithThing;
                     }
@@ -262,18 +333,27 @@ public class Customer : MonoBehaviour {
             // Wait for bladder to empty.
             // Display emptying bladder animation
             else if ( bladder.Emptying ) {
-            bladder.ShouldWetNow = false;
+                bladder.ShouldWetNow = false;
                 // Update pee stream emote
                 Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
-                if (emote == null) {
+                if ( emote == null ) {
                     Debug.Break();
                     throw new NullReferenceException();
                 }
-                if (Emotes.currentEmote != emote) {
+                if ( Emotes.currentEmote != emote ) {
                     Emotes.Emote(emote);
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Updates the customers desperation state and state machine
+    /// </summary>
+    private void UpdateDesperationState() {
+        DesperationState = GetDesperationState();
+        DesperationStateChangeThisUpdate = DesperationState != LastDesperationState;
+        LastDesperationState = DesperationState;
     }
 
     public void MoveToVector3(Vector3 destination) {
@@ -316,7 +396,6 @@ public class Customer : MonoBehaviour {
     public string DisplayName { get; set; }
     public char Gender { get; set; }
     // Enum for behavior types
-    public bool FeelsNeedToGo = false;
     public bool CanReenterBathroom = true;
     public float CanReenterBathroomIn = 0f;
     public bool IsRelievingSelf = false;
@@ -329,6 +408,9 @@ public class Customer : MonoBehaviour {
     public Collections.BladderControlState CustomerState = Collections.BladderControlState.Normal;
     public Bladder bladder = new Bladder();
     public int Shyness { get; set; }
+    // State machine for desperation state
+    private Collections.CustomerDesperationState LastDesperationState = Collections.CustomerDesperationState.State0;
+    public bool DesperationStateChangeThisUpdate = false;
 
     // Times
     public double UrinateStartDelay;
@@ -336,7 +418,6 @@ public class Customer : MonoBehaviour {
     private double RemainingUrinateStartDelay;
     private double RemainingUrinateStopDelay;
     public float WetSelfLeaveBathroomDelay = 6f;
-    public float WetSelfLeaveBathroomDelayRemaining;
     public float TotalTimeAtBar = 0f;
     public float MinTimeAtBar = 60f;
     public float MinTimeAtBarNow = 0f;
@@ -358,27 +439,30 @@ public class Customer : MonoBehaviour {
     public void SpriteUpdate() {
         // Set the sprite
         Sprite sprite = Collections.GetPersonSprite(this);
-        if (sprite != SRenderer.sprite) {
+        if ( sprite != SRenderer.sprite ) {
             SRenderer.sprite = sprite;
         }
 
         // Sprite shaking to show desperation
         // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
         // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
-        switch ( DesperationState ) {
-            case Collections.CustomerDesperationState.State4:
-            if ( Time.frameCount % 2 == 0 ) {
-                SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 5), Random.Range(0, 5), 0);
+        // Do not run if paused.
+        if ( !GameController.GamePaused ) {
+            switch ( DesperationState ) {
+                case Collections.CustomerDesperationState.State4:
+                if ( Time.frameCount % 2 == 0 ) {
+                    SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 5), Random.Range(0, 5), 0);
+                }
+                break;
+                case Collections.CustomerDesperationState.State3:
+                if ( Time.frameCount % 20 == 0 ) {
+                    SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 4), 0, 0);
+                }
+                break;
+                default:
+                SRenderer.transform.position = this.gameObject.transform.position;
+                break;
             }
-            break;
-            case Collections.CustomerDesperationState.State3:
-            if ( Time.frameCount % 20 == 0 ) {
-                SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 4), 0, 0);
-            }
-            break;
-            default:
-            SRenderer.transform.position = this.gameObject.transform.position;
-            break;
         }
     }
 
@@ -484,6 +568,10 @@ public class Customer : MonoBehaviour {
         Emotes.ShowBladderCircle(true);
         IsWet = true;
         IsWetting = true;
+        // If using something while wetting, it is now soiled.
+        if (AtDestination() && Occupying != null && Occupying.CanBeSoiled) {
+            Occupying.IsSoiled = true;
+        }
         ActionState = Collections.CustomerActionState.Wetting;
     }
     public void EndPeeingSelf() {
@@ -528,18 +616,12 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        // Toggle closed
-        if (Menu.enabled) {
-            MenuClose();
+        // Can't open menu when game paused.
+        if (GameController.GamePaused) {
+            return;
         }
 
-        // Toggle opened
-        else if ( CanDisplayMenu() ) {
-            // Close any open customer menus
-            GameController.controller.CloseOpenMenus();
-            // Open this customers menu
-            MenuOpen();
-        }
+        BathroomMenu.Toggle();
     }
 
     // Button for sending away
@@ -557,11 +639,14 @@ public class Customer : MonoBehaviour {
     // Button to use sink
     [SerializeField]
     public Button ButtonSink;
-    // The menu
+    /// <summary>This menu is available when the customer is the restroom</summary>
     [SerializeField]
-    public Canvas Menu;
+    public Menu BathroomMenu;
+    public Canvas BathroomMenuCanvas;
+    /// <summary>This menu is only available when the customer is relieving themselves</summary>
     [SerializeField]
-    public Text LastPeedText;
+    public Menu ReliefMenu;
+    public Canvas ReliefMenuCanvas;
 
     // Can the menu be displayed?
     public bool CanDisplayMenu() {
@@ -583,21 +668,9 @@ public class Customer : MonoBehaviour {
         }
         return false;
     }
-    // TODO: Close menu when a button is clicked
-    // Menu Open
-    public void MenuOpen() {
-        Menu.enabled = true;
-    }
-    // Menu Close
-    public void MenuClose() {
-        Menu.enabled = false;
-    }
     private void MenuUpdate() {
         ButtonUrinal.interactable = WillUseUrinal();
         ButtonSink.interactable = WillUseSink();
-
-        TimeSpan secondsSincePee = DateTime.Now - bladder.LastPeedAt;
-        LastPeedText.text = $"Last peed\r\n{secondsSincePee.ToString("hh")}:{secondsSincePee.ToString("mm")}:{secondsSincePee.ToString("ss")} ago\r\nDrinks had: {bladder.DrinksHad}";
     }
     /// <summary>
     /// Adds the listeners for buttons. Makes them do stuff when you click them
@@ -664,7 +737,7 @@ public class Customer : MonoBehaviour {
     }
     #endregion
 
-    #region Movements
+    #region CustomerPhysicalActions
     // Sends this customer to relief
     public void EnterRelief(Relief relief) {
         position = Collections.Location.Relief;
@@ -674,6 +747,8 @@ public class Customer : MonoBehaviour {
     // Goes to the doorway queue
     public bool EnterDoorway() {
         if ( DoorwayQueue.doorwayQueue.HasOpenWaitingSpot() ) {
+            // Makes customer hold on for a while longer when entering doorway.
+            bladder.ResetLossOfControlTime();
             WaitingSpot waitingSpot = DoorwayQueue.doorwayQueue.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.Doorway;
@@ -712,4 +787,5 @@ public class Customer : MonoBehaviour {
         position = Collections.Location.Outside;
     }
     #endregion
+
 }
