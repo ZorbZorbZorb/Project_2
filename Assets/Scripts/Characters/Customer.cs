@@ -15,7 +15,7 @@ public class Customer : MonoBehaviour {
             Destination = this.transform.position;
         }
         UID = GameController.GetUid();
-        Menu.enabled = false;
+        BathroomMenu.enabled = false;
 
         Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
 
@@ -60,11 +60,11 @@ public class Customer : MonoBehaviour {
         // Emote think
         Emotes.Update();
 
-        if (GameController.GamePaused && Menu.enabled) {
+        if (GameController.GamePaused && BathroomMenu.enabled) {
             MenuClose();
         }
         else {
-            if (Menu.enabled) {
+            if (BathroomMenu.enabled) {
                 // Menu auto-close
                 if (!CanDisplayMenu()) {
                     MenuClose();
@@ -627,7 +627,7 @@ public class Customer : MonoBehaviour {
         }
 
         // Toggle closed
-        if (Menu.enabled) {
+        if (BathroomMenu.enabled) {
             MenuClose();
         }
 
@@ -655,11 +655,12 @@ public class Customer : MonoBehaviour {
     // Button to use sink
     [SerializeField]
     public Button ButtonSink;
-    // The menu
+    /// <summary>This menu is available when the customer is the restroom</summary>
     [SerializeField]
-    public Canvas Menu;
+    public Canvas BathroomMenu;
+    /// <summary>This menu is only available when the customer is relieving themselves</summary>
     [SerializeField]
-    public Text LastPeedText;
+    public Canvas ReliefMenu;
 
     // Can the menu be displayed?
     public bool CanDisplayMenu() {
@@ -684,18 +685,15 @@ public class Customer : MonoBehaviour {
     // TODO: Close menu when a button is clicked
     // Menu Open
     public void MenuOpen() {
-        Menu.enabled = true;
+        BathroomMenu.enabled = true;
     }
     // Menu Close
     public void MenuClose() {
-        Menu.enabled = false;
+        BathroomMenu.enabled = false;
     }
     private void MenuUpdate() {
         ButtonUrinal.interactable = WillUseUrinal();
         ButtonSink.interactable = WillUseSink();
-
-        TimeSpan secondsSincePee = DateTime.Now - bladder.LastPeedAt;
-        LastPeedText.text = $"Last peed\r\n{secondsSincePee.ToString("hh")}:{secondsSincePee.ToString("mm")}:{secondsSincePee.ToString("ss")} ago\r\nDrinks had: {bladder.DrinksHad}";
     }
     /// <summary>
     /// Adds the listeners for buttons. Makes them do stuff when you click them

@@ -240,7 +240,7 @@ public class GameController : MonoBehaviour {
     // Closes any open menu
     public void CloseOpenInPlayMenus() {
         // Close customer menus
-        customers.Where(x => x.Menu.enabled == true).ToList().ForEach(x => x.MenuClose());
+        customers.Where(x => x.BathroomMenu.enabled == true).ToList().ForEach(x => x.MenuClose());
     }
 
     public Customer SpawnCustomerInBar(double metric) {

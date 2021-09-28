@@ -5,7 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 // Pee is stored in the balls
-[System.Serializable]
+[Serializable]
 public class Bladder {
     [SerializeField]
     public double AverageMax = 800;
