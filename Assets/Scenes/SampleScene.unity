@@ -3448,7 +3448,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1062059278
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6151,8 +6151,14 @@ MonoBehaviour:
   ButtonToilet: {fileID: 1742517714}
   ButtonUrinal: {fileID: 1208568130}
   ButtonSink: {fileID: 406074936}
-  Menu: {fileID: 986688706}
-  LastPeedText: {fileID: 1233729751}
+  BathroomMenu:
+    canvas: {fileID: 0}
+    Enabled: 0
+  BathroomMenuCanvas: {fileID: 986688706}
+  ReliefMenu:
+    canvas: {fileID: 0}
+    Enabled: 0
+  ReliefMenuCanvas: {fileID: 1062059281}
 --- !u!222 &1592566870
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8176,7 +8182,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 65, y: -68}
+  m_AnchoredPosition: {x: 78.6, y: -40.8}
   m_SizeDelta: {x: 70, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2017757652
@@ -8243,7 +8249,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 707fb8a0fdb06b64fbfc76eede8f848a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c57928506c0b76f4e9fe3ebf2e3f93db, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
