@@ -66,7 +66,9 @@
     <Compile Include="Assets\Scripts\Objects\WaitingSpot.cs" />
     <Compile Include="Assets\Scripts\Objects\Seat.cs" />
     <Compile Include="Assets\Scripts\Sinks.cs" />
+    <Compile Include="Assets\Scripts\MenuButton.cs" />
     <Compile Include="Assets\Scripts\Objects\Relief.cs" />
+    <Compile Include="Assets\Scripts\Menu.cs" />
     <Compile Include="Assets\Scripts\Objects\Urinal.cs" />
     <Compile Include="Assets\Scripts\Bar.cs" />
     <Compile Include="Assets\Scripts\WaitingRoom.cs" />
@@ -80,8 +82,6 @@
     <Compile Include="Assets\Scripts\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\DoorwayQueue.cs" />
-    <Compile Include="Assets\Scripts\Menu.cs" />
-    <Compile Include="Assets\Scripts\MenuButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
