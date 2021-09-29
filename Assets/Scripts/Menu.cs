@@ -14,6 +14,14 @@ namespace Assets.Scripts {
         /// </summary>
         public static List<Menu> OpenMenus = new List<Menu>();
         /// <summary>
+        /// List containing all buttons for this menu.
+        /// </summary>
+        public static List<MenuButton> Buttons = new List<MenuButton>();
+        /// <summary>
+        /// List containing all buttons for this menu that change interactability or in some way update.
+        /// </summary>
+        public static List<MenuButton> UpdatingButtons = new List<MenuButton>();
+        /// <summary>
         /// Closes all opened menus and clears the opened menus list.
         /// </summary>
         public static void CloseAllOpenMenus() {
@@ -37,7 +45,6 @@ namespace Assets.Scripts {
         /// </summary>
         [SerializeField]
         private Canvas canvas;
-        public IEnumerable<Button> Buttons;
         /// <summary>
         /// Code to call when checking if the menu can be opened right now
         /// <para>Accepts any function that returns bool</para>
@@ -73,13 +80,22 @@ namespace Assets.Scripts {
         }
         public void Update() {
             // If the menu is open and can't be opened now, close it.
-            if (Enabled && !canOpenNow()) {
-                Close();
+            if (Enabled) {
+                if (!canOpenNow()) {
+                    Close();
+                    return;
+                }
+                UpdatingButtons.ForEach(x => x.Update());
             }
         }
-        public Menu(Canvas _canvas, IEnumerable<Button> buttons) {
+        public void AddButton(MenuButton button) {
+            Buttons.Add(button);
+            if (button.interactable != null) {
+                UpdatingButtons.Add(button);
+            }
+        }
+        public Menu(Canvas _canvas) {
             canvas = _canvas;
-            Buttons = buttons;
             canOpenNow = () => { return true; };
             Enabled = canvas.gameObject.activeSelf;
         }

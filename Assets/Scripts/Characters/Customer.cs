@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -17,19 +18,27 @@ public class Customer : MonoBehaviour {
         }
         UID = GameController.GetUid();
 
-        // Set up the buttons for this customers menus
-        SetupButtons();
-
-        // Create the menus for this customer.
-        BathroomMenu = new Menu(BathroomMenuCanvas, new Button[] { ButtonDecline, ButtonSink, ButtonToilet, ButtonUrinal, ButtonWaitingRoom });
-        BathroomMenu.canOpenNow = CanDisplayBathroomMenu;
-        ReliefMenu = new Menu(ReliefMenuCanvas, new Button[] { });
-        ReliefMenu.canOpenNow = CanDisplayReliefMenu;
-
+        // Set up the emotes system for this customer
         Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
+
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        // Set up the menus for this customer
+        BathroomMenu = new Menu(BathroomMenuCanvas);
+        BathroomMenu.canOpenNow = CanDisplayBathroomMenu;
+        ReliefMenu = new Menu(ReliefMenuCanvas);
+        ReliefMenu.canOpenNow = CanDisplayReliefMenu;
+
+        // Set up the buttons for the menus
+        MenuButton MenuButtonWaitingRoom = new MenuButton(this, BathroomMenu, ButtonWaitingRoom, () => { MenuOptionGotoWaiting(); });
+        MenuButton MenuButtonDecline = new MenuButton(this, BathroomMenu, ButtonDecline, () => { MenuOptionDismiss(); });
+        MenuButton MenuButtonToilet = new MenuButton(this, BathroomMenu, ButtonToilet, () => { MenuOptionGotoToilet(); });
+        MenuButton MenuButtonUrinal = new MenuButton(this, BathroomMenu, ButtonUrinal, () => { MenuOptionGotoUrinal(); }, WillUseUrinal);
+        MenuButton MenuButtonSink = new MenuButton(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); }, WillUseSink);
+
+        MenuButton MenuButtonReliefStop = new MenuButton(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
+
         Funds = Random.Range(20f, 100f);
 
         bladder = new Bladder();
@@ -70,10 +79,6 @@ public class Customer : MonoBehaviour {
         // Menu updates
         BathroomMenu.Update();
         ReliefMenu.Update();
-
-        // TODO: Create a button class like menu class
-        ButtonUrinal.interactable = WillUseUrinal();
-        ButtonSink.interactable = WillUseSink();
 
         // Move sprite
         MoveUpdate();
@@ -131,10 +136,11 @@ public class Customer : MonoBehaviour {
             else if (NextWhenTrue == null || NextWhenTrue()) {
                 NextAction last = Next;
                 Next();
-                // Clear if not updated
+                // If next was not assigned a new method from inside next clear it out.
                 if ( Next.Method == last.Method ) {
                     Next = null;
                 }
+                return;
             }
             else {
                 return;
@@ -405,6 +411,7 @@ public class Customer : MonoBehaviour {
     public int UID = GameController.GetUid();
     public Collections.CustomerDesperationState lastState;
     public string DisplayName { get; set; }
+    [SerializeField]
     public char Gender { get; set; }
     // Enum for behavior types
     public bool CanReenterBathroom = true;
@@ -485,25 +492,25 @@ public class Customer : MonoBehaviour {
 
     #region Desperation/Wetting/Peeing
     // Current willingness to use a urinal for relief
-    public bool WillUseUrinal() {
+    public bool WillUseUrinal(Customer customer) {
         // Yup
-        if ( Gender == 'm' ) {
+        if ( customer.Gender == 'm' ) {
             return true;
         }
         // Only if they're about to lose it
-        if ( Gender == 'f' ) {
+        if ( customer.Gender == 'f' ) {
             return bladder.LosingControl || bladder.FeltNeed > 0.93;
         }
         throw new NotImplementedException();
     }
     // Current willingness to use a sink for relief
-    public bool WillUseSink() {
+    public bool WillUseSink(Customer customer) {
         // It's just a weird urinal you wash your hands in, right?
-        if (Gender == 'm') {
+        if ( customer.Gender == 'm') {
             return bladder.LosingControl || bladder.FeltNeed > 0.93d;
         }
         // Girls will only use the sink if they're wetting themselves
-        if ( Gender == 'f' ) {
+        if ( customer.Gender == 'f' ) {
             return bladder.LosingControl || bladder.FeltNeed > 0.99d;
         }
         throw new NotImplementedException();
@@ -657,7 +664,7 @@ public class Customer : MonoBehaviour {
     public Button ButtonSink;
     // Button to stop peeing
     [SerializeField]
-    public Button ButtonStop;
+    public Button ButtonReliefStop;
     /// <summary>This menu is available when the customer is the restroom</summary>
     [SerializeField]
     public Menu BathroomMenu;
@@ -698,30 +705,6 @@ public class Customer : MonoBehaviour {
         return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && (ReliefType == Collections.ReliefType.Urinal || ReliefType == Collections.ReliefType.Sink);
     }
 
-
-    /// <summary>
-    /// Adds the listeners for buttons. Makes them do stuff when you click them
-    /// </summary>
-    private void SetupButtons() {
-        ButtonWaitingRoom.onClick.AddListener(delegate {
-            MenuOptionGotoWaiting();
-        });
-        ButtonDecline.onClick.AddListener(delegate {
-            MenuOptionDismiss();
-        });
-        ButtonToilet.onClick.AddListener(delegate {
-            MenuOptionGotoToilet();
-        });
-        ButtonUrinal.onClick.AddListener(delegate {
-            MenuOptionGotoUrinal();
-        });
-        ButtonSink.onClick.AddListener(delegate {
-            MenuOptionGotoSink();
-        });
-        ButtonStop.onClick.AddListener(delegate {
-            MenuOptionStopPeeing();
-        });
-    }
     #endregion
 
     #region MenuActions

@@ -6117,6 +6117,8 @@ MonoBehaviour:
     LossOfControlTime: 10
     LossOfControlTimeNow: 10
     StruggleStopPeeing: 0
+    StruggleStopSpurt: 0
+    StruggleStopSpurtNow: 0
     DrinksHad: 0
     Emptying: 0
     LosingControl: 0
@@ -6153,7 +6155,7 @@ MonoBehaviour:
   ButtonToilet: {fileID: 1742517714}
   ButtonUrinal: {fileID: 1208568130}
   ButtonSink: {fileID: 406074936}
-  ButtonStop: {fileID: 2017757652}
+  ButtonReliefStop: {fileID: 2017757652}
   BathroomMenu:
     canvas: {fileID: 0}
     Enabled: 0
