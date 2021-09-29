@@ -323,22 +323,23 @@ public class Customer : MonoBehaviour {
         }
         else {
             // When finished peeing
-            if ( !bladder.Emptying && bladder.Percentage < 0.1 ) {
-                ActionState = relief.StatePantsUp;
-                Emotes.Emote(Emote.PantsUp);
-                if ( RemainingUrinateStopDelay > 0 ) {
-                    RemainingUrinateStopDelay -= 1 * Time.deltaTime;
-                }
-                else {
-                    if ( !HasNext ) {
-                        HasNext = true;
-                        Next = EndPeeingWithThing;
-                    }
+            if ( !bladder.Emptying ) {
+                if (!HasNext) {
+                    SetNext(0f, () => {
+                        ActionState = relief.StatePantsUp;
+                        Emotes.Emote(Emote.PantsUp);
+                        SetNext((float)RemainingUrinateStopDelay, () => {
+                            EndPeeingWithThing();
+                        });
+                    });
                 }
             }
             // If bladder isnt emptying, set it to empty
             // Display unzip/pantsdown animation
             else if ( !bladder.Emptying ) {
+                if (!HasNext) {
+
+                }
                 if ( RemainingUrinateStartDelay > 0 ) {
                     RemainingUrinateStartDelay -= 1 * Time.deltaTime;
                 }
@@ -521,10 +522,9 @@ public class Customer : MonoBehaviour {
         IsRelievingSelf = true;
         Emotes.Emote(Emote.PantsDown);
         Emotes.ShowBladderCircle(true);
-        // Add a delay between starting and stopping urination
-        RemainingUrinateStartDelay = UrinateStartDelay;
-        RemainingUrinateStopDelay = UrinateStopDelay;
+
         // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
+        RemainingUrinateStopDelay = RemainingUrinateStopDelay;
         if ( bladder.LosingControl ) {
             RemainingUrinateStopDelay = RemainingUrinateStopDelay * 2.5d;
             Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
@@ -533,15 +533,31 @@ public class Customer : MonoBehaviour {
         switch ( reliefType ) {
             case Collections.ReliefType.Toilet:
             ActionState = Collections.CustomerActionState.ToiletPantsDown;
+            SetNext((float)UrinateStartDelay, () => {
+                bladder.Emptying = true;
+                Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
+                ActionState = relief.StatePeeing;
+            });
             break;
             case Collections.ReliefType.Urinal:
             ActionState = Collections.CustomerActionState.UrinalPantsDown;
+            SetNext((float)UrinateStartDelay, () => {
+                bladder.Emptying = true;
+                Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
+                ActionState = relief.StatePeeing;
+            });
             break;
             case Collections.ReliefType.Sink:
             ActionState = Collections.CustomerActionState.SinkPantsDown;
+            SetNext((float)UrinateStartDelay, () => {
+                bladder.Emptying = true;
+                Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
+                ActionState = relief.StatePeeing;
+            });
             break;
             case Collections.ReliefType.Towel:
             ActionState = Collections.CustomerActionState.TowelPantsDown;
+            throw new NotImplementedException();
             break;
         }
     }
