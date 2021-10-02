@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -14,6 +15,7 @@ public class GameController : MonoBehaviour {
 
     [SerializeField]
     public double funds = 0d;
+
 
     // Unique Id System
     static private int uid = 0;
@@ -52,16 +54,50 @@ public class GameController : MonoBehaviour {
 
     public static GameController controller = null;
 
+    /// <summary>
+    /// Returns to the main menu without saving
+    /// <para>The main menu scene should always be scene index 0, which opens on game start</para>
+    /// </summary>
+    public void GoToMainMenu() {
+        // Timescale and static vars are preserved between scenes!
+        Time.timeScale = 1;
+        ResetStaticMembers();
+        // Load menu scene
+        SceneManager.LoadScene(0);
+    }
+    /// <summary>
+    /// Restarts the current night in progress.
+    /// Just reloads the scene to reload the current saved data, because the
+    /// scene in play is unsaved.
+    /// </summary>
+    public void RestartCurrentNight() {
+        // Timescale and static vars are preserved between scenes!
+        Time.timeScale = 1;
+        ResetStaticMembers();
+        // Reload scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    public void SaveNightData() {
+        throw new NotImplementedException();
+    }
+    public void LoadNightData() {
+        throw new NotImplementedException();
+    }
+    public void ResetStaticMembers() {
+        uid = 0;
+        GamePaused = false;
+        gamePaused = false;
+        customers = new List<Customer>();
+    }
+
+    #region PauseMenu
     [SerializeField]
-    public Canvas PauseMenuCanvas;
+    public PauseMenu PauseMenu;
     private static bool gamePaused = false;
     public static bool GamePaused {
         get => gamePaused;
         private set => gamePaused = value;
     }
-
-    public Text GameOverText;
-
     /// <summary>
     /// Pauses the game.
     /// <para>Closes all open menus and enables the game paused canvas</para>
@@ -70,23 +106,48 @@ public class GameController : MonoBehaviour {
         Time.timeScale = 0;
         // Close all open menus.
         Menu.CloseAllOpenMenus();
-        PauseMenuCanvas.gameObject.SetActive(true);
+        PauseMenu.Open();
         Debug.Log("Game paused.");
     }
-
+    /// <summary>
+    /// Resumes the game, only if the game isnt ended.
+    /// </summary>
     void ResumeGame() {
         if (gameEnd) {
             Debug.LogWarning("Player wants to resume game but game has ended.");
             return;
         }
         Time.timeScale = 1;
-        PauseMenuCanvas.gameObject.SetActive(false);
+        PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
+    private void OpenMenu() {
+        gamePaused = true;
+        PauseGame();
+    }
+    private void CloseMenu() {
+        gamePaused = false;
+        ResumeGame();
+    }
+    /// <summary>
+    /// Toggles the pause menu
+    /// </summary>
+    private void ToggleMenu() {
+        if ( gamePaused ) {
+            CloseMenu();
+        }
+        else {
+            OpenMenu();
+        }
+    }
+    #endregion
 
+    /// <summary>
+    /// Sets the game to be lost. Displays the game over pause menu
+    /// </summary>
     void LoseGame() {
         PauseGame();
-        GameOverText.gameObject.SetActive(true);
+        PauseMenu.SwitchToBoldTextDisplay();
     }
 
     public static void AddFunds(double amount) {
@@ -99,6 +160,10 @@ public class GameController : MonoBehaviour {
             throw new InvalidOperationException("Only one game controller may exist");
         }
         controller = this;
+
+        // Set the callbacks for the pause menu buttons. (restart and main menu)
+        PauseMenu.SetUpButtons();
+
         maxCustomers = Bar.Singleton.Seats.Length;
 
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
@@ -136,28 +201,15 @@ public class GameController : MonoBehaviour {
         HandleKeypresses();
     }
 
+    /// <summary>
+    /// Handles user key presses
+    /// <para>Pressing escape will pause the game</para>
+    /// </summary>
     private void HandleKeypresses() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             ToggleMenu();
         }
     }
-    private void OpenMenu() {
-        gamePaused = true;
-        PauseGame();
-    }
-    private void CloseMenu() {
-        gamePaused = false;
-        ResumeGame();
-    }
-    private void ToggleMenu() {
-        if (gamePaused) {
-            CloseMenu();
-        }
-        else {
-            OpenMenu();
-        }
-    }
-
 
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
     private void DespawnCustomerOutside() {
