@@ -23,7 +23,6 @@ public class Bar : MonoBehaviour {
     private void Awake() {
         DrinkCost = 5d;
         DrinkAmount = 360d;
-
         Singleton = this;
     }
 

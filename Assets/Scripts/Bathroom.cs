@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Bathroom : MonoBehaviour {
-    public static Bathroom bathroom = null;
+    public static Bathroom Singleton = null;
     public Toilet GetToilet() {
         return Toilets.Where(x => x.OccupiedBy == null).First();
     }
@@ -25,9 +25,8 @@ public class Bathroom : MonoBehaviour {
     public List<Urinal> Urinals;
 
     // Start is called before the first frame update
-    void Start()
-    {
-        bathroom = this;
+    void Start() {
+        Singleton = this;
     }
 
     // Update is called once per frame

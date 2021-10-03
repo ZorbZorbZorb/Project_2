@@ -584,8 +584,8 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
-        else if (Bathroom.bathroom.Sinks.Line.HasOpenWaitingSpot() && !Bathroom.bathroom.Sinks.AllSinksBeingPeedIn()) {
-            Bathroom.bathroom.Sinks.EnterLine(this);
+        else if (Bathroom.Singleton.Sinks.Line.HasOpenWaitingSpot() && !Bathroom.Singleton.Sinks.AllSinksBeingPeedIn()) {
+            Bathroom.Singleton.Sinks.EnterLine(this);
         }
         else {
             ActionState = Collections.CustomerActionState.None;
@@ -598,6 +598,7 @@ public class Customer : MonoBehaviour {
         }
     }
     public void BeginPeeingSelf() {
+        GameController.AddWetting();
         bladder.Emptying = true;
         Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
         if ( emote == null ) {
@@ -737,22 +738,22 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
-        if (Bathroom.bathroom.HasToiletAvailable) {
-            EnterRelief(Bathroom.bathroom.GetToilet());
+        if (Bathroom.Singleton.HasToiletAvailable) {
+            EnterRelief(Bathroom.Singleton.GetToilet());
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoUrinal() {
-        if (Bathroom.bathroom.HasUrinalAvailable) {
-            EnterRelief(Bathroom.bathroom.GetUrinal());
+        if (Bathroom.Singleton.HasUrinalAvailable) {
+            EnterRelief(Bathroom.Singleton.GetUrinal());
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoSink() {
-        if (Bathroom.bathroom.HasSinkForRelief) {
-            EnterRelief(Bathroom.bathroom.Sinks.FirstUnoccupiedSink());
+        if (Bathroom.Singleton.HasSinkForRelief) {
+            EnterRelief(Bathroom.Singleton.Sinks.FirstUnoccupiedSink());
             return true;
         }
         return false;

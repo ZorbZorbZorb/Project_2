@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,12 +11,9 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
 
-    [SerializeField]
-    public bool spawningEnabled = true;
-
-    [SerializeField]
-    public double funds = 0d;
-
+    [SerializeField] public bool spawningEnabled = true;
+    [SerializeField] public static bool CreateNewSaveDataOnStart = true;  // Hey, turn this off on build
+    [SerializeField] public GameData gameData;
 
     // Unique Id System
     static private int uid = 0;
@@ -150,12 +148,31 @@ public class GameController : MonoBehaviour {
         PauseMenu.SwitchToBoldTextDisplay();
     }
 
+    /// <summary>
+    /// Adds funds to track in save data
+    /// </summary>
+    /// <param name="amount">amount to add</param>
     public static void AddFunds(double amount) {
-        controller.funds += amount;
+        controller.gameData.funds += amount;
         controller.UpdateFundsDisplay();
+    }
+    /// <summary>Adds a wetting event to track in save data</summary>
+    public static void AddWetting() {
+        controller.gameData.wettings++;
     }
 
     void Start() {
+
+        if ( CreateNewSaveDataOnStart ) {
+            gameData = new GameData();
+            gameData.bathroomSinks = Bathroom.Singleton.Sinks.Items.Count();
+            gameData.bathroomToilets = Bathroom.Singleton.Toilets.Count();
+            gameData.bathroomUrinals = Bathroom.Singleton.Toilets.Count();
+        }
+        else {
+            throw new NotImplementedException();
+        }
+
         if ( controller != null ) {
             throw new InvalidOperationException("Only one game controller may exist");
         }
@@ -238,14 +255,14 @@ public class GameController : MonoBehaviour {
             .Count();
     }
     private int GetReliefAvailableCount() {
-        return Bathroom.bathroom.Toilets.Count() + Bathroom.bathroom.Urinals.Count() + Bathroom.bathroom.Sinks.Items.Count();
+        return Bathroom.Singleton.Toilets.Count() + Bathroom.Singleton.Urinals.Count() + Bathroom.Singleton.Sinks.Items.Count();
     }
     private int GetCustomersPeeingCount() {
         return customers.Where(x => x.bladder.Emptying).Count();
     }
 
     public void UpdateFundsDisplay() {
-        fundsDisplay.text = "$" + Math.Round(funds, 0).ToString();
+        fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
 
     private void AdvanceTime() {
