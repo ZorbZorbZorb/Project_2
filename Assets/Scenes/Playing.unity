@@ -3361,7 +3361,7 @@ GameObject:
   - component: {fileID: 986688705}
   - component: {fileID: 986688704}
   m_Layer: 5
-  m_Name: OptionsCanvas
+  m_Name: BathroomMenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3704,7 +3704,7 @@ GameObject:
   - component: {fileID: 1062059280}
   - component: {fileID: 1062059279}
   m_Layer: 5
-  m_Name: ReliefOptionsCanvas
+  m_Name: ReliefMenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5975,7 +5975,7 @@ GameObject:
   - component: {fileID: 1540510673}
   - component: {fileID: 1540510675}
   m_Layer: 5
-  m_Name: ButtonSendAway
+  m_Name: ButtonDecline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6370,20 +6370,6 @@ MonoBehaviour:
     bladderWidthCalculationFactor2: 0
     bladderWidthCalculationFactor3: 0
     bladderHeightCalculationFactor1: 0
-  ButtonDecline: {fileID: 1540510675}
-  ButtonWaitingRoom: {fileID: 1707149142}
-  ButtonToilet: {fileID: 1742517714}
-  ButtonUrinal: {fileID: 1208568130}
-  ButtonSink: {fileID: 406074936}
-  ButtonReliefStop: {fileID: 2017757652}
-  BathroomMenu:
-    canvas: {fileID: 0}
-    Enabled: 0
-  BathroomMenuCanvas: {fileID: 986688706}
-  ReliefMenu:
-    canvas: {fileID: 0}
-    Enabled: 0
-  ReliefMenuCanvas: {fileID: 1062059281}
 --- !u!222 &1592566870
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7038,7 +7024,7 @@ GameObject:
   - component: {fileID: 1707149140}
   - component: {fileID: 1707149142}
   m_Layer: 5
-  m_Name: ButtonWaitInLine
+  m_Name: ButtonWait
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8506,7 +8492,7 @@ GameObject:
   - component: {fileID: 2017757653}
   - component: {fileID: 2017757652}
   m_Layer: 5
-  m_Name: ButtonStopRelief
+  m_Name: ButtonReliefStop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

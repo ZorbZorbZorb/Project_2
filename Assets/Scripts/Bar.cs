@@ -8,9 +8,9 @@ public class Bar : MonoBehaviour {
     public static Bar Singleton = null;
 
     [SerializeField]
-    public static double DrinkCost = 5d;
+    public static double DrinkCost;
     [SerializeField]
-    public static double DrinkAmount = 360d;
+    public static double DrinkAmount;
 
     [SerializeField]
     public Seat[] Seats;
@@ -21,8 +21,10 @@ public class Bar : MonoBehaviour {
     }
 
     private void Awake() {
+        DrinkCost = 5d;
+        DrinkAmount = 360d;
+
         Singleton = this;
-        Customer.Bar = this;
     }
 
 }

@@ -24,11 +24,21 @@ public class Customer : MonoBehaviour {
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        // Get references to game objects for the customer
+        BathroomMenuCanvas = gameObject.transform.Find("BathroomMenuCanvas").GetComponent<Canvas>();
+        ReliefMenuCanvas = gameObject.transform.Find("ReliefMenuCanvas").GetComponent<Canvas>();
         // Set up the menus for this customer
         BathroomMenu = new Menu(BathroomMenuCanvas);
         BathroomMenu.canOpenNow = CanDisplayBathroomMenu;
         ReliefMenu = new Menu(ReliefMenuCanvas);
         ReliefMenu.canOpenNow = CanDisplayReliefMenu;
+
+        ButtonWaitingRoom = gameObject.transform.Find("BathroomMenuCanvas/ButtonWait").GetComponent<Button>();
+        ButtonDecline = gameObject.transform.Find("BathroomMenuCanvas/ButtonDecline").GetComponent<Button>();
+        ButtonToilet = gameObject.transform.Find("BathroomMenuCanvas/ButtonToilet").GetComponent<Button>();
+        ButtonUrinal = gameObject.transform.Find("BathroomMenuCanvas/ButtonUrinal").GetComponent<Button>();
+        ButtonSink = gameObject.transform.Find("BathroomMenuCanvas/ButtonSink").GetComponent<Button>();
+        ButtonReliefStop = gameObject.transform.Find("ReliefMenuCanvas/ButtonReliefStop").GetComponent<Button>();
 
         // Set up the buttons for the menus
         MenuButton MenuButtonWaitingRoom = new MenuButton(this, BathroomMenu, ButtonWaitingRoom, () => { MenuOptionGotoWaiting(); });
@@ -406,8 +416,6 @@ public class Customer : MonoBehaviour {
 
     public bool CheatPeeNow = false;
 
-    public static Bar Bar;
-
     public bool Active = false;
     public int UID = GameController.GetUid();
     public Collections.CustomerDesperationState lastState;
@@ -524,7 +532,7 @@ public class Customer : MonoBehaviour {
         Emotes.ShowBladderCircle(true);
 
         // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
-        RemainingUrinateStopDelay = RemainingUrinateStopDelay;
+        RemainingUrinateStopDelay = UrinateStopDelay;
         if ( bladder.LosingControl ) {
             RemainingUrinateStopDelay = RemainingUrinateStopDelay * 2.5d;
             Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
@@ -558,7 +566,6 @@ public class Customer : MonoBehaviour {
             case Collections.ReliefType.Towel:
             ActionState = Collections.CustomerActionState.TowelPantsDown;
             throw new NotImplementedException();
-            break;
         }
     }
     public void EndPeeingWithThing() {
@@ -583,7 +590,7 @@ public class Customer : MonoBehaviour {
         }
         else {
             ActionState = Collections.CustomerActionState.None;
-            Seat seat = Bar.GetOpenSeat();
+            Seat seat = Bar.Singleton.GetOpenSeat();
             seat.MoveCustomerIntoSpot(this);
         }
 
@@ -663,32 +670,19 @@ public class Customer : MonoBehaviour {
         }
     }
 
-    // Button for sending away
-    [SerializeField]
-    public Button ButtonDecline;
-    // Button for waiting in line
-    [SerializeField]
-    public Button ButtonWaitingRoom;
-    // Button to use toilet
-    [SerializeField]
-    public Button ButtonToilet;
-    // Button to use urinal
-    [SerializeField]
-    public Button ButtonUrinal;
-    // Button to use sink
-    [SerializeField]
-    public Button ButtonSink;
-    // Button to stop peeing
-    [SerializeField]
-    public Button ButtonReliefStop;
+    // Buttons for the customer menus
+    private Button ButtonDecline;
+    private Button ButtonWaitingRoom;
+    private Button ButtonToilet;
+    private Button ButtonUrinal;
+    private Button ButtonSink;
+    private Button ButtonReliefStop;
     /// <summary>This menu is available when the customer is the restroom</summary>
-    [SerializeField]
-    public Menu BathroomMenu;
-    public Canvas BathroomMenuCanvas;
+    private Menu BathroomMenu;
+    private Canvas BathroomMenuCanvas;
     /// <summary>This menu is only available when the customer is relieving themselves</summary>
-    [SerializeField]
-    public Menu ReliefMenu;
-    public Canvas ReliefMenuCanvas;
+    private Menu ReliefMenu;
+    private Canvas ReliefMenuCanvas;
 
     /// <summary>
     /// Code for if bathroom menu can be displayed
