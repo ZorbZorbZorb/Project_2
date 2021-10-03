@@ -74,10 +74,10 @@ public class Bladder {
                     else {
                         DrainRateNow -= (8d * Time.deltaTime);
                     }
-                    // To make it more interesting heres some naiev for spurting when stopping
+                    // To make it more interesting heres some naive for spurting when stopping
                     if (!StruggleStopSpurtNow && !StruggleStopSpurt && DrainRateNow < DrainRate / 2) {
                         StruggleStopSpurt = true;
-                        if (Random.Range(0, 2) == 1) {  // 50/50 for this behavior to trigger
+                        if (Random.Range(0, 2) == 1 && Percentage > 0.4d) {  // 50/50 for this behavior to trigger when full
                             StruggleStopSpurtNow = true;
                         }
                     }
@@ -146,6 +146,7 @@ public class Bladder {
             Emptying = false;
             Wetting = false;
             ShouldWetNow = false;
+            DrainRateNow = DrainRate;
             LastPeedAt = DateTime.Now;
             if (ControlRemaining < 1d) {
                 ControlRemaining = 1d;

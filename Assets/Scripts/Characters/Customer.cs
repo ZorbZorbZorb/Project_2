@@ -528,6 +528,8 @@ public class Customer : MonoBehaviour {
         Emotes.Emote(Emote.PantsDown);
         Emotes.ShowBladderCircle(true);
 
+        // Make them pee slower if they don't need to go badly to incentivize making them hold it longer
+        bladder.DrainRateNow = bladder.DrainRate * 0.75;
         // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
         RemainingUrinateStopDelay = UrinateStopDelay;
         if ( bladder.LosingControl ) {
