@@ -334,7 +334,7 @@ public class Customer : MonoBehaviour {
         else {
             // When finished peeing
             if ( !bladder.Emptying ) {
-                if (!HasNext) {
+                if (Next == null) {
                     SetNext(0f, () => {
                         ActionState = relief.StatePantsUp;
                         Emotes.Emote(Emote.PantsUp);
@@ -347,9 +347,6 @@ public class Customer : MonoBehaviour {
             // If bladder isnt emptying, set it to empty
             // Display unzip/pantsdown animation
             else if ( !bladder.Emptying ) {
-                if (!HasNext) {
-
-                }
                 if ( RemainingUrinateStartDelay > 0 ) {
                     RemainingUrinateStartDelay -= 1 * Time.deltaTime;
                 }
