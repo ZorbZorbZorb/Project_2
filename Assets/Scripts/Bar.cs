@@ -16,7 +16,7 @@ public class Bar : MonoBehaviour {
     public Seat[] Seats;
 
     public Seat GetOpenSeat() {
-        var x = Seats.Where(x => x.OccupiedBy == null).ToArray();
+        var x = Seats.Where(x => x.OccupiedBy == null && !x.IsSoiled).ToArray();
         return x[Random.Range(0, x.Count())];
     }
 
