@@ -52,7 +52,8 @@ public class Customer : MonoBehaviour {
         Funds = Random.Range(20f, 100f);
 
         bladder = new Bladder();
-        bladder.SetupBladder(minBladderPercent, maxBladderPercent);
+        bladder.SetupBladder(this, minBladderPercent, maxBladderPercent);
+        
 
         UrinateStartDelay = 4d;
         UrinateStopDelay = 6d;
@@ -112,6 +113,7 @@ public class Customer : MonoBehaviour {
     public double Funds = 0d;
     public float LastDrinkAt = -25f;
     public float DrinkInterval = 30f;
+    public int EnteredTicksElapsed = 0;
 
     private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
@@ -231,7 +233,7 @@ public class Customer : MonoBehaviour {
 
         // Should buy drink?
         else {
-            if ( Funds >= Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > DrinkInterval ) {
+            if ( WantsToBuyDrink() && Funds >= Bar.DrinkCost ) {
                 BuyDrink();
             }
         }
@@ -255,31 +257,33 @@ public class Customer : MonoBehaviour {
 
     }
 
-    /// <summary>
-    /// Customer wants to enter the bathroom right now.
-    /// </summary>
-    /// <returns></returns>
+    #region Wants to X...
     public bool WantsToEnterBathroom() {
         return bladder.FeltNeed > 0.40d;
     }
-    /// <summary>
-    /// Customer wants to buy a drink right now.
-    /// </summary>
-    /// <returns></returns>
     public bool WantsToLeaveBar() {
         Collections.CustomerDesperationState[] tooDesperateStates = {
             Collections.CustomerDesperationState.State4,
             Collections.CustomerDesperationState.State3
         };
+
+        // Basic assertions
         bool tooDesperate = tooDesperateStates.Contains(DesperationState);
+        bool wetted = IsWet && !IsWetting;
+        bool stayedTooLong = EnteredTicksElapsed - GameController.controller.timeTicksElapsed > 10;
+        bool noMoreFunds = Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f;
+        bool tooLateAtNight = GameController.controller.timeTicksElapsed >= GameController.controller.nightMaxCustomerSpawnTime;
 
-        return
-            ( IsWet && !IsWetting ) ||
+        // Compound assertions
+        bool wouldNormallyLeave = stayedTooLong || noMoreFunds || tooLateAtNight;
 
-            !tooDesperate &&
-            ((TotalTimeAtBar / GameController.controller.AdvanceBarTimeEveryXSeconds ) * GameController.controller.AdvanceBarTimeByXMinutes > 120 || 
-                Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f);
+        // The thought juice
+        return wetted || (!tooDesperate && wouldNormallyLeave );
     }
+    public bool WantsToBuyDrink() {
+        return TotalTimeAtBar - LastDrinkAt > DrinkInterval;
+    }
+    #endregion
 
     private Collections.CustomerActionState LastActionState;
     private void FrameActionDebug() {
@@ -430,7 +434,7 @@ public class Customer : MonoBehaviour {
     public bool IsWet = false;
     public Collections.CustomerDesperationState DesperationState = Collections.CustomerDesperationState.State0;
     public Collections.BladderControlState CustomerState = Collections.BladderControlState.Normal;
-    public Bladder bladder = new Bladder();
+    public Bladder bladder;
     public int Shyness { get; set; }
     // State machine for desperation state
     private Collections.CustomerDesperationState LastDesperationState = Collections.CustomerDesperationState.State0;
