@@ -159,7 +159,18 @@ public class Bladder {
     public void StopPeeingEarly() {
         StruggleStopPeeing = true;
     }
-    public void SetupBladder(int min, int max) {
+    public void SetupBladder(Customer customer, int min, int max) {
+        // Make guys able to hold on longer than girls can after they start losing control
+        if (customer.Gender == 'm') {
+            LossOfControlTime = 20d;
+            LossOfControlTimeNow = LossOfControlTime;
+        }
+        else {
+
+            LossOfControlTime = 10d;
+            LossOfControlTimeNow = LossOfControlTime;
+        }
+
         // Randomly give maximum bladder size from 550 to 1500
         Max = Random.Range(550, 1500);
         // Randomly give fullness of min% to max%
