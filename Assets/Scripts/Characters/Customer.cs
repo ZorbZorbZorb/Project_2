@@ -266,9 +266,8 @@ public class Customer : MonoBehaviour {
         Debug.Log($"Customer {UID} bought a drink");
         LastDrinkAt = TotalTimeAtBar;
         bladder.Stomach += Bar.DrinkAmount;
-        Funds -= Bar.DrinkCost;
-        GameController.AddFunds(Bar.DrinkCost);
-
+        //Funds -= Bar.DrinkCost;
+        //GameController.AddFunds(Bar.DrinkCost);
     }
 
     #region Wants to X...
