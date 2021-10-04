@@ -22,7 +22,7 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     public float runTime = 0f;
     [SerializeField]
-    public int timeIncrementsElapsed = 0;
+    public int timeTicksElapsed = 0;
     [SerializeField]
     public DateTime barTime;
     [SerializeField]
@@ -293,7 +293,7 @@ public class GameController : MonoBehaviour {
     }
 
     private void AdvanceTime() {
-        timeIncrementsElapsed++;
+        timeTicksElapsed++;
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
@@ -313,17 +313,15 @@ public class GameController : MonoBehaviour {
         }
 
         // Stop spawning customers when its too late
-        if (timeIncrementsElapsed >= nightMaxCustomerSpawnTime) {
+        if (timeTicksElapsed >= nightMaxCustomerSpawnTime) {
             spawningEnabled = false;
 
             // End game at end time or everyone has left
-            if (customers.Count() < 1 || timeIncrementsElapsed >= nightMaxTime ) {
+            if (customers.Count() < 1 || timeTicksElapsed >= nightMaxTime ) {
                 gameEnd = true;
                 return;
             }
         }
-
-
 
         // Customer spawning
         if ( spawningEnabled && customers.Count < maxCustomers ) {
@@ -347,7 +345,7 @@ public class GameController : MonoBehaviour {
         }
 
         // Update the bar time
-        if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeIncrementsElapsed ) {
+        if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
             AdvanceTime();
         }
     }
@@ -388,6 +386,8 @@ public class GameController : MonoBehaviour {
         Customer newCustomer = Instantiate(templateCustomer);
         newCustomer.Gender = Random.Range(0,3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
+
+        newCustomer.EnteredTicksElapsed = timeTicksElapsed;
 
         // Customer count changes range of bladder fullness for next customer to enter
         int min = 35;
