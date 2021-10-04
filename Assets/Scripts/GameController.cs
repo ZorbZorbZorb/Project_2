@@ -39,6 +39,8 @@ public class GameController : MonoBehaviour {
     public static List<Customer> customers = new List<Customer>();
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
+    public double nightStartFunds;
+    public bool gameLost = false;
     public bool gameEnd = false;
 
     public void SetMaxCustomers(int max) {
@@ -76,10 +78,10 @@ public class GameController : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     public void SaveNightData() {
-        throw new NotImplementedException();
+        GameData.Export(0, gameData);
     }
     public void LoadNightData() {
-        throw new NotImplementedException();
+        gameData = GameData.Import(0);
     }
     public void ResetStaticMembers() {
         uid = 0;
@@ -148,6 +150,16 @@ public class GameController : MonoBehaviour {
         PauseMenu.SwitchToBoldTextDisplay();
     }
 
+    void EndGame() {
+        PauseGame();
+        PauseMenu.SwitchToBoldTextDisplay();
+        PauseMenu.SetBoldTextDisplay($"End of night {gameData.night}\r\n\r\nYou made {gameData.funds - nightStartFunds} kromer.");
+
+        // TODO: Add a fade to black here.
+        // TODO: Add a continue button instead of just instant exporting?
+        GameData.Export(0, gameData);
+    }
+
     /// <summary>
     /// Adds funds to track in save data
     /// </summary>
@@ -156,23 +168,14 @@ public class GameController : MonoBehaviour {
         controller.gameData.funds += amount;
         controller.UpdateFundsDisplay();
     }
-    /// <summary>Adds a wetting event to track in save data</summary>
+    /// <summary>
+    /// Adds a wetting event to track in save data
+    /// </summary>
     public static void AddWetting() {
         controller.gameData.wettings++;
     }
 
     void Start() {
-
-        if ( CreateNewSaveDataOnStart ) {
-            gameData = new GameData();
-            gameData.bathroomSinks = Bathroom.Singleton.Sinks.Items.Count();
-            gameData.bathroomToilets = Bathroom.Singleton.Toilets.Count();
-            gameData.bathroomUrinals = Bathroom.Singleton.Toilets.Count();
-        }
-        else {
-            throw new NotImplementedException();
-        }
-
         if ( controller != null ) {
             throw new InvalidOperationException("Only one game controller may exist");
         }
@@ -181,12 +184,31 @@ public class GameController : MonoBehaviour {
         // Set the callbacks for the pause menu buttons. (restart and main menu)
         PauseMenu.SetUpButtons();
 
+        StartGame();
+
         maxCustomers = Bar.Singleton.Seats.Length;
 
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
         Customer firstCustomer = CreateCustomer();
         firstCustomer.Active = true;
+    }
+
+    /// <summary>
+    /// This function is called once per controller startup and handles initializing the game data object.
+    /// </summary>
+    private void StartGame() {
+        if ( CreateNewSaveDataOnStart ) {
+            gameData = new GameData();
+            gameData.bathroomSinks = Bathroom.Singleton.Sinks.Items.Count();
+            gameData.bathroomToilets = Bathroom.Singleton.Toilets.Count();
+            gameData.bathroomUrinals = Bathroom.Singleton.Toilets.Count();
+        }
+        else {
+            LoadNightData();
+        }
+
+        nightStartFunds = gameData.funds;
     }
 
     public int nightMaxTime = 30;
@@ -201,7 +223,12 @@ public class GameController : MonoBehaviour {
     float timeAcc = 0f;
     void Update() {
         if (gameEnd && !GamePaused) {
-            LoseGame();
+            if (gameLost) {
+                LoseGame();
+            }
+            else {
+                EndGame();
+            }
         }
 
         runTime += Time.deltaTime;
@@ -281,8 +308,22 @@ public class GameController : MonoBehaviour {
         // End the game if too many seats are soiled
         if (maxCustomers <= 10) {
             gameEnd = true;
+            gameLost = true;
             return;
         }
+
+        // Stop spawning customers when its too late
+        if (timeIncrementsElapsed >= nightMaxCustomerSpawnTime) {
+            spawningEnabled = false;
+
+            // End game at end time or everyone has left
+            if (customers.Count() < 1 || timeIncrementsElapsed >= nightMaxTime ) {
+                gameEnd = true;
+                return;
+            }
+        }
+
+
 
         // Customer spawning
         if ( spawningEnabled && customers.Count < maxCustomers ) {
