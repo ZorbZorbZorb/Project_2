@@ -1686,16 +1686,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawningEnabled: 1
-  funds: 0
+  gameData:
+    night: 1
+    wettings: 0
+    funds: 0
+    bathroomToilets: -1
+    bathroomUrinals: -1
+    bathroomSinks: -1
+    barHasBar: 1
+    barStools: 6
+    barSeats: -1
   runTime: 0
-  timeIncrementsElapsed: 0
+  timeTicksElapsed: 0
   barTimeDisplay: {fileID: 248144060}
   fundsDisplay: {fileID: 1030702937}
-  AdvanceBarTimeEveryXSeconds: 30
+  AdvanceBarTimeEveryXSeconds: 10
   AdvanceBarTimeByXMinutes: 10
   templateCustomer: {fileID: 1592566869}
   ticksSinceLastSpawn: 0
   maxCustomers: 0
+  nightStartFunds: 0
+  gameLost: 0
   gameEnd: 0
   waitingRoom: {fileID: 1519871047}
   doorwayQueue: {fileID: 435333485}
@@ -6308,6 +6319,7 @@ MonoBehaviour:
   Funds: 0
   LastDrinkAt: -20
   DrinkInterval: 30
+  EnteredTicksElapsed: 0
   SRenderer: {fileID: 1907411329}
   EmotesBladderAmountText: {fileID: 1318797695}
   CheatPeeNow: 0
