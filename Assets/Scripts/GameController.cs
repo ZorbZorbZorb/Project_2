@@ -274,6 +274,7 @@ public class GameController : MonoBehaviour {
                 x.DesperationState != Collections.CustomerDesperationState.State4)
             .Count();
     }
+    private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Collections.Location.Bar);
     private int GetCustomersAboutToWetCount() {
         return customers
             .Where(x =>
@@ -292,8 +293,19 @@ public class GameController : MonoBehaviour {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
 
+    /// <summary>
+    /// Advances the night forward one time tick.
+    /// <para>Adds funds for each customer in the bar</para>
+    /// <para>Updates time related displays on the screen</para>
+    /// </summary>
     private void AdvanceTime() {
+        // Generate funds for customers in bar
+        int customersInBar = CustomersInBar().Count();
+        AddFunds(customersInBar * 1d);
+        // TODO: Have a little money emote display above each customer in the bar who generated funds.
+        // Advance time
         timeTicksElapsed++;
+        // Update time related displays
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
