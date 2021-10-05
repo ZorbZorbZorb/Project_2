@@ -17,8 +17,13 @@ public class Sink : Relief {
         customer.ActionState = Collections.CustomerActionState.SinkWashingHands;
         customer.NextDelay = 6f;
         customer.Next = () => {
-            customer.ActionState = Collections.CustomerActionState.None;
-            customer.EnterBar();
+            if (customer.IsWet) {
+                customer.ActionState = Collections.CustomerActionState.None;
+                customer.Leave();
+            }
+            else {
+                customer.EnterBar();
+            }
         };
     }
 }
