@@ -25,6 +25,8 @@ namespace Assets.Scripts {
         public Button RestartButton;
         [SerializeField]
         public Button MainMenuButton;
+        [SerializeField]
+        public Button ContinueButton;
 
         private string centerTextStringDefault = "Paused";
         private string hintTextStringDefault = "(Press Esc to Resume)";
@@ -68,9 +70,13 @@ namespace Assets.Scripts {
             CenterText.text = text;
             HintText.text = hint;
         }
+        public void EnableContinueButton(bool value) {
+            ContinueButton.gameObject.SetActive(value);
+        }
         public void SetUpButtons() {
             RestartButton.onClick.AddListener(GameController.controller.RestartCurrentNight);
             MainMenuButton.onClick.AddListener(GameController.controller.GoToMainMenu);
+            ContinueButton.onClick.AddListener(GameController.controller.ContinueToNextNight);
         }
         public void FadeOverlayToBlack() {
             float rate = 0.00005f * Time.fixedUnscaledDeltaTime;
@@ -86,6 +92,7 @@ namespace Assets.Scripts {
         }
 
         public PauseMenu() {
+            EnableContinueButton(false);
         }
     }
 }

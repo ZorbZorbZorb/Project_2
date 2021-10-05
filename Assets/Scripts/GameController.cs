@@ -43,6 +43,7 @@ public class GameController : MonoBehaviour {
     public bool gameLost = false;
     public bool gameEnd = false;
     public bool fadeToBlack = false;
+    
 
     public void SetMaxCustomers(int max) {
         maxCustomers = max;
@@ -78,12 +79,24 @@ public class GameController : MonoBehaviour {
         // Reload scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+    public void ContinueToNextNight() {
+        gameData.night++;
+        SaveNightData();
+        // Timescale and static vars are preserved between scenes!
+        Time.timeScale = 1;
+        ResetStaticMembers();
+        // Reload scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
     public void SaveNightData() {
         GameData.Export(0, gameData);
     }
     public void LoadNightData() {
         gameData = GameData.Import(0);
     }
+    /// <summary>
+    /// Resets static properties between scene reloads
+    /// </summary>
     public void ResetStaticMembers() {
         uid = 0;
         GamePaused = false;
@@ -156,10 +169,9 @@ public class GameController : MonoBehaviour {
     void EndGame() {
         PauseGame();
         PauseMenu.SwitchToBoldTextDisplay();
-        PauseMenu.SetBoldTextDisplay($"End of night {gameData.night}\r\n\r\nYou made {gameData.funds - nightStartFunds} kromer.");
+        PauseMenu.SetBoldTextDisplay($"End of night {gameData.night}\r\n\r\nYou made ${gameData.funds - nightStartFunds}.");
+        PauseMenu.EnableContinueButton(true);
         fadeToBlack = true;
-        // TODO: Add a continue button instead of just instant exporting?
-        GameData.Export(0, gameData);
     }
 
     /// <summary>
