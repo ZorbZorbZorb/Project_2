@@ -193,7 +193,7 @@ public class Customer : MonoBehaviour {
         }
 
         // Should leave?
-        if ( WantsToLeaveBar() && DesperationState != Collections.CustomerDesperationState.State4 ) {
+        if ( WantsToLeaveBar() ) {
             Leave();
         }
 
@@ -275,10 +275,20 @@ public class Customer : MonoBehaviour {
         return bladder.FeltNeed > 0.40d;
     }
     public bool WantsToLeaveBar() {
-        Collections.CustomerDesperationState[] tooDesperateStates = {
-            Collections.CustomerDesperationState.State4,
-            Collections.CustomerDesperationState.State3
-        };
+        GameController controller = GameController.controller;
+        Collections.CustomerDesperationState[] tooDesperateStates;
+
+        if ( controller.timeTicksElapsed >= ( controller.nightMaxCustomerSpawnTime + controller.nightMaxCustomerSpawnTime / 2 ) ) {
+            tooDesperateStates = new Collections.CustomerDesperationState[] {
+                Collections.CustomerDesperationState.State4
+            };
+        }
+        else {
+            tooDesperateStates = new Collections.CustomerDesperationState[] {
+                Collections.CustomerDesperationState.State4,
+                Collections.CustomerDesperationState.State3
+            };
+        }
 
         // Basic assertions
         bool tooDesperate = tooDesperateStates.Contains(DesperationState);
