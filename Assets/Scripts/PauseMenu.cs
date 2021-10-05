@@ -13,6 +13,9 @@ namespace Assets.Scripts {
         public GameObject Canvas;
 
         [SerializeField]
+        public SpriteRenderer Overlay;
+
+        [SerializeField]
         public Text CenterText;
         [SerializeField]
         public Text HintText;
@@ -68,6 +71,18 @@ namespace Assets.Scripts {
         public void SetUpButtons() {
             RestartButton.onClick.AddListener(GameController.controller.RestartCurrentNight);
             MainMenuButton.onClick.AddListener(GameController.controller.GoToMainMenu);
+        }
+        public void FadeOverlayToBlack() {
+            float rate = 0.00005f * Time.fixedUnscaledDeltaTime;
+            Color current = Overlay.color;
+            current.r = Math.Max(current.r - rate, 0f);
+            current.g = Math.Max(current.g - rate, 0f);
+            current.b = Math.Max(current.b - rate, 0f);
+            current.a = Math.Min(current.a + rate, 1f);
+            Overlay.color = current;
+        }
+        public bool FadeOverlayComplete() {
+            return Overlay.color.r == 0f && Overlay.color.a == 255f;
         }
 
         public PauseMenu() {

@@ -9,6 +9,8 @@ using Random = UnityEngine.Random;
 public class Bladder {
     [SerializeField]
     public double AverageMax = 800;
+    [SerializeField]
+    public Customer customer;
     public double Stomach;  // The stomach is stored in the bladder
     public double Amount;
     public double Max;
@@ -72,7 +74,13 @@ public class Bladder {
                         }
                     }
                     else {
-                        DrainRateNow -= (8d * Time.deltaTime);
+                        // Guys will be better at interrupting peeing than girls
+                        if (customer.Gender == 'm') {
+                            DrainRateNow -= ( 16d * Time.deltaTime );
+                        }
+                        else {
+                            DrainRateNow -= (8d * Time.deltaTime);
+                        }
                     }
                     // To make it more interesting heres some naive for spurting when stopping
                     if (!StruggleStopSpurtNow && !StruggleStopSpurt && DrainRateNow < DrainRate / 2) {

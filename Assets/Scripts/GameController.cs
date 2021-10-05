@@ -42,6 +42,7 @@ public class GameController : MonoBehaviour {
     public double nightStartFunds;
     public bool gameLost = false;
     public bool gameEnd = false;
+    public bool fadeToBlack = false;
 
     public void SetMaxCustomers(int max) {
         maxCustomers = max;
@@ -104,6 +105,7 @@ public class GameController : MonoBehaviour {
     /// </summary>
     void PauseGame() {
         Time.timeScale = 0;
+        gamePaused = true;
         // Close all open menus.
         Menu.CloseAllOpenMenus();
         PauseMenu.Open();
@@ -118,6 +120,7 @@ public class GameController : MonoBehaviour {
             return;
         }
         Time.timeScale = 1;
+        gamePaused = false;
         PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
@@ -154,8 +157,7 @@ public class GameController : MonoBehaviour {
         PauseGame();
         PauseMenu.SwitchToBoldTextDisplay();
         PauseMenu.SetBoldTextDisplay($"End of night {gameData.night}\r\n\r\nYou made {gameData.funds - nightStartFunds} kromer.");
-
-        // TODO: Add a fade to black here.
+        fadeToBlack = true;
         // TODO: Add a continue button instead of just instant exporting?
         GameData.Export(0, gameData);
     }
@@ -209,6 +211,7 @@ public class GameController : MonoBehaviour {
         }
 
         nightStartFunds = gameData.funds;
+
     }
 
     public int nightMaxTime = 30;
@@ -222,12 +225,20 @@ public class GameController : MonoBehaviour {
     // Think only once a second for better game performance.
     float timeAcc = 0f;
     void Update() {
-        if (gameEnd && !GamePaused) {
-            if (gameLost) {
-                LoseGame();
+        if (gameEnd){
+            if (!GamePaused) {
+                if (gameLost) {
+                    LoseGame();
+                }
+                else {
+                    EndGame();
+                }
             }
-            else {
-                EndGame();
+            else if ( fadeToBlack ) {
+                PauseMenu.FadeOverlayToBlack();
+                if (PauseMenu.FadeOverlayComplete()) {
+                    fadeToBlack = true;
+                }
             }
         }
 

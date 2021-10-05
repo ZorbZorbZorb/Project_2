@@ -53,7 +53,7 @@ public class Customer : MonoBehaviour {
 
         bladder = new Bladder();
         bladder.SetupBladder(this, minBladderPercent, maxBladderPercent);
-        
+        bladder.customer = this;
 
         UrinateStartDelay = 4d;
         UrinateStopDelay = 6d;
