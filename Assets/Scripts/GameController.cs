@@ -73,17 +73,14 @@ public class GameController : MonoBehaviour {
     /// scene in play is unsaved.
     /// </summary>
     public void RestartCurrentNight() {
-        // Timescale and static vars are preserved between scenes!
-        Time.timeScale = 1;
         ResetStaticMembers();
         // Reload scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     public void ContinueToNextNight() {
+        PauseMenu.Close();
         gameData.night++;
         SaveNightData();
-        // Timescale and static vars are preserved between scenes!
-        Time.timeScale = 1;
         ResetStaticMembers();
         // Reload scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -224,6 +221,9 @@ public class GameController : MonoBehaviour {
         else {
             LoadNightData();
         }
+
+        // Timescale and static vars are preserved between scenes!
+        ResumeGame();
 
         nightStartFunds = gameData.funds;
 

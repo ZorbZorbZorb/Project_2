@@ -77,6 +77,8 @@ namespace Assets.Scripts {
             RestartButton.onClick.AddListener(GameController.controller.RestartCurrentNight);
             MainMenuButton.onClick.AddListener(GameController.controller.GoToMainMenu);
             ContinueButton.onClick.AddListener(GameController.controller.ContinueToNextNight);
+
+            EnableContinueButton(false);
         }
         public void FadeOverlayToBlack() {
             float rate = 0.00005f * Time.fixedUnscaledDeltaTime;
@@ -92,7 +94,6 @@ namespace Assets.Scripts {
         }
 
         public PauseMenu() {
-            EnableContinueButton(false);
         }
     }
 }
