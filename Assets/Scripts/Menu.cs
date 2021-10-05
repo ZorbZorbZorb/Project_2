@@ -94,6 +94,11 @@ namespace Assets.Scripts {
                 UpdatingButtons.Add(button);
             }
         }
+        public static void ClearForSceneReload() {
+            OpenMenus.Clear();
+            Buttons.Clear();
+            UpdatingButtons.Clear();
+        }
         public Menu(Canvas _canvas) {
             canvas = _canvas;
             canOpenNow = () => { return true; };

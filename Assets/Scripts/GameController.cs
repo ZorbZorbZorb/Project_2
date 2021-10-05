@@ -183,6 +183,9 @@ public class GameController : MonoBehaviour {
         }
         controller = this;
 
+        // Clear the menu system's caches.
+        Menu.ClearForSceneReload();
+
         // Set the callbacks for the pause menu buttons. (restart and main menu)
         PauseMenu.SetUpButtons();
 
