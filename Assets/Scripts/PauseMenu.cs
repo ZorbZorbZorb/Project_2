@@ -81,7 +81,7 @@ namespace Assets.Scripts {
             EnableContinueButton(false);
         }
         public void FadeOverlayToBlack() {
-            float rate = 0.00005f * Time.fixedUnscaledDeltaTime;
+            float rate = 0.3f * Time.unscaledDeltaTime;
             Color current = Overlay.color;
             current.r = Math.Max(current.r - rate, 0f);
             current.g = Math.Max(current.g - rate, 0f);

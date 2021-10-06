@@ -185,22 +185,22 @@ public class GameController : MonoBehaviour {
     /// <returns>Returns false if still fading. Returns true when finished fading.</returns>
     public bool FadeOutNightStartScreen() {
         if ( nightStartDelay > 0f) {
-            nightStartDelay -= 1 * Time.fixedUnscaledDeltaTime;
+            nightStartDelay -= 1 * Time.unscaledDeltaTime;
             return false;
         }
         else if (NightStartOverlay.color.a > 0.2) {
-            float rate = 0.1f * Time.fixedUnscaledDeltaTime;
+            float rate = 0.5f * Time.unscaledDeltaTime;
             Color current = NightStartOverlay.color;
             current.a = Math.Max(current.a - rate, 0f);
             NightStartOverlay.color = current;
             return false;
         }
         else if ( NightStartOverlay.color.a <= 0.2 && NightStartText.color.a > 0) {
-            float rate = 0.1f * Time.fixedUnscaledDeltaTime;
+            float rate = 0.5f * Time.unscaledDeltaTime;
             Color current = NightStartOverlay.color;
             current.a = Math.Max(current.a - rate, 0f);
             NightStartOverlay.color = current;
-            rate = 0.5f * Time.fixedUnscaledDeltaTime;
+            rate = 0.5f * Time.unscaledDeltaTime;
             current = NightStartText.color;
             current.a = Math.Max(current.a - rate, 0f);
             NightStartText.color = current;
