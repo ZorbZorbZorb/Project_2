@@ -22,6 +22,7 @@ public class Sink : Relief {
                 customer.Leave();
             }
             else {
+                customer.ActionState = Collections.CustomerActionState.None;
                 customer.EnterBar();
             }
         };
