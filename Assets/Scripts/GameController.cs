@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour {
     public bool gameEnd = false;
     public bool fadeToBlack = false;
 
-    public float nightStartDelay = 4f;
+    public float nightStartDelay = 2f;
     [SerializeField]
     public Canvas NightStartCanvas;
     [SerializeField]
