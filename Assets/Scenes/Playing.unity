@@ -2479,6 +2479,7 @@ MonoBehaviour:
   gameLost: 0
   gameEnd: 0
   fadeToBlack: 0
+  nightStartDelay: 4
   NightStartCanvas: {fileID: 801821831}
   NightStartText: {fileID: 936202726}
   NightStartOverlay: {fileID: 453549925}
@@ -3577,7 +3578,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &801821828
 RectTransform:
   m_ObjectHideFlags: 0
