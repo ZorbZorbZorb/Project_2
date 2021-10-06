@@ -40,10 +40,18 @@ public class GameController : MonoBehaviour {
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
     public double nightStartFunds;
+    public bool gameStarted = false;
     public bool gameLost = false;
     public bool gameEnd = false;
     public bool fadeToBlack = false;
-    
+
+    public float nightStartDelay = 4f;
+    [SerializeField]
+    public Canvas NightStartCanvas;
+    [SerializeField]
+    public Text NightStartText;
+    [SerializeField]
+    public SpriteRenderer NightStartOverlay;
 
     public void SetMaxCustomers(int max) {
         maxCustomers = max;
@@ -86,6 +94,7 @@ public class GameController : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     public void SaveNightData() {
+        CreateNewSaveDataOnStart = false;
         GameData.Export(0, gameData);
     }
     public void LoadNightData() {
@@ -170,6 +179,38 @@ public class GameController : MonoBehaviour {
         PauseMenu.EnableContinueButton(true);
         fadeToBlack = true;
     }
+    /// <summary>
+    /// Fades away the night start screen and eventually disables it.
+    /// </summary>
+    /// <returns>Returns false if still fading. Returns true when finished fading.</returns>
+    public bool FadeOutNightStartScreen() {
+        if ( nightStartDelay > 0f) {
+            nightStartDelay -= 1 * Time.fixedUnscaledDeltaTime;
+            return false;
+        }
+        else if (NightStartOverlay.color.a > 0.2) {
+            float rate = 0.1f * Time.fixedUnscaledDeltaTime;
+            Color current = NightStartOverlay.color;
+            current.a = Math.Max(current.a - rate, 0f);
+            NightStartOverlay.color = current;
+            return false;
+        }
+        else if ( NightStartOverlay.color.a <= 0.2 && NightStartText.color.a > 0) {
+            float rate = 0.1f * Time.fixedUnscaledDeltaTime;
+            Color current = NightStartOverlay.color;
+            current.a = Math.Max(current.a - rate, 0f);
+            NightStartOverlay.color = current;
+            rate = 0.5f * Time.fixedUnscaledDeltaTime;
+            current = NightStartText.color;
+            current.a = Math.Max(current.a - rate, 0f);
+            NightStartText.color = current;
+            return false;
+        }
+        else {
+            NightStartCanvas.gameObject.SetActive(false);
+            return true;
+        }
+    }
 
     /// <summary>
     /// Adds funds to track in save data
@@ -198,20 +239,11 @@ public class GameController : MonoBehaviour {
         // Set the callbacks for the pause menu buttons. (restart and main menu)
         PauseMenu.SetUpButtons();
 
-        StartGame();
-
         maxCustomers = Bar.Singleton.Seats.Length;
 
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
-        Customer firstCustomer = CreateCustomer();
-        firstCustomer.Active = true;
-    }
-
-    /// <summary>
-    /// This function is called once per controller startup and handles initializing the game data object.
-    /// </summary>
-    private void StartGame() {
+        // Load or create game data
         if ( CreateNewSaveDataOnStart ) {
             gameData = new GameData();
             gameData.bathroomSinks = Bathroom.Singleton.Sinks.Items.Count();
@@ -222,25 +254,24 @@ public class GameController : MonoBehaviour {
             LoadNightData();
         }
 
-        // Timescale and static vars are preserved between scenes!
-        ResumeGame();
-
-        nightStartFunds = gameData.funds;
+        NightStartCanvas.gameObject.SetActive(true);
+        NightStartText.text = $"Night {gameData.night}";
 
     }
 
-    public int nightMaxTime = 30;
-    public int nightMaxCustomerSpawnTime = 20;
-    public double GetCustomerSpawnFactor(int currentTime, int endTime) {
-        return currentTime >= endTime
-            ? 0d
-            : Math.Sin(( currentTime / endTime ) * Math.PI);
-    }
-
-    // Think only once a second for better game performance.
-    float timeAcc = 0f;
     void Update() {
-        if (gameEnd){
+        HandleKeypresses();
+
+        if (!gameStarted) {
+            if (FadeOutNightStartScreen()) {
+                StartGame();
+            }
+            else {
+                return;
+            }
+        }
+
+        else if (gameEnd){
             if (!GamePaused) {
                 if (gameLost) {
                     LoseGame();
@@ -268,8 +299,33 @@ public class GameController : MonoBehaviour {
             barTimeDisplay.text = barTime.ToString("hh:mm tt");
         }
 
-        HandleKeypresses();
     }
+
+    /// <summary>
+    /// This function is called once at the start of each scene to start the night
+    /// </summary>
+    private void StartGame() {
+        gameStarted = true;
+
+        // Timescale and static vars are preserved between scenes!
+        ResumeGame();
+
+        nightStartFunds = gameData.funds;
+
+        Customer firstCustomer = CreateCustomer();
+        firstCustomer.Active = true;
+    }
+
+    public int nightMaxTime = 30;
+    public int nightMaxCustomerSpawnTime = 20;
+    public double GetCustomerSpawnFactor(int currentTime, int endTime) {
+        return currentTime >= endTime
+            ? 0d
+            : Math.Sin(( currentTime / endTime ) * Math.PI);
+    }
+
+    // Think only once a second for better game performance.
+    float timeAcc = 0f;
 
     /// <summary>
     /// Handles user key presses
