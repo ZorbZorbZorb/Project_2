@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine;
 
 namespace Assets.Scripts {
     [Serializable]
@@ -16,7 +17,12 @@ namespace Assets.Scripts {
         public Interactable interactable;
         public void Update() {
             if ( interactable != null) {
-                Button.interactable = interactable(Customer);
+                try {
+                    Button.interactable = interactable(Customer);
+                }
+                catch {
+                    Debug.LogError(Button == null ? "Button for customer was null" : "Customer was null for button");
+                }
             }
         }
         /// <summary>

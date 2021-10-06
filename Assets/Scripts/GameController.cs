@@ -357,6 +357,7 @@ public class GameController : MonoBehaviour {
             .Count();
     }
     private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Collections.Location.Bar);
+    private IEnumerable<Customer> CustomersInBathroom() => customers.Where(x => x.position == Collections.Location.Doorway || x.position == Collections.Location.Relief || x.position == Collections.Location.WaitingRoom);
     private int GetCustomersAboutToWetCount() {
         return customers
             .Where(x =>
@@ -383,7 +384,8 @@ public class GameController : MonoBehaviour {
     private void AdvanceTime() {
         // Generate funds for customers in bar
         int customersInBar = CustomersInBar().Count();
-        AddFunds(customersInBar * 1d);
+        int customersInBathroom = CustomersInBathroom().Count();
+        AddFunds((customersInBar * 3d) + (customersInBathroom * 1d));
         // TODO: Have a little money emote display above each customer in the bar who generated funds.
         // Advance time
         timeTicksElapsed++;
