@@ -79,6 +79,7 @@
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\GameData.cs" />
+    <Compile Include="Assets\Scripts\BathroomEntitySpawnpoint.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
