@@ -184,10 +184,16 @@ public class GameController : MonoBehaviour {
     /// </summary>
     /// <returns>Returns false if still fading. Returns true when finished fading.</returns>
     public bool FadeOutNightStartScreen() {
-        if ( nightStartDelay > 0f) {
+        // If the canvas isn't enabled, dont perform any action
+        if (!NightStartCanvas.gameObject.activeSelf) {
+            return true;
+        }
+        // Delay starting the fade by nightStartDelay seconds
+        else if ( nightStartDelay > 0f) {
             nightStartDelay -= 1 * Time.unscaledDeltaTime;
             return false;
         }
+        // Start fading the background first
         else if (NightStartOverlay.color.a > 0.2) {
             float rate = 0.5f * Time.unscaledDeltaTime;
             Color current = NightStartOverlay.color;
@@ -195,6 +201,7 @@ public class GameController : MonoBehaviour {
             NightStartOverlay.color = current;
             return false;
         }
+        // Start fading the text second
         else if ( NightStartOverlay.color.a <= 0.2 && NightStartText.color.a > 0) {
             float rate = 0.5f * Time.unscaledDeltaTime;
             Color current = NightStartOverlay.color;
@@ -206,6 +213,7 @@ public class GameController : MonoBehaviour {
             NightStartText.color = current;
             return false;
         }
+        // Done fading
         else {
             NightStartCanvas.gameObject.SetActive(false);
             return true;
