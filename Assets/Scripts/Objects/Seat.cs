@@ -19,6 +19,8 @@ public class Seat : CustomerInteractable {
 
     public override bool CanBeSoiled => true;
 
+    public override bool ChangesCustomerSprite => true;
+
     public SpriteRenderer Renderer;
 
     private void Start() {
@@ -53,5 +55,12 @@ public class Seat : CustomerInteractable {
         customer.Occupying = this;
         OccupiedBy = customer;
         customer.position = Collections.Location.Bar;
+    }
+
+    public override Sprite GetCustomerSprite(Customer customer) {
+        var genderedSpriteLookup = customer.Gender == 'm' 
+            ? Collections.DesperationSeatSpriteLookupM 
+            : Collections.DesperationSeatSpriteLookupF;
+        return genderedSpriteLookup[customer.DesperationState];
     }
 }

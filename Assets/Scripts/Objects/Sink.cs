@@ -1,4 +1,5 @@
 using Assets.Scripts.Objects;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Sink : Relief {
@@ -13,6 +14,42 @@ public class Sink : Relief {
     public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.SinkPeeing;
     public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.SinkPantsUp;
     public override bool CanBeSoiled => false;
+
+    public override bool ChangesCustomerSprite => true;
+
+    [SerializeField] public Sprite SpritePantsDownM;
+    [SerializeField] public Sprite SpritePantsUpM;
+    [SerializeField] public Sprite SpritePeeingM;
+    [SerializeField] public Sprite SpritePantsDownF;
+    [SerializeField] public Sprite SpritePantsUpF;
+    [SerializeField] public Sprite SpritePeeingF;
+
+    private Dictionary<Collections.CustomerActionState, Sprite> SpriteLookupM = null;
+    private Dictionary<Collections.CustomerActionState, Sprite> SpriteLookupF = null;
+
+    public override Sprite GetCustomerSprite(Customer customer) {
+        if (SpriteLookupM == null) {
+            SpriteLookupM = new Dictionary<Collections.CustomerActionState, Sprite>() {
+                { Collections.CustomerActionState.SinkPantsDown, SpritePantsDownM },
+                { Collections.CustomerActionState.SinkPantsUp, SpritePantsUpM },
+                { Collections.CustomerActionState.SinkPeeing, SpritePeeingM }
+            };
+            SpriteLookupF = new Dictionary<Collections.CustomerActionState, Sprite>() {
+                { Collections.CustomerActionState.SinkPantsDown, SpritePantsDownF },
+                { Collections.CustomerActionState.SinkPantsUp, SpritePantsUpF },
+                { Collections.CustomerActionState.SinkPeeing, SpritePeeingF }
+            };
+        }
+
+        if ( customer.Gender == 'm' ) {
+            return SpriteLookupM[customer.ActionState];
+        }
+        else {
+            return SpriteLookupF[customer.ActionState];
+        }
+        
+    }
+
     public void Use(Customer customer) {
         customer.ActionState = Collections.CustomerActionState.SinkWashingHands;
         customer.NextDelay = 6f;

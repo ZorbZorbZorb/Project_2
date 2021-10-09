@@ -11,10 +11,13 @@ namespace Assets.Scripts.Objects {
             Sink
         };
         public abstract InteractableType Type { get; }
-        public abstract Vector3 CustomerPositionF { get; }
-        public abstract Vector3 CustomerPositionM { get; }
+        public virtual Vector3 CustomerPositionF { get; }
+        public virtual Vector3 CustomerPositionM { get; }
+        [SerializeField] public bool Sideways = false;
         public abstract Collections.Location CustomerLocation { get; }
         public Customer OccupiedBy;
+        public abstract Sprite GetCustomerSprite(Customer customer);
+        public abstract bool ChangesCustomerSprite { get; }
         public abstract bool HidesCustomer { get; }
         public abstract bool CanWetHere { get; }
         public abstract bool CanBeSoiled { get; }

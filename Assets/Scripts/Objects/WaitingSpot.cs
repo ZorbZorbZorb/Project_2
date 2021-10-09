@@ -17,7 +17,7 @@ public class WaitingSpot : CustomerInteractable {
     public bool Wet = false;
     public Collections.Location CustomerState = Collections.Location.WaitingRoom;
     public override bool CanBeSoiled => false;
-
+    public override bool ChangesCustomerSprite => false;
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
         if ( customer.position == Collections.Location.Bar ) {
@@ -28,5 +28,8 @@ public class WaitingSpot : CustomerInteractable {
         customer.MoveToVector3(CustomerPositionF);
         customer.Occupying = this;
         OccupiedBy = customer;
+    }
+    public override Sprite GetCustomerSprite(Customer customer) {
+        throw new System.InvalidOperationException();
     }
 }
