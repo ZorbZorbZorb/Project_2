@@ -11,6 +11,7 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
 
+    [SerializeField] public bool DisplayNightStartSplash;
     [SerializeField] public bool spawningEnabled = true;
     [SerializeField] public static bool CreateNewSaveDataOnStart = true;  // Hey, turn this off on build
     [SerializeField] public GameData gameData;
@@ -262,8 +263,11 @@ public class GameController : MonoBehaviour {
             LoadNightData();
         }
 
-        NightStartCanvas.gameObject.SetActive(true);
-        NightStartText.text = $"Night {gameData.night}";
+        // Display the night start splash screen
+        if (DisplayNightStartSplash) {
+            NightStartCanvas.gameObject.SetActive(true);
+            NightStartText.text = $"Night {gameData.night}";
+        }
 
     }
 
