@@ -489,7 +489,7 @@ public class Customer : MonoBehaviour {
     #region Sprites
     public void SpriteUpdate() {
         // Set the sprite
-        if ( Occupying?.ChangesCustomerSprite ?? false  && AtDestination()) {
+        if ( Occupying != null && Occupying.ChangesCustomerSprite && AtDestination()) {
             SRenderer.sprite = Occupying.GetCustomerSprite(this);
         }
         else {
