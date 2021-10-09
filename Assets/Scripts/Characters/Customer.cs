@@ -493,7 +493,7 @@ public class Customer : MonoBehaviour {
             SRenderer.sprite = Occupying.GetCustomerSprite(this);
         }
         else {
-            SRenderer.sprite = Collections.GetPersonSprite(this);
+            SRenderer.sprite = Collections.GenderedDesperationSpriteLookup[Gender][DesperationState];
         }
 
         // Sprite shaking to show desperation

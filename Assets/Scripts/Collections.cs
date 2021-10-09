@@ -177,10 +177,6 @@ public class Collections : MonoBehaviour {
         z = 0
     };
 
-    public static Sprite GetPersonSprite(Customer customer) {
-        return GenderedDesperationSpriteLookup[customer.Gender][customer.DesperationState];
-    }
-
     public static Sprite GetBubbleSprite(Customer customer) {
         CustomerActionState[] ValidBubbleActionStates = customer.Gender == 'm' ? ValidBubbleActionStatesM : ValidBubbleActionStatesF;
         if (! ValidBubbleActionStates.Contains(customer.ActionState) ) {
