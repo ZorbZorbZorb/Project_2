@@ -1921,9 +1921,11 @@ MonoBehaviour:
   SpritePantsDownM: {fileID: 21300000, guid: 0a4c5e550ed6c1b4baf126501acfda7d, type: 3}
   SpritePantsUpM: {fileID: 21300000, guid: c34bdf3704aef0f4493a30b0a1f2f833, type: 3}
   SpritePeeingM: {fileID: 21300000, guid: 249e1b913373ac946bcb6e972aa4a0c5, type: 3}
+  SpriteWashM: {fileID: 0}
   SpritePantsDownF: {fileID: 21300000, guid: 4f35c8d2f6f8d7742b2640022af576ae, type: 3}
   SpritePantsUpF: {fileID: 21300000, guid: dfc89523827a19f428f055ace364322c, type: 3}
   SpritePeeingF: {fileID: 21300000, guid: 5225e718acd0f5e4f93955cb1893fea6, type: 3}
+  SpriteWashF: {fileID: 0}
 --- !u!1 &406074934
 GameObject:
   m_ObjectHideFlags: 0
@@ -2729,6 +2731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DisplayNightStartSplash: 0
   spawningEnabled: 1
   gameData:
     night: 1
@@ -4945,8 +4948,8 @@ MonoBehaviour:
   Toilets:
   - {fileID: 1248710655}
   Urinals:
-  - {fileID: 1293586734}
   - {fileID: 1069086787}
+  - {fileID: 1293586734}
 --- !u!1 &1030702935
 GameObject:
   m_ObjectHideFlags: 0
@@ -5355,7 +5358,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1069086785}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 219, y: 58, z: 5}
+  m_LocalPosition: {x: 220, y: 60, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1045468237}
@@ -5374,7 +5377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ded041fcfe6039c45888a6627b597c9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sideways: 0
+  Sideways: 1
   OccupiedBy: {fileID: 0}
   SRenderer: {fileID: 1045468238}
   InUseBy: {fileID: 0}

@@ -28,9 +28,11 @@ namespace Assets.Scripts {
         [SerializeField]
         public Button ContinueButton;
 
+        #pragma warning disable CS0414
         private string centerTextStringDefault = "Paused";
         private string hintTextStringDefault = "(Press Esc to Resume)";
         private string BoldTextStringDefault = "Game Over\r\n\r\nToo many people wet\r\nthemselves in the bar\r\n";
+        #pragma warning restore CS0414
 
         private bool enabled = false;
         public bool Enabled {
@@ -74,9 +76,9 @@ namespace Assets.Scripts {
             ContinueButton.gameObject.SetActive(value);
         }
         public void SetUpButtons() {
-            RestartButton.onClick.AddListener(GameController.controller.RestartCurrentNight);
-            MainMenuButton.onClick.AddListener(GameController.controller.GoToMainMenu);
-            ContinueButton.onClick.AddListener(GameController.controller.ContinueToNextNight);
+            RestartButton.onClick.AddListener(GameController.GC.RestartCurrentNight);
+            MainMenuButton.onClick.AddListener(GameController.GC.GoToMainMenu);
+            ContinueButton.onClick.AddListener(GameController.GC.ContinueToNextNight);
 
             EnableContinueButton(false);
         }

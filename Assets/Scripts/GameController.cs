@@ -11,7 +11,8 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
 
-    [SerializeField] public bool DisplayNightStartSplash;
+    [SerializeField] public bool DebugCustomersWillinglyUseAny = false;
+    [SerializeField] public bool DisplayNightStartSplash = true;
     [SerializeField] public bool spawningEnabled = true;
     [SerializeField] public static bool CreateNewSaveDataOnStart = true;  // Hey, turn this off on build
     [SerializeField] public GameData gameData;
@@ -63,7 +64,8 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     public DoorwayQueue doorwayQueue;
 
-    public static GameController controller = null;
+    /// <summary>References the currently active GameController singleton</summary>
+    public static GameController GC = null;
 
     /// <summary>
     /// Returns to the main menu without saving
@@ -226,21 +228,22 @@ public class GameController : MonoBehaviour {
     /// </summary>
     /// <param name="amount">amount to add</param>
     public static void AddFunds(double amount) {
-        controller.gameData.funds += amount;
-        controller.UpdateFundsDisplay();
+        GC.gameData.funds += amount;
+        GC.UpdateFundsDisplay();
     }
     /// <summary>
     /// Adds a wetting event to track in save data
     /// </summary>
     public static void AddWetting() {
-        controller.gameData.wettings++;
+        GC.gameData.wettings++;
     }
 
     void Start() {
-        if ( controller != null ) {
-            throw new InvalidOperationException("Only one game controller may exist");
+        if ( GC != null ) {
+            Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
         }
-        controller = this;
+        GC = this;
+        Customer.GC = this;
 
         // Clear the menu system's caches.
         Menu.ClearForSceneReload();

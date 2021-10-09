@@ -11,6 +11,9 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class Customer : MonoBehaviour {
+
+    public static GameController GC = null;
+
     void Start() {
 
         if (Destination == null) {
@@ -161,7 +164,7 @@ public class Customer : MonoBehaviour {
 
         // If about to leave or has left
         if ( position == Collections.Location.Outside && AtDestination() && transform.position == Collections.OffScreenTop ) {
-            GameController.controller.RemoveCustomer(this);
+            GC.RemoveCustomer(this);
         }
 
         // If wet self and finished wetting self
@@ -275,10 +278,9 @@ public class Customer : MonoBehaviour {
         return bladder.FeltNeed > 0.40d;
     }
     public bool WantsToLeaveBar() {
-        GameController controller = GameController.controller;
         Collections.CustomerDesperationState[] tooDesperateStates;
 
-        if ( controller.timeTicksElapsed >= ( controller.nightMaxCustomerSpawnTime + controller.nightMaxCustomerSpawnTime / 2 ) ) {
+        if ( GC.timeTicksElapsed >= ( GC.nightMaxCustomerSpawnTime + GC.nightMaxCustomerSpawnTime / 2 ) ) {
             tooDesperateStates = new Collections.CustomerDesperationState[] {
                 Collections.CustomerDesperationState.State4
             };
@@ -293,9 +295,9 @@ public class Customer : MonoBehaviour {
         // Basic assertions
         bool tooDesperate = tooDesperateStates.Contains(DesperationState);
         bool wetted = IsWet && !IsWetting;
-        bool stayedTooLong = EnteredTicksElapsed - GameController.controller.timeTicksElapsed > 10;
+        bool stayedTooLong = EnteredTicksElapsed - GC.timeTicksElapsed > 10;
         bool noMoreFunds = Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f;
-        bool tooLateAtNight = GameController.controller.timeTicksElapsed >= GameController.controller.nightMaxCustomerSpawnTime;
+        bool tooLateAtNight = GC.timeTicksElapsed >= GC.nightMaxCustomerSpawnTime;
 
         // Compound assertions
         bool wouldNormallyLeave = stayedTooLong || noMoreFunds || tooLateAtNight;
@@ -542,11 +544,11 @@ public class Customer : MonoBehaviour {
     public bool WillUseSink(Customer customer) {
         // It's just a weird urinal you wash your hands in, right?
         if ( customer.Gender == 'm') {
-            return bladder.LosingControl || bladder.FeltNeed > 0.93d;
+            return GC.DebugCustomersWillinglyUseAny || bladder.LosingControl || bladder.FeltNeed > 0.93d;
         }
         // Girls will only use the sink if they're wetting themselves
         if ( customer.Gender == 'f' ) {
-            return bladder.LosingControl || bladder.FeltNeed > 0.99d;
+            return GC.DebugCustomersWillinglyUseAny || bladder.LosingControl || bladder.FeltNeed > 0.99d;
         }
         throw new NotImplementedException();
     }
