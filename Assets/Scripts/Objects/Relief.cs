@@ -7,8 +7,5 @@ namespace Assets.Scripts.Objects {
         public override Collections.Location CustomerLocation => Collections.Location.Relief;
         // Confucius says, Man whos dick is out of pants, cannot piss in pants
         public override bool CanWetHere => false;
-        public abstract Collections.CustomerActionState StatePantsDown { get; }
-        public abstract Collections.CustomerActionState StatePeeing { get; }
-        public abstract Collections.CustomerActionState StatePantsUp { get; }
     }
 }

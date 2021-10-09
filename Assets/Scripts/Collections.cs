@@ -61,63 +61,24 @@ public class Collections : MonoBehaviour {
             { CustomerDesperationState.State6, Resources.Load<Sprite>("Sprites/People/Bar/m/DespStateStool_6") }
         };
 
-        ActionSpriteLookupF = new Dictionary<CustomerActionState, Sprite>() {
-            { CustomerActionState.ToiletPeeing, Resources.Load<Sprite>("Sprites/People/f/peeing_toilet") },
-            { CustomerActionState.UrinalPeeing, Resources.Load<Sprite>("Sprites/People/f/peeing_urinal") },
-            { CustomerActionState.SinkPeeing, Resources.Load<Sprite>("Sprites/People/f/peeing_sink") },
-            { CustomerActionState.SinkPantsDown, Resources.Load<Sprite>("Sprites/People/f/pants_down") },
-            { CustomerActionState.ToiletPantsDown, Resources.Load<Sprite>("Sprites/People/f/pants_down") },
-            { CustomerActionState.UrinalPantsDown, Resources.Load<Sprite>("Sprites/People/f/pants_down") },
-            { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/People/f/pants_up") },
-            { CustomerActionState.ToiletPantsUp, Resources.Load<Sprite>("Sprites/People/f/pants_up") },
-            { CustomerActionState.UrinalPantsUp, Resources.Load<Sprite>("Sprites/People/f/pants_up") },
-            { CustomerActionState.SinkWashingHands, Resources.Load<Sprite>("Sprites/People/f/wash") },
-        };
-        ActionSpriteLookupM = new Dictionary<CustomerActionState, Sprite>() {
-            { CustomerActionState.ToiletPeeing, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.UrinalPeeing, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.SinkPeeing, Resources.Load<Sprite>("Sprites/People/m/peeing_sink") },
-            { CustomerActionState.SinkPantsDown, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.ToiletPantsDown, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.UrinalPantsDown, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.ToiletPantsUp, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.UrinalPantsUp, Resources.Load<Sprite>("Sprites/People/m/peeing_toilet") },
-            { CustomerActionState.SinkWashingHands, Resources.Load<Sprite>("Sprites/People/m/wash") },
-        };
-
         BubbleSpriteLookupM = new Dictionary<CustomerActionState, Sprite>() {
             { CustomerActionState.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.ToiletPeeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.UrinalPeeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.SinkPeeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.ToiletPantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.UrinalPantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.SinkPantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.ToiletPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
-            { CustomerActionState.UrinalPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
-            { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
+            { CustomerActionState.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            { CustomerActionState.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
+            { CustomerActionState.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };
         BubbleSpriteLookupF = new Dictionary<CustomerActionState, Sprite>() {
             { CustomerActionState.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.ToiletPeeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.UrinalPeeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.SinkPeeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.ToiletPantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.UrinalPantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.SinkPantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.ToiletPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
-            { CustomerActionState.UrinalPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
-            { CustomerActionState.SinkPantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
+            { CustomerActionState.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            { CustomerActionState.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
+            { CustomerActionState.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };
 
         SpriteStoolNormal = Resources.Load<Sprite>("Sprites/Entities/Stool_normal");
         SpriteStoolWet = Resources.Load<Sprite>("Sprites/Entities/Stool_wet");
 
         // Are ya pissin son?
-        ValidSpriteActionStatesF = ActionSpriteLookupF.Keys.ToArray();
         ValidBubbleActionStatesF = BubbleSpriteLookupF.Keys.ToArray();
-        ValidSpriteActionStatesM = ActionSpriteLookupM.Keys.ToArray();
         ValidBubbleActionStatesM = BubbleSpriteLookupM.Keys.ToArray();
 
         GenderedActionSpriteLookup = new Dictionary<char, Dictionary<CustomerActionState, Sprite>>() {
@@ -161,20 +122,10 @@ public class Collections : MonoBehaviour {
     }
     public enum CustomerActionState {
         None,
-        ToiletPantsDown,
-        ToiletPantsUp,
-        ToiletPeeing,
-        UrinalPantsDown,
-        UrinalPantsUp,
-        UrinalPeeing,
-        SinkWashingHands,
-        SinkPantsDown,
-        SinkPantsUp,
-        SinkPeeing,
-        TowelPantsDown,
-        TowelPantsUp,
-        TowelPeeing,
-        TowelWetting,
+        PantsDown,
+        PantsUp,
+        Peeing,
+        WashingHands,
         Wetting
     }
 
@@ -227,20 +178,7 @@ public class Collections : MonoBehaviour {
     };
 
     public static Sprite GetPersonSprite(Customer customer) {
-        bool atDestination = customer.AtDestination();
-        CustomerActionState[] ValidSpriteActionStates = customer.Gender == 'm' ? ValidSpriteActionStatesM : ValidSpriteActionStatesF;
-        if ( atDestination && ValidSpriteActionStates.Contains(customer.ActionState)) {
-            var genderedSpritePool = GenderedActionSpriteLookup[customer.Gender];
-            return genderedSpritePool[customer.ActionState];
-        }
-        else if ( atDestination && customer?.Occupying?.Type == InteractableType.Seat) {
-            var genderedSpritePool = GenderedSeatDesperationSpriteLookup[customer.Gender];
-            return genderedSpritePool[customer.DesperationState];
-        }
-        else {
-            var genderedSpritePool = GenderedDesperationSpriteLookup[customer.Gender];
-            return genderedSpritePool[customer.DesperationState];
-        }
+        return GenderedDesperationSpriteLookup[customer.Gender][customer.DesperationState];
     }
 
     public static Sprite GetBubbleSprite(Customer customer) {

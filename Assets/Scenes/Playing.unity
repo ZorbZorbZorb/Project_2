@@ -1918,12 +1918,12 @@ MonoBehaviour:
     Line:
       Items: []
     Items: []
-  SpritePantsDownM: {fileID: 0}
-  SpritePantsUpM: {fileID: 0}
-  SpritePeeingM: {fileID: 0}
-  SpritePantsDownF: {fileID: 0}
-  SpritePantsUpF: {fileID: 0}
-  SpritePeeingF: {fileID: 0}
+  SpritePantsDownM: {fileID: 21300000, guid: 0a4c5e550ed6c1b4baf126501acfda7d, type: 3}
+  SpritePantsUpM: {fileID: 21300000, guid: c34bdf3704aef0f4493a30b0a1f2f833, type: 3}
+  SpritePeeingM: {fileID: 21300000, guid: 249e1b913373ac946bcb6e972aa4a0c5, type: 3}
+  SpritePantsDownF: {fileID: 21300000, guid: 4f35c8d2f6f8d7742b2640022af576ae, type: 3}
+  SpritePantsUpF: {fileID: 21300000, guid: dfc89523827a19f428f055ace364322c, type: 3}
+  SpritePeeingF: {fileID: 21300000, guid: 5225e718acd0f5e4f93955cb1893fea6, type: 3}
 --- !u!1 &406074934
 GameObject:
   m_ObjectHideFlags: 0
@@ -4946,6 +4946,7 @@ MonoBehaviour:
   - {fileID: 1248710655}
   Urinals:
   - {fileID: 1293586734}
+  - {fileID: 1069086787}
 --- !u!1 &1030702935
 GameObject:
   m_ObjectHideFlags: 0
@@ -5378,12 +5379,12 @@ MonoBehaviour:
   SRenderer: {fileID: 1045468238}
   InUseBy: {fileID: 0}
   ReservedBy: {fileID: 0}
-  SpritePantsDownM: {fileID: 0}
-  SpritePantsUpM: {fileID: 0}
-  SpritePeeingM: {fileID: 0}
-  SpritePantsDownF: {fileID: 0}
-  SpritePantsUpF: {fileID: 0}
-  SpritePeeingF: {fileID: 0}
+  SpritePantsDownM: {fileID: 21300000, guid: 1f884167a3ef7cb44aea2238f4a32958, type: 3}
+  SpritePantsUpM: {fileID: 21300000, guid: 511f8996b32bfd3478ce1173fdb8f360, type: 3}
+  SpritePeeingM: {fileID: 21300000, guid: 6649923499d9a714aaf392af6789bdf5, type: 3}
+  SpritePantsDownF: {fileID: 21300000, guid: b6aa2cce04d71d74f8a2a4a5c524a3a9, type: 3}
+  SpritePantsUpF: {fileID: 21300000, guid: 50676e19ad2abf94fb35f9f97be1718b, type: 3}
+  SpritePeeingF: {fileID: 21300000, guid: 5e54ba2601c4cba46977b2a1df03bb0a, type: 3}
 --- !u!1 &1075643273
 GameObject:
   m_ObjectHideFlags: 0
@@ -6311,12 +6312,12 @@ MonoBehaviour:
   SRenderer: {fileID: 1944893290}
   InUseBy: {fileID: 0}
   ReservedBy: {fileID: 0}
-  SpritePantsDownM: {fileID: 0}
-  SpritePantsUpM: {fileID: 0}
-  SpritePeeingM: {fileID: 0}
-  SpritePantsDownF: {fileID: 0}
-  SpritePantsUpF: {fileID: 0}
-  SpritePeeingF: {fileID: 0}
+  SpritePantsDownM: {fileID: 21300000, guid: 0a4c5e550ed6c1b4baf126501acfda7d, type: 3}
+  SpritePantsUpM: {fileID: 21300000, guid: c34bdf3704aef0f4493a30b0a1f2f833, type: 3}
+  SpritePeeingM: {fileID: 21300000, guid: f75c554edbf9c6d449f2352a86713186, type: 3}
+  SpritePantsDownF: {fileID: 21300000, guid: 4f35c8d2f6f8d7742b2640022af576ae, type: 3}
+  SpritePantsUpF: {fileID: 21300000, guid: dfc89523827a19f428f055ace364322c, type: 3}
+  SpritePeeingF: {fileID: 21300000, guid: d07191cfb8710ed4d92bba39b9a54dec, type: 3}
 --- !u!61 &1248710656
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6506,12 +6507,12 @@ MonoBehaviour:
   SRenderer: {fileID: 1075643275}
   InUseBy: {fileID: 0}
   ReservedBy: {fileID: 0}
-  SpritePantsDownM: {fileID: 0}
-  SpritePantsUpM: {fileID: 0}
-  SpritePeeingM: {fileID: 0}
-  SpritePantsDownF: {fileID: 0}
-  SpritePantsUpF: {fileID: 0}
-  SpritePeeingF: {fileID: 0}
+  SpritePantsDownM: {fileID: 21300000, guid: 0a4c5e550ed6c1b4baf126501acfda7d, type: 3}
+  SpritePantsUpM: {fileID: 21300000, guid: c34bdf3704aef0f4493a30b0a1f2f833, type: 3}
+  SpritePeeingM: {fileID: 21300000, guid: f75c554edbf9c6d449f2352a86713186, type: 3}
+  SpritePantsDownF: {fileID: 21300000, guid: 4f35c8d2f6f8d7742b2640022af576ae, type: 3}
+  SpritePantsUpF: {fileID: 21300000, guid: dfc89523827a19f428f055ace364322c, type: 3}
+  SpritePeeingF: {fileID: 21300000, guid: d1afddc72f141884eaf017915748db36, type: 3}
 --- !u!1 &1306932258
 GameObject:
   m_ObjectHideFlags: 0

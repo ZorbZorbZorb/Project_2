@@ -9,9 +9,6 @@ public class Toilet : Relief {
     public override Collections.ReliefType ReliefType => Collections.ReliefType.Toilet;
     public override bool HidesCustomer => true;
     public override string DisplayName => "Toilet";
-    public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.ToiletPantsDown;
-    public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.ToiletPeeing;
-    public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.ToiletPantsUp;
     public override bool CanBeSoiled => false;
 
     public override bool ChangesCustomerSprite => true;
@@ -54,14 +51,14 @@ public class Toilet : Relief {
     public override Sprite GetCustomerSprite(Customer customer) {
         if ( SpriteLookupM == null ) {
             SpriteLookupM = new Dictionary<Collections.CustomerActionState, Sprite>() {
-                { Collections.CustomerActionState.SinkPantsDown, SpritePantsDownM },
-                { Collections.CustomerActionState.SinkPantsUp, SpritePantsUpM },
-                { Collections.CustomerActionState.SinkPeeing, SpritePeeingM }
+                { Collections.CustomerActionState.PantsDown, SpritePantsDownM },
+                { Collections.CustomerActionState.PantsUp, SpritePantsUpM },
+                { Collections.CustomerActionState.Peeing, SpritePeeingM }
             };
             SpriteLookupF = new Dictionary<Collections.CustomerActionState, Sprite>() {
-                { Collections.CustomerActionState.SinkPantsDown, SpritePantsDownF },
-                { Collections.CustomerActionState.SinkPantsUp, SpritePantsUpF },
-                { Collections.CustomerActionState.SinkPeeing, SpritePeeingF }
+                { Collections.CustomerActionState.PantsDown, SpritePantsDownF },
+                { Collections.CustomerActionState.PantsUp, SpritePantsUpF },
+                { Collections.CustomerActionState.Peeing, SpritePeeingF }
             };
         }
 

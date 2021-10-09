@@ -10,12 +10,9 @@ public class Urinal : Relief {
     public override Collections.ReliefType ReliefType => Collections.ReliefType.Urinal;
     public override bool HidesCustomer => false;
     public override string DisplayName => "Urinal";
-    public override Collections.CustomerActionState StatePantsDown => Collections.CustomerActionState.UrinalPantsDown;
-    public override Collections.CustomerActionState StatePeeing => Collections.CustomerActionState.UrinalPeeing;
-    public override Collections.CustomerActionState StatePantsUp => Collections.CustomerActionState.UrinalPantsUp;
     public override bool CanBeSoiled => false;
 
-    public override bool ChangesCustomerSprite => throw new System.NotImplementedException();
+    public override bool ChangesCustomerSprite => true;
 
     [SerializeField] public Sprite SpritePantsDownM;
     [SerializeField] public Sprite SpritePantsUpM;
@@ -30,14 +27,14 @@ public class Urinal : Relief {
     public override Sprite GetCustomerSprite(Customer customer) {
         if ( SpriteLookupM == null ) {
             SpriteLookupM = new Dictionary<Collections.CustomerActionState, Sprite>() {
-                { Collections.CustomerActionState.SinkPantsDown, SpritePantsDownM },
-                { Collections.CustomerActionState.SinkPantsUp, SpritePantsUpM },
-                { Collections.CustomerActionState.SinkPeeing, SpritePeeingM }
+                { Collections.CustomerActionState.PantsDown, SpritePantsDownM },
+                { Collections.CustomerActionState.PantsUp, SpritePantsUpM },
+                { Collections.CustomerActionState.Peeing, SpritePeeingM }
             };
             SpriteLookupF = new Dictionary<Collections.CustomerActionState, Sprite>() {
-                { Collections.CustomerActionState.SinkPantsDown, SpritePantsDownF },
-                { Collections.CustomerActionState.SinkPantsUp, SpritePantsUpF },
-                { Collections.CustomerActionState.SinkPeeing, SpritePeeingF }
+                { Collections.CustomerActionState.PantsDown, SpritePantsDownF },
+                { Collections.CustomerActionState.PantsUp, SpritePantsUpF },
+                { Collections.CustomerActionState.Peeing, SpritePeeingF }
             };
         }
 

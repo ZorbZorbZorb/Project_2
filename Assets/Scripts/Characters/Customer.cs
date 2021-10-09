@@ -363,7 +363,7 @@ public class Customer : MonoBehaviour {
             if ( !bladder.Emptying ) {
                 if (Next == null) {
                     SetNext(0f, () => {
-                        ActionState = relief.StatePantsUp;
+                        ActionState = Collections.CustomerActionState.Peeing;
                         Emotes.Emote(Emote.PantsUp);
                         SetNext((float)RemainingUrinateStopDelay, () => {
                             EndPeeingWithThing();
@@ -379,7 +379,7 @@ public class Customer : MonoBehaviour {
                 }
                 else {
                     bladder.Emptying = true;
-                    ActionState = relief.StatePeeing;
+                    ActionState = Collections.CustomerActionState.Peeing;
                 }
             }
             // Wait for bladder to empty.
@@ -489,9 +489,11 @@ public class Customer : MonoBehaviour {
     #region Sprites
     public void SpriteUpdate() {
         // Set the sprite
-        Sprite sprite = Collections.GetPersonSprite(this);
-        if ( sprite != SRenderer.sprite ) {
-            SRenderer.sprite = sprite;
+        if ( Occupying?.ChangesCustomerSprite ?? false  && AtDestination()) {
+            SRenderer.sprite = Occupying.GetCustomerSprite(this);
+        }
+        else {
+            SRenderer.sprite = Collections.GetPersonSprite(this);
         }
 
         // Sprite shaking to show desperation
@@ -566,32 +568,17 @@ public class Customer : MonoBehaviour {
         Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
         switch ( reliefType ) {
             case Collections.ReliefType.Toilet:
-            ActionState = Collections.CustomerActionState.ToiletPantsDown;
-            SetNext((float)UrinateStartDelay, () => {
-                bladder.Emptying = true;
-                Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
-                ActionState = relief.StatePeeing;
-            });
-            break;
             case Collections.ReliefType.Urinal:
-            ActionState = Collections.CustomerActionState.UrinalPantsDown;
-            SetNext((float)UrinateStartDelay, () => {
-                bladder.Emptying = true;
-                Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
-                ActionState = relief.StatePeeing;
-            });
-            break;
             case Collections.ReliefType.Sink:
-            ActionState = Collections.CustomerActionState.SinkPantsDown;
-            SetNext((float)UrinateStartDelay, () => {
-                bladder.Emptying = true;
-                Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
-                ActionState = relief.StatePeeing;
-            });
+                ActionState = Collections.CustomerActionState.PantsDown;
+                SetNext((float)UrinateStartDelay, () => {
+                    bladder.Emptying = true;
+                    Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
+                    ActionState = Collections.CustomerActionState.Peeing;
+                });
             break;
-            case Collections.ReliefType.Towel:
-            ActionState = Collections.CustomerActionState.TowelPantsDown;
-            throw new NotImplementedException();
+            default:
+                throw new NotImplementedException();
         }
     }
     public void EndPeeingWithThing() {
