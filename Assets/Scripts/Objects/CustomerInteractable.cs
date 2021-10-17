@@ -38,8 +38,11 @@ namespace Assets.Scripts.Objects {
         public abstract string DisplayName { get; }
 
         [SerializeField]
-        public SpriteRenderer SRenderer;
-        public Sprite[] Sprites;
-        public Sprite[] SpritesSideways;
+        public SpriteRenderer MainSRenderer;
+        public SpriteRenderer AltSRenderer;
+        public Sprite[] MainSprites;
+        public Sprite[] MainSpritesSideways;
+        public Sprite[] AltSprites;
+        public Sprite[] AltSpritesSideways;
     }
 }

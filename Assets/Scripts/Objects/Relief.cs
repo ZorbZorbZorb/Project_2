@@ -51,5 +51,9 @@ namespace Assets.Scripts.Objects {
                 };
             }
         }
+
+        private void Start() {
+            MainSRenderer.sprite = Sideways ? MainSpritesSideways[0] : MainSprites[0];
+        }
     }
 }

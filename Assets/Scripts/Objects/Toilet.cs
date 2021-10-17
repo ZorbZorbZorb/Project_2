@@ -15,27 +15,26 @@ public class Toilet : Relief {
 
     private bool doorClosed = false;
     
-
-    
+    // TODO: This doesn't need to be an on update. I was just lazy.
     private void Update() {
         // Open or close the stall door
         if (OccupiedBy != null && !doorClosed && OccupiedBy.AtDestination()) {
-            SRenderer.sprite = Collections.spriteStallClosed;
+            AltSRenderer.sprite = Collections.spriteStallClosed;
             doorClosed = true;
         }
         else if(doorClosed && OccupiedBy == null) {
-            SRenderer.sprite = Collections.spriteStallOpened;
+            AltSRenderer.sprite = Collections.spriteStallOpened;
             doorClosed = false;
         }
     }
 
     private void OnMouseOver() {
         if (OccupiedBy != null) {
-            SRenderer.color = new Color(1f, 1f, 1f, 0.7f);
+            AltSRenderer.color = new Color(1f, 1f, 1f, 0.7f);
         }
     }
     private void OnMouseExit() {
-        SRenderer.color = new Color(1f, 1f, 1f, 1f);
+        AltSRenderer.color = new Color(1f, 1f, 1f, 1f);
     }
 
     public override Sprite GetCustomerSprite(Customer customer) {

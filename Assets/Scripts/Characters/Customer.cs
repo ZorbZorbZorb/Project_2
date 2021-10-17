@@ -610,7 +610,7 @@ public class Customer : MonoBehaviour {
         }
 
         if ( ReliefType == CustomerInteractable.ReliefType.Toilet ) {
-            ( (Toilet)Occupying ).SRenderer.sprite = Collections.spriteStallOpened;
+            ( (Toilet)Occupying ).AltSRenderer.sprite = Collections.spriteStallOpened;
         }
     }
     public void BeginPeeingSelf() {
