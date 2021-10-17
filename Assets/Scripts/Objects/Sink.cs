@@ -14,32 +14,9 @@ public class Sink : Relief {
 
     public override bool ChangesCustomerSprite => true;
 
-    [SerializeField] public Sprite SpritePantsDownM;
-    [SerializeField] public Sprite SpritePantsUpM;
-    [SerializeField] public Sprite SpritePeeingM;
-    [SerializeField] public Sprite SpriteWashM;
-    [SerializeField] public Sprite SpritePantsDownF;
-    [SerializeField] public Sprite SpritePantsUpF;
-    [SerializeField] public Sprite SpritePeeingF;
-    [SerializeField] public Sprite SpriteWashF;
-
-    private Dictionary<Collections.CustomerActionState, Sprite> SpriteLookupM = null;
-    private Dictionary<Collections.CustomerActionState, Sprite> SpriteLookupF = null;
-
     public override Sprite GetCustomerSprite(Customer customer) {
         if (SpriteLookupM == null) {
-            SpriteLookupM = new Dictionary<Collections.CustomerActionState, Sprite>() {
-                { Collections.CustomerActionState.PantsDown, SpritePantsDownM },
-                { Collections.CustomerActionState.PantsUp, SpritePantsUpM },
-                { Collections.CustomerActionState.Peeing, SpritePeeingM },
-                { Collections.CustomerActionState.WashingHands, SpriteWashM}
-            };
-            SpriteLookupF = new Dictionary<Collections.CustomerActionState, Sprite>() {
-                { Collections.CustomerActionState.PantsDown, SpritePantsDownF },
-                { Collections.CustomerActionState.PantsUp, SpritePantsUpF },
-                { Collections.CustomerActionState.Peeing, SpritePeeingF },
-                { Collections.CustomerActionState.WashingHands, SpriteWashF}
-            };
+            BuildSpriteLookup();
         }
 
         if ( customer.Gender == 'm' ) {

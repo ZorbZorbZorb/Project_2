@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.Objects {
     public abstract class CustomerInteractable : MonoBehaviour {
@@ -18,6 +19,7 @@ namespace Assets.Scripts.Objects {
         public Customer OccupiedBy;
         public abstract Sprite GetCustomerSprite(Customer customer);
         public abstract bool ChangesCustomerSprite { get; }
+        protected internal abstract void BuildSpriteLookup();
         public abstract bool HidesCustomer { get; }
         public abstract bool CanWetHere { get; }
         public abstract bool CanBeSoiled { get; }

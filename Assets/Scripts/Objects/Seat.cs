@@ -63,4 +63,10 @@ public class Seat : CustomerInteractable {
             : Collections.DesperationSeatSpriteLookupF;
         return genderedSpriteLookup[customer.DesperationState];
     }
+
+    protected internal override void BuildSpriteLookup() {
+        // TODO: Build this dynamically instead of storing it in Collections.cs
+        //          More classes will inherit CustomerInteractable in the future.
+        throw new System.NotImplementedException();
+    }
 }
