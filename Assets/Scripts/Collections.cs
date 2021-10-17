@@ -19,6 +19,12 @@ public class Collections : MonoBehaviour {
         Emote.StruggleStop =    new Emote("Sprites/Bubbles/bubble_struggle_stop");
         Emote.PeeStreamEmotes = new Emote[] { Emote.PeeWeak, Emote.PeeWeak, Emote.PeeWeak, Emote.PeeMedium, Emote.PeeMedium, Emote.PeeStrong, Emote.PeeStrong };
         // maybe add a null to the start so it looks like they took a second between peeing and pants up?
+        //   No. Do this using next action chaining.
+
+        spriteToilet = Resources.Load<Sprite>("Sprites/Entities/Toilet");
+        spriteUrinal = Resources.Load<Sprite>("Sprites/Entities/Urinal");
+        spriteUrinalSideways = Resources.Load<Sprite>("Sprites/Entities/Urinal_Side");
+        spriteSink = Resources.Load<Sprite>("Sprites/Entities/Sink");
 
         spriteStallClosed = Resources.Load<Sprite>("Sprites/Entities/Stall_closed");
         spriteStallOpened = Resources.Load<Sprite>("Sprites/Entities/Stall_opened");
@@ -131,6 +137,11 @@ public class Collections : MonoBehaviour {
         new Vector3(80,-500,0),
         new Vector3(80,-300,0)
     };
+
+    public static Sprite spriteToilet;
+    public static Sprite spriteUrinal;
+    public static Sprite spriteUrinalSideways;
+    public static Sprite spriteSink;
 
     public static Sprite spriteStallClosed;
     public static Sprite spriteStallOpened;
