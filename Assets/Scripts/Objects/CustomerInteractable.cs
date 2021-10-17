@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Objects {
     public abstract class CustomerInteractable : MonoBehaviour {
+        // TODO: There has to be a better way than having two enums with intersecting values...
         public enum InteractableType {
             WaitingSpot,
             Seat,
@@ -11,7 +12,15 @@ namespace Assets.Scripts.Objects {
             Ourinal,
             Sink
         };
-        public abstract InteractableType Type { get; }
+        public enum ReliefType {
+            None,
+            Toilet,
+            Urinal,
+            Sink,
+            Towel,
+        }
+        public abstract InteractableType IType { get; }
+        public abstract ReliefType RType { get; }
         public virtual Vector3 CustomerPositionF { get; }
         public virtual Vector3 CustomerPositionM { get; }
         [SerializeField] public bool Sideways = false;
@@ -24,12 +33,13 @@ namespace Assets.Scripts.Objects {
         public abstract bool CanWetHere { get; }
         public abstract bool CanBeSoiled { get; }
         public bool IsSoiled { get; set; }
-        public abstract Collections.ReliefType ReliefType { get; }
         public int UID { get => uid; }
         private readonly int uid = GameController.GetUid();
         public abstract string DisplayName { get; }
 
         [SerializeField]
         public SpriteRenderer SRenderer;
+        public Sprite[] Sprites;
+        public Sprite[] SpritesSideways;
     }
 }

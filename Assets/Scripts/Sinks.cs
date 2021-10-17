@@ -40,7 +40,7 @@ public class Sinks {
         return Line.HasOpenWaitingSpot();
     }
     public void EnterLine(Customer customer) {
-        if (customer.Occupying.Type == CustomerInteractable.InteractableType.Sink) {
+        if (customer.Occupying.IType == CustomerInteractable.InteractableType.Sink) {
             Sink sink = (Sink)customer.Occupying;
             customer.UseInteractable(sink);
             sink.Use(customer);

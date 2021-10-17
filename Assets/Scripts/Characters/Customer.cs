@@ -343,13 +343,13 @@ public class Customer : MonoBehaviour {
         UpdateDesperationState();
 
         // Can customer relieve themselves now?
-        Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
+        CustomerInteractable.ReliefType reliefType = Occupying?.RType ?? CustomerInteractable.ReliefType.None;
 
         // Get the relief the customer is occupying, if applicable
-        Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
+        Relief relief = reliefType == CustomerInteractable.ReliefType.None ? null : (Relief)Occupying;
 
         // Behavior depending on if have reached an area they can relieve themselves
-        if ( reliefType == Collections.ReliefType.None ) {
+        if ( reliefType == CustomerInteractable.ReliefType.None ) {
             // If should wet now
             if ( bladder.ShouldWetNow || CheatPeeNow ) {
                 CheatPeeNow = false;
@@ -552,7 +552,7 @@ public class Customer : MonoBehaviour {
         }
         throw new NotImplementedException();
     }
-    private Collections.ReliefType ReliefType => Occupying?.ReliefType ?? Collections.ReliefType.None;
+    private CustomerInteractable.ReliefType ReliefType => Occupying?.RType ?? CustomerInteractable.ReliefType.None;
 
     public void BeginPeeingWithThing() {
         IsRelievingSelf = true;
@@ -567,15 +567,15 @@ public class Customer : MonoBehaviour {
             RemainingUrinateStopDelay = RemainingUrinateStopDelay * 2.5d;
             Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
         }
-        Collections.ReliefType reliefType = Occupying?.ReliefType ?? Collections.ReliefType.None;
+        CustomerInteractable.ReliefType reliefType = Occupying?.RType ?? CustomerInteractable.ReliefType.None;
         switch ( reliefType ) {
-            case Collections.ReliefType.Toilet:
-            case Collections.ReliefType.Urinal:
-            case Collections.ReliefType.Sink:
+            case CustomerInteractable.ReliefType.Toilet:
+            case CustomerInteractable.ReliefType.Urinal:
+            case CustomerInteractable.ReliefType.Sink:
                 ActionState = Collections.CustomerActionState.PantsDown;
                 SetNext((float)UrinateStartDelay, () => {
                     bladder.Emptying = true;
-                    Relief relief = reliefType == Collections.ReliefType.None ? null : (Relief)Occupying;
+                    Relief relief = reliefType == CustomerInteractable.ReliefType.None ? null : (Relief)Occupying;
                     ActionState = Collections.CustomerActionState.Peeing;
                 });
             break;
@@ -609,7 +609,7 @@ public class Customer : MonoBehaviour {
             seat.MoveCustomerIntoSpot(this);
         }
 
-        if ( ReliefType == Collections.ReliefType.Toilet ) {
+        if ( ReliefType == CustomerInteractable.ReliefType.Toilet ) {
             ( (Toilet)Occupying ).SRenderer.sprite = Collections.spriteStallOpened;
         }
     }
@@ -728,7 +728,7 @@ public class Customer : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     public bool CanDisplayReliefMenu() {
-        return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && (ReliefType == Collections.ReliefType.Urinal || ReliefType == Collections.ReliefType.Sink);
+        return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && (ReliefType == CustomerInteractable.ReliefType.Urinal || ReliefType == CustomerInteractable.ReliefType.Sink);
     }
 
     #endregion

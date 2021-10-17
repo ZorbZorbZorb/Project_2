@@ -257,13 +257,16 @@ public class GameController : MonoBehaviour {
         // Load or create game data
         if ( CreateNewSaveDataOnStart ) {
             gameData = new GameData();
-            gameData.bathroomSinks = Bathroom.Singleton.Sinks.Items.Count();
-            gameData.bathroomToilets = Bathroom.Singleton.Toilets.Count();
-            gameData.bathroomUrinals = Bathroom.Singleton.Toilets.Count();
+            gameData.bathroomSinks = 1;
+            gameData.bathroomToilets = 1;
+            gameData.bathroomUrinals = 1;
         }
         else {
             LoadNightData();
         }
+
+        // Construct the bathroom
+        Bathroom.Singleton.ConstructBathroom(gameData);
 
         // Display the night start splash screen
         if ( DisplayNightStartSplash ) {

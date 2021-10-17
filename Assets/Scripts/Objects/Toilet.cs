@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Toilet : Relief {
-    public override InteractableType Type => InteractableType.Toilet;
+    public override InteractableType IType => InteractableType.Toilet;
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 0, z = 1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -15, z = 1 };
-    public override Collections.ReliefType ReliefType => Collections.ReliefType.Toilet;
+    public override ReliefType RType => ReliefType.Toilet;
     public override bool HidesCustomer => true;
     public override string DisplayName => "Toilet";
     public override bool CanBeSoiled => false;
@@ -39,10 +39,6 @@ public class Toilet : Relief {
     }
 
     public override Sprite GetCustomerSprite(Customer customer) {
-        if ( SpriteLookupM == null ) {
-            BuildSpriteLookup();
-        }
-
         if ( customer.Gender == 'm' ) {
             return SpriteLookupM[customer.ActionState];
         }

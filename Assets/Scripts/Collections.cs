@@ -113,13 +113,6 @@ public class Collections : MonoBehaviour {
         State5,  // Wetting
         State6,  // Wet
     }
-    public enum ReliefType {
-        None,
-        Toilet,
-        Urinal,
-        Sink,
-        Towel,
-    }
     public enum CustomerActionState {
         None,
         PantsDown,

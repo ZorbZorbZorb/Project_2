@@ -1,15 +1,10 @@
+using Assets.Scripts.Objects;
 using System;
 using UnityEngine;
 
 [Serializable]
 public class BathroomEntitySpawnpoint : MonoBehaviour {
-    public enum Type {
-        Toilet, 
-        Sink, 
-        Urinal
-    }
-    [SerializeField]
-    public Type type;
-    [SerializeField]
-    public bool sideways; 
+    public CustomerInteractable.InteractableType IType;
+    public bool Sideways;
+    public bool used = false;
 }
