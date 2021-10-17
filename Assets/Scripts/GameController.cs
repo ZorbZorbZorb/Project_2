@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -137,7 +136,7 @@ public class GameController : MonoBehaviour {
     /// Resumes the game, only if the game isnt ended.
     /// </summary>
     void ResumeGame() {
-        if (gameEnd) {
+        if ( gameEnd ) {
             Debug.LogWarning("Player wants to resume game but game has ended.");
             return;
         }
@@ -188,16 +187,16 @@ public class GameController : MonoBehaviour {
     /// <returns>Returns false if still fading. Returns true when finished fading.</returns>
     public bool FadeOutNightStartScreen() {
         // If the canvas isn't enabled, dont perform any action
-        if (!NightStartCanvas.gameObject.activeSelf) {
+        if ( !NightStartCanvas.gameObject.activeSelf ) {
             return true;
         }
         // Delay starting the fade by nightStartDelay seconds
-        else if ( nightStartDelay > 0f) {
+        else if ( nightStartDelay > 0f ) {
             nightStartDelay -= 1 * Time.unscaledDeltaTime;
             return false;
         }
         // Start fading the background first
-        else if (NightStartOverlay.color.a > 0.2) {
+        else if ( NightStartOverlay.color.a > 0.2 ) {
             float rate = 0.5f * Time.unscaledDeltaTime;
             Color current = NightStartOverlay.color;
             current.a = Math.Max(current.a - rate, 0f);
@@ -205,7 +204,7 @@ public class GameController : MonoBehaviour {
             return false;
         }
         // Start fading the text second
-        else if ( NightStartOverlay.color.a <= 0.2 && NightStartText.color.a > 0) {
+        else if ( NightStartOverlay.color.a <= 0.2 && NightStartText.color.a > 0 ) {
             float rate = 0.5f * Time.unscaledDeltaTime;
             Color current = NightStartOverlay.color;
             current.a = Math.Max(current.a - rate, 0f);
@@ -267,7 +266,7 @@ public class GameController : MonoBehaviour {
         }
 
         // Display the night start splash screen
-        if (DisplayNightStartSplash) {
+        if ( DisplayNightStartSplash ) {
             NightStartCanvas.gameObject.SetActive(true);
             NightStartText.text = $"Night {gameData.night}";
         }
@@ -277,8 +276,8 @@ public class GameController : MonoBehaviour {
     void Update() {
         HandleKeypresses();
 
-        if (!gameStarted) {
-            if (FadeOutNightStartScreen()) {
+        if ( !gameStarted ) {
+            if ( FadeOutNightStartScreen() ) {
                 StartGame();
             }
             else {
@@ -286,9 +285,9 @@ public class GameController : MonoBehaviour {
             }
         }
 
-        else if (gameEnd){
-            if (!GamePaused) {
-                if (gameLost) {
+        else if ( gameEnd ) {
+            if ( !GamePaused ) {
+                if ( gameLost ) {
                     LoseGame();
                 }
                 else {
@@ -297,7 +296,7 @@ public class GameController : MonoBehaviour {
             }
             else if ( fadeToBlack ) {
                 PauseMenu.FadeOverlayToBlack();
-                if (PauseMenu.FadeOverlayComplete()) {
+                if ( PauseMenu.FadeOverlayComplete() ) {
                     fadeToBlack = true;
                 }
             }
@@ -347,7 +346,7 @@ public class GameController : MonoBehaviour {
     /// <para>Pressing escape will pause the game</para>
     /// </summary>
     private void HandleKeypresses() {
-        if (Input.GetKeyDown(KeyCode.Escape)) {
+        if ( Input.GetKeyDown(KeyCode.Escape) ) {
             ToggleMenu();
         }
     }
@@ -355,7 +354,7 @@ public class GameController : MonoBehaviour {
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
     private void DespawnCustomerOutside() {
         Customer[] targets = customers.Where(x => x.position == Collections.Location.Outside && x.AtDestination() && x.Active).ToArray();
-        foreach(Customer target in targets) {
+        foreach ( Customer target in targets ) {
             RemoveCustomer(target);
         }
     }
@@ -366,8 +365,8 @@ public class GameController : MonoBehaviour {
     }
     private int CustomersInBarDesperate() {
         return customers
-            .Where(x => 
-            x.DesperationState == Collections.CustomerDesperationState.State3 || 
+            .Where(x =>
+            x.DesperationState == Collections.CustomerDesperationState.State3 ||
                 x.DesperationState != Collections.CustomerDesperationState.State4)
             .Count();
     }
@@ -400,7 +399,7 @@ public class GameController : MonoBehaviour {
         // Generate funds for customers in bar
         int customersInBar = CustomersInBar().Count();
         int customersInBathroom = CustomersInBathroom().Count();
-        AddFunds((customersInBar * 3d) + (customersInBathroom * 1d));
+        AddFunds(( customersInBar * 3d ) + ( customersInBathroom * 1d ));
         // TODO: Have a little money emote display above each customer in the bar who generated funds.
         // Advance time
         timeTicksElapsed++;
@@ -417,18 +416,18 @@ public class GameController : MonoBehaviour {
             .Count();
 
         // End the game if too many seats are soiled
-        if (maxCustomers <= 10) {
+        if ( maxCustomers <= 10 ) {
             gameEnd = true;
             gameLost = true;
             return;
         }
 
         // Stop spawning customers when its too late
-        if (timeTicksElapsed >= nightMaxCustomerSpawnTime) {
+        if ( timeTicksElapsed >= nightMaxCustomerSpawnTime ) {
             spawningEnabled = false;
 
             // End game at end time or everyone has left
-            if (customers.Count() < 1 || timeTicksElapsed >= nightMaxTime ) {
+            if ( customers.Count() < 1 || timeTicksElapsed >= nightMaxTime ) {
                 gameEnd = true;
                 return;
             }
@@ -438,7 +437,7 @@ public class GameController : MonoBehaviour {
         if ( spawningEnabled && customers.Count < maxCustomers ) {
             ticksSinceLastSpawn++;
             bool spawnNow = Random.Range(0, 6) == 0;
-            if ((spawnNow && ticksSinceLastSpawn > 1) || ticksSinceLastSpawn > 6) {
+            if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
                 ticksSinceLastSpawn = 0;
                 //int customersDesperateCount = CustomersInBarDesperate();
                 //int customersNotDesperateCount = CustomersInBarNotDesperate();
@@ -446,7 +445,7 @@ public class GameController : MonoBehaviour {
                 int aboutToWetCount = GetCustomersAboutToWetCount();
                 int customersPeeing = GetCustomersPeeingCount();
                 //if (((customersNotDesperateCount / 2) > customersDesperateCount) && (aboutToWetCount < reliefCount)) {
-                if (aboutToWetCount + customersPeeing <= reliefCount) {
+                if ( aboutToWetCount + customersPeeing <= reliefCount ) {
                     Customer customer = SpawnCustomerInBar(desperate: true);
                 }
                 else {
@@ -456,7 +455,7 @@ public class GameController : MonoBehaviour {
         }
 
         // Update the bar time
-        if ( Math.Floor( runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
+        if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
             AdvanceTime();
         }
     }
@@ -468,7 +467,7 @@ public class GameController : MonoBehaviour {
         Customer newCustomer = Instantiate(templateCustomer);
         newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
-        if (desperate) {
+        if ( desperate ) {
             newCustomer.SetupCustomer(80, 100);
         }
         else {
@@ -478,9 +477,9 @@ public class GameController : MonoBehaviour {
         newCustomer.Active = true;
         bool enteredDoorway = false;
         if ( newCustomer.WantsToEnterBathroom() &&
-            (newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
+            ( newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State5) ) {
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) ) {
 
             enteredDoorway = newCustomer.EnterDoorway();
         }
@@ -495,7 +494,7 @@ public class GameController : MonoBehaviour {
 
     public Customer CreateCustomer() {
         Customer newCustomer = Instantiate(templateCustomer);
-        newCustomer.Gender = Random.Range(0,3) == 0 ? 'm' : 'f';
+        newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
 
         newCustomer.EnteredTicksElapsed = timeTicksElapsed;
@@ -503,11 +502,11 @@ public class GameController : MonoBehaviour {
         // Customer count changes range of bladder fullness for next customer to enter
         int min = 35;
         int max = 105;
-        if (customers.Count() > 8) {
+        if ( customers.Count() > 8 ) {
             min = 10;
             max = 80;
         }
-        if (customers.Count() == 1) {
+        if ( customers.Count() == 1 ) {
             min = 85;
             max = 98;
         }
@@ -521,16 +520,16 @@ public class GameController : MonoBehaviour {
         bool enteredDoorway = false;
         //Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
         //Debug.Log($"{newCustomer.bladder.FeltNeed}");
-        if (newCustomer.WantsToEnterBathroom() &&
+        if ( newCustomer.WantsToEnterBathroom() &&
             newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State4 || 
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State5) {
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
+            newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) {
 
             enteredDoorway = newCustomer.EnterDoorway();
         }
 
         // Else sit right down at the bar and wait
-        if (!enteredDoorway) { 
+        if ( !enteredDoorway ) {
             Seat seat = Bar.Singleton.GetOpenSeat();
             seat.MoveCustomerIntoSpot(newCustomer);
         }

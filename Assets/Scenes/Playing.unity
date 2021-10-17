@@ -2731,6 +2731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugCustomersWillinglyUseAny: 1
   DisplayNightStartSplash: 0
   spawningEnabled: 1
   gameData:
