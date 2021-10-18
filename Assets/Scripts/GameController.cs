@@ -12,9 +12,13 @@ public class GameController : MonoBehaviour {
 
     [SerializeField] public bool DebugCustomersWillinglyUseAny = false;
     [SerializeField] public bool DisplayNightStartSplash = true;
-    [SerializeField] public bool spawningEnabled = true;
+    [SerializeField] public bool ReadyToStartNight = false;
+    [SerializeField] public bool SpawningEnabled = true;
+    [SerializeField] public bool CanPause = true;
     [SerializeField] public static bool CreateNewSaveDataOnStart = true;  // Hey, turn this off on build
     [SerializeField] public GameData gameData;
+
+    public bool DisplayedNightStartSplashScreen = false;
 
     // Unique Id System
     static private int uid = 0;
@@ -41,10 +45,10 @@ public class GameController : MonoBehaviour {
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
     public double nightStartFunds;
-    public bool gameStarted = false;
-    public bool gameLost = false;
-    public bool gameEnd = false;
-    public bool fadeToBlack = false;
+    public bool GameStarted = false;
+    public bool GameLost = false;
+    public bool GameEnd = false;
+    public bool FadeToBlack = false;
 
     public float nightStartDelay = 2f;
     [SerializeField]
@@ -112,6 +116,23 @@ public class GameController : MonoBehaviour {
         customers = new List<Customer>();
     }
 
+    #region BuildMenu
+    [SerializeField] public bool InBuildMenu;
+    [SerializeField] public BuildMenu BuildMenu;
+    public void StartBuildMode() {
+        InBuildMenu = true;
+        CanPause = false;
+        Time.timeScale = 0;
+        BuildMenu.Open();
+    }
+    public void EndBuildMode() {
+        InBuildMenu = false;
+        ReadyToStartNight = true;
+        Time.timeScale = 1;
+        BuildMenu.Close();
+    }
+    #endregion
+
     #region PauseMenu
     [SerializeField]
     public PauseMenu PauseMenu;
@@ -136,7 +157,7 @@ public class GameController : MonoBehaviour {
     /// Resumes the game, only if the game isnt ended.
     /// </summary>
     void ResumeGame() {
-        if ( gameEnd ) {
+        if ( GameEnd ) {
             Debug.LogWarning("Player wants to resume game but game has ended.");
             return;
         }
@@ -157,7 +178,7 @@ public class GameController : MonoBehaviour {
     /// Toggles the pause menu
     /// </summary>
     private void ToggleMenu() {
-        if ( gamePaused ) {
+        if ( CanPause && gamePaused ) {
             CloseMenu();
         }
         else {
@@ -179,7 +200,7 @@ public class GameController : MonoBehaviour {
         PauseMenu.SwitchToBoldTextDisplay();
         PauseMenu.SetBoldTextDisplay($"End of night {gameData.night}\r\n\r\nYou made ${gameData.funds - nightStartFunds}.");
         PauseMenu.EnableContinueButton(true);
-        fadeToBlack = true;
+        FadeToBlack = true;
     }
     /// <summary>
     /// Fades away the night start screen and eventually disables it.
@@ -249,6 +270,7 @@ public class GameController : MonoBehaviour {
 
         // Set the callbacks for the pause menu buttons. (restart and main menu)
         PauseMenu.SetUpButtons();
+        BuildMenu.SetUpButtons();
 
         maxCustomers = Bar.Singleton.Seats.Length;
 
@@ -268,19 +290,26 @@ public class GameController : MonoBehaviour {
         // Construct the bathroom
         Bathroom.Singleton.ConstructBathroom(gameData);
 
-        // Display the night start splash screen
-        if ( DisplayNightStartSplash ) {
-            NightStartCanvas.gameObject.SetActive(true);
-            NightStartText.text = $"Night {gameData.night}";
-        }
-
+        // Start build mode if not first night
+        StartBuildMode();
     }
 
     void Update() {
         HandleKeypresses();
 
-        if ( !gameStarted ) {
+        if ( !ReadyToStartNight ) {
+            return;
+        }
+
+        // Display the night start splash screen
+        if ( DisplayNightStartSplash && !DisplayedNightStartSplashScreen ) {
+            NightStartCanvas.gameObject.SetActive(true);
+            NightStartText.text = $"Night {gameData.night}";
+        }
+
+        if ( !GameStarted ) {
             if ( FadeOutNightStartScreen() ) {
+                DisplayedNightStartSplashScreen = true;
                 StartGame();
             }
             else {
@@ -288,19 +317,19 @@ public class GameController : MonoBehaviour {
             }
         }
 
-        else if ( gameEnd ) {
+        else if ( GameEnd ) {
             if ( !GamePaused ) {
-                if ( gameLost ) {
+                if ( GameLost ) {
                     LoseGame();
                 }
                 else {
                     EndGame();
                 }
             }
-            else if ( fadeToBlack ) {
+            else if ( FadeToBlack ) {
                 PauseMenu.FadeOverlayToBlack();
                 if ( PauseMenu.FadeOverlayComplete() ) {
-                    fadeToBlack = true;
+                    FadeToBlack = true;
                 }
             }
         }
@@ -322,7 +351,8 @@ public class GameController : MonoBehaviour {
     /// This function is called once at the start of each scene to start the night
     /// </summary>
     private void StartGame() {
-        gameStarted = true;
+        GameStarted = true;
+        CanPause = true;
 
         // Timescale and static vars are preserved between scenes!
         ResumeGame();
@@ -350,7 +380,9 @@ public class GameController : MonoBehaviour {
     /// </summary>
     private void HandleKeypresses() {
         if ( Input.GetKeyDown(KeyCode.Escape) ) {
-            ToggleMenu();
+            if ( CanPause ) {
+                ToggleMenu();
+            }
         }
     }
 
@@ -388,7 +420,6 @@ public class GameController : MonoBehaviour {
     private int GetCustomersPeeingCount() {
         return customers.Where(x => x.bladder.Emptying).Count();
     }
-
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
@@ -420,24 +451,24 @@ public class GameController : MonoBehaviour {
 
         // End the game if too many seats are soiled
         if ( maxCustomers <= 10 ) {
-            gameEnd = true;
-            gameLost = true;
+            GameEnd = true;
+            GameLost = true;
             return;
         }
 
         // Stop spawning customers when its too late
         if ( timeTicksElapsed >= nightMaxCustomerSpawnTime ) {
-            spawningEnabled = false;
+            SpawningEnabled = false;
 
             // End game at end time or everyone has left
             if ( customers.Count() < 1 || timeTicksElapsed >= nightMaxTime ) {
-                gameEnd = true;
+                GameEnd = true;
                 return;
             }
         }
 
         // Customer spawning
-        if ( spawningEnabled && customers.Count < maxCustomers ) {
+        if ( SpawningEnabled && customers.Count < maxCustomers ) {
             ticksSinceLastSpawn++;
             bool spawnNow = Random.Range(0, 6) == 0;
             if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {

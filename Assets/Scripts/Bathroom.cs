@@ -27,31 +27,24 @@ public class Bathroom : MonoBehaviour {
     
     public void ConstructBathroom(GameData gameData) {
         for ( int i = 0; i < gameData.bathroomToilets; i++ ) {
-            Toilet newToilet = SpawnRelifPrefab(PrefabToilet);
+            Toilet newToilet = SpawnReliefPrefab(PrefabToilet);
             Toilets.Add(newToilet);
         }
 
         for ( int i = 0; i < gameData.bathroomUrinals; i++ ) {
-            Urinal newUrinal = SpawnRelifPrefab(PrefabUrinal);
+            Urinal newUrinal = SpawnReliefPrefab(PrefabUrinal);
             Urinals.Add(newUrinal);
         }
     }
-    private T SpawnRelifPrefab<T>(T prefab) where T:Relief {
-        // Get a spawn point
-        BathroomEntitySpawnpoint point = Spawnpoints
-            .Where(x => x.IType == prefab.IType && !x.used)
-            .FirstOrDefault();
-        if ( point == null ) {
-            Debug.LogError($"Failed to spawn prefab {prefab.IType} because there are no points to spawn it at!");
-            return null;
-        }
+    public T SpawnReliefPrefab<T>(T prefab, BathroomEntitySpawnpoint point) where T:Relief {
+        Debug.Log($"Spawning prefab {prefab} at point {point}");
 
         // Duplicate prefab at the spawnpoints position
         GameObject gameObject = Instantiate(prefab.gameObject, point.transform.position, point.transform.rotation);
 
         // Get the monobehavior script
         T relief = gameObject.GetComponent<T>();
-        if (relief == null) {
+        if ( relief == null ) {
             Debug.LogError($"Failed to spawn prefab {prefab.IType} because expepcted monobehavior script is missing!");
             Destroy(gameObject);
             return null;
@@ -62,12 +55,44 @@ public class Bathroom : MonoBehaviour {
         relief.BuildSpriteLookup();
 
         // Mark spawn point as used so next spawn doesn't try to use it and stack relief objects.
-        point.used = true;
+        point.Occupied = true;
 
         // Return the newly cloned monobehavior
         return relief;
     }
+    public T SpawnReliefPrefab<T>(T prefab) where T:Relief {
+        // Get a spawn point
+        BathroomEntitySpawnpoint point = Spawnpoints
+            .Where(x => x.IType == prefab.IType && !x.Occupied)
+            .FirstOrDefault();
+        if ( point == null ) {
+            Debug.LogError($"Failed to spawn prefab {prefab.IType} because there are no points to spawn it at!");
+            return null;
+        }
 
+        return SpawnReliefPrefab(prefab, point);
+    }
+    public Relief SpawnReliefPrefab(BathroomEntitySpawnpoint point) {
+        Relief item;
+        switch(point.IType) {
+            case CustomerInteractable.InteractableType.Sink:
+            item = SpawnReliefPrefab(PrefabSink, point);
+            Sinks.Items.Add(item as Sink);
+            break;
+            case CustomerInteractable.InteractableType.Toilet:
+            item = SpawnReliefPrefab(PrefabToilet, point);
+            Toilets.Add(item as Toilet);
+            break;
+            case CustomerInteractable.InteractableType.Urinal:
+            item = SpawnReliefPrefab(PrefabUrinal, point);
+            Urinals.Add(item as Urinal);
+            break;
+            default:
+            throw new NotImplementedException($"Type {point.IType} is not supported.");
+        }
+        point.Occupied = true;
+        return item;
+    }
     // These three are checked once per tick by each customer. Have them as public bools that are not calculated to save ups.
     public bool HasToiletAvailable { get; private set; }
     public bool HasUrinalAvailable { get; private set; }

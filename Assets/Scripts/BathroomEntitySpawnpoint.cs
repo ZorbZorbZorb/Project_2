@@ -6,5 +6,5 @@ using UnityEngine;
 public class BathroomEntitySpawnpoint : MonoBehaviour {
     public CustomerInteractable.InteractableType IType;
     public bool Sideways;
-    public bool used = false;
+    public bool Occupied = false;
 }
