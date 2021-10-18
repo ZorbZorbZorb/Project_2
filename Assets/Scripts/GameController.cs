@@ -10,9 +10,9 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
 
+    [SerializeField] public bool DebugDisplayBuildMenuOnFirstNight = false;
     [SerializeField] public bool DebugCustomersWillinglyUseAny = false;
     [SerializeField] public bool DisplayNightStartSplash = true;
-    [SerializeField] public bool ReadyToStartNight = false;
     [SerializeField] public bool SpawningEnabled = true;
     [SerializeField] public bool CanPause = true;
     [SerializeField] public static bool CreateNewSaveDataOnStart = true;  // Hey, turn this off on build
@@ -49,6 +49,7 @@ public class GameController : MonoBehaviour {
     public bool GameLost = false;
     public bool GameEnd = false;
     public bool FadeToBlack = false;
+    private bool ReadyToStartNight = false;
 
     public float nightStartDelay = 2f;
     [SerializeField]
@@ -285,13 +286,19 @@ public class GameController : MonoBehaviour {
         }
         else {
             LoadNightData();
+            UpdateFundsDisplay();
         }
 
         // Construct the bathroom
         Bathroom.Singleton.ConstructBathroom(gameData);
 
         // Start build mode if not first night
-        StartBuildMode();
+        if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
+            StartBuildMode();
+        }
+        else {
+            ReadyToStartNight = true;
+        }
     }
 
     void Update() {

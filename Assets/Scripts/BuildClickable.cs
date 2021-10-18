@@ -1,10 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ClickableObject : MonoBehaviour {
+public class BuildClickable : MonoBehaviour {
+    [SerializeField] public TMPro.TMP_Text Text;
     [SerializeField] public Action OnClick;
     private void OnMouseDown() {
         OnClick();

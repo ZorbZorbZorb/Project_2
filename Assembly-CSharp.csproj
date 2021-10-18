@@ -81,7 +81,7 @@
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\BuildMenu.cs" />
-    <Compile Include="Assets\Scripts\ClickableObject.cs" />
+    <Compile Include="Assets\Scripts\BuildClickable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

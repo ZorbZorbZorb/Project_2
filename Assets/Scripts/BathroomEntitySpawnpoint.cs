@@ -7,4 +7,5 @@ public class BathroomEntitySpawnpoint : MonoBehaviour {
     public CustomerInteractable.InteractableType IType;
     public bool Sideways;
     public bool Occupied = false;
+    public double Price;
 }
