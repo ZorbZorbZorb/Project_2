@@ -1,10 +1,9 @@
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Assets.Scripts;
 using Assets.Scripts.Objects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class Bathroom : MonoBehaviour {
     public static Bathroom Singleton = null;
@@ -24,19 +23,21 @@ public class Bathroom : MonoBehaviour {
     }
 
     public Sinks Sinks = new Sinks();
-    
-    public void ConstructBathroom(GameData gameData) {
-        for ( int i = 0; i < gameData.bathroomToilets; i++ ) {
-            Toilet newToilet = SpawnReliefPrefab(PrefabToilet);
-            Toilets.Add(newToilet);
-        }
 
-        for ( int i = 0; i < gameData.bathroomUrinals; i++ ) {
-            Urinal newUrinal = SpawnReliefPrefab(PrefabUrinal);
-            Urinals.Add(newUrinal);
+    public void ConstructBathroom(GameData gameData) {
+        foreach ( int id in gameData.UnlockedPoints ) {
+            // Lookup the point
+            var spawnpoint = Spawnpoints.Where(x => x.Id == id).FirstOrDefault();
+            if (spawnpoint == null) {
+                Debug.LogError($"GameData requests non-existant spawnpoint '{id}' be activated!");
+                continue;
+            }
+
+            // Spawn the prefab
+            SpawnReliefPrefab(spawnpoint);
         }
     }
-    public T SpawnReliefPrefab<T>(T prefab, BathroomEntitySpawnpoint point) where T:Relief {
+    public T SpawnReliefPrefab<T>(T prefab, BathroomEntitySpawnpoint point) where T : Relief {
         Debug.Log($"Spawning prefab {prefab} at point {point}");
 
         // Duplicate prefab at the spawnpoints position
@@ -60,7 +61,7 @@ public class Bathroom : MonoBehaviour {
         // Return the newly cloned monobehavior
         return relief;
     }
-    public T SpawnReliefPrefab<T>(T prefab) where T:Relief {
+    public T SpawnReliefPrefab<T>(T prefab) where T : Relief {
         // Get a spawn point
         BathroomEntitySpawnpoint point = Spawnpoints
             .Where(x => x.IType == prefab.IType && !x.Occupied)
@@ -74,7 +75,7 @@ public class Bathroom : MonoBehaviour {
     }
     public Relief SpawnReliefPrefab(BathroomEntitySpawnpoint point) {
         Relief item;
-        switch(point.IType) {
+        switch ( point.IType ) {
             case CustomerInteractable.InteractableType.Sink:
             item = SpawnReliefPrefab(PrefabSink, point);
             Sinks.Items.Add(item as Sink);

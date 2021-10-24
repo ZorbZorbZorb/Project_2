@@ -95,7 +95,7 @@ namespace Assets.Scripts {
                         GameController.GC.gameData.funds -= point.Price;
                         GameController.GC.UpdateFundsDisplay();
                         Bathroom.Singleton.SpawnReliefPrefab(point);
-                        //UnityEngine.Object.Destroy(clickable);
+                        GameController.GC.gameData.UnlockedPoints.Add(point.Id);
                         RebuildClickables();
                     }
                 };

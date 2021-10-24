@@ -4,6 +4,7 @@ using UnityEngine;
 
 [Serializable]
 public class BathroomEntitySpawnpoint : MonoBehaviour {
+    public int Id;
     public CustomerInteractable.InteractableType IType;
     public bool Sideways;
     public bool Occupied = false;

@@ -1125,6 +1125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c8dc09a6ccece47ab169dfaa8c023a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 4
   IType: 3
   Sideways: 1
   Occupied: 0
@@ -1491,6 +1492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c8dc09a6ccece47ab169dfaa8c023a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 0
   IType: 2
   Sideways: 0
   Occupied: 0
@@ -1929,6 +1931,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c8dc09a6ccece47ab169dfaa8c023a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 3
   IType: 5
   Sideways: 0
   Occupied: 1
@@ -2825,6 +2828,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c8dc09a6ccece47ab169dfaa8c023a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 5
   IType: 3
   Sideways: 1
   Occupied: 0
@@ -2978,6 +2982,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugEndNightNow: 0
   DebugDisplayBuildMenuOnFirstNight: 0
   DebugCustomersWillinglyUseAny: 0
   DisplayNightStartSplash: 0
@@ -2987,12 +2992,8 @@ MonoBehaviour:
     night: 1
     wettings: 0
     funds: 0
-    bathroomToilets: -1
-    bathroomUrinals: -1
-    bathroomSinks: -1
     barHasBar: 1
-    barStools: 6
-    barSeats: -1
+    UnlockedPoints: 
   DisplayedNightStartSplashScreen: 0
   runTime: 0
   timeTicksElapsed: 0
@@ -3655,6 +3656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c8dc09a6ccece47ab169dfaa8c023a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 2
   IType: 5
   Sideways: 0
   Occupied: 1
@@ -5541,6 +5543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c8dc09a6ccece47ab169dfaa8c023a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Id: 1
   IType: 2
   Sideways: 0
   Occupied: 0

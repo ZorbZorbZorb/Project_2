@@ -1,6 +1,6 @@
 using Assets.Scripts;
+using Assets.Scripts.Objects;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -57,7 +57,9 @@ public class GameController : MonoBehaviour {
     public WaitingRoom waitingRoom;
     public DoorwayQueue doorwayQueue;
 
-    /// <summary>References the currently active GameController singleton</summary>
+    /// <summary>
+    /// References the currently active GameController singleton
+    /// </summary>
     public static GameController GC = null;
 
     /// <summary>
@@ -269,9 +271,11 @@ public class GameController : MonoBehaviour {
         // Load or create game data
         if ( CreateNewSaveData ) {
             gameData = new GameData();
-            gameData.bathroomSinks = 1;
-            gameData.bathroomToilets = 1;
-            gameData.bathroomUrinals = 1;
+
+            // Add one sinnk, toilet, and urinal to the unlocked items list
+            gameData.UnlockedPoints.Add(Bathroom.Singleton.Spawnpoints.Where(x => x.IType == CustomerInteractable.InteractableType.Sink).First().Id);
+            gameData.UnlockedPoints.Add(Bathroom.Singleton.Spawnpoints.Where(x => x.IType == CustomerInteractable.InteractableType.Toilet).First().Id);
+            gameData.UnlockedPoints.Add(Bathroom.Singleton.Spawnpoints.Where(x => x.IType == CustomerInteractable.InteractableType.Urinal).First().Id);
 
             CreateNewSaveData = false;
         }

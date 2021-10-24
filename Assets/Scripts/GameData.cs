@@ -56,22 +56,13 @@ namespace Assets.Scripts {
         public int night;
         public int wettings;
         public double funds;
-
-        public int bathroomToilets;
-        public int bathroomUrinals;
-        public int bathroomSinks;
-
         public bool barHasBar;
-        public int barStools;
-        public int barSeats;
+        
+        public List<int> UnlockedPoints;
 
         public GameData() {
             barHasBar = true;
-            barStools = 6;
-            barSeats = -1;
-            bathroomSinks = -1;
-            bathroomToilets = -1;
-            bathroomUrinals = -1;
+            UnlockedPoints = new List<int>();
             night = 1;
             wettings = 0;
             funds = 0d;
