@@ -17,6 +17,7 @@ public class MainMenuController : MonoBehaviour {
     }
 
     public void NewGame() {
+        GameController.CreateNewSaveData = true;
         SceneManager.LoadScene(1);
     }
     public void Quit() {

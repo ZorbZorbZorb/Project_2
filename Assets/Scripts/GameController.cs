@@ -10,13 +10,14 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
 
-    [SerializeField] public bool DebugDisplayBuildMenuOnFirstNight = false;
-    [SerializeField] public bool DebugCustomersWillinglyUseAny = false;
-    [SerializeField] public bool DisplayNightStartSplash = true;
-    [SerializeField] public bool SpawningEnabled = true;
-    [SerializeField] public bool CanPause = true;
-    [SerializeField] public static bool CreateNewSaveDataOnStart = true;  // Hey, turn this off on build
-    [SerializeField] public GameData gameData;
+    public bool DebugEndNightNow = false;
+    public bool DebugDisplayBuildMenuOnFirstNight = false;
+    public bool DebugCustomersWillinglyUseAny = false;
+    public bool DisplayNightStartSplash = true;
+    public bool SpawningEnabled = true;
+    public bool CanPause = true;
+    public static bool CreateNewSaveData = true;  // Hey, turn this off on build
+    public GameData gameData;
 
     public bool DisplayedNightStartSplashScreen = false;
 
@@ -24,19 +25,12 @@ public class GameController : MonoBehaviour {
     static private int uid = 0;
     static public int GetUid() => uid++;
 
-    [SerializeField]
     public float runTime = 0f;
-    [SerializeField]
     public int timeTicksElapsed = 0;
-    [SerializeField]
     public DateTime barTime;
-    [SerializeField]
     public Text barTimeDisplay;
-    [SerializeField]
     public Text fundsDisplay;
-    [SerializeField]
     public int AdvanceBarTimeEveryXSeconds;
-    [SerializeField]
     public int AdvanceBarTimeByXMinutes;
 
     public Customer templateCustomer;
@@ -52,20 +46,15 @@ public class GameController : MonoBehaviour {
     private bool ReadyToStartNight = false;
 
     public float nightStartDelay = 2f;
-    [SerializeField]
     public Canvas NightStartCanvas;
-    [SerializeField]
     public Text NightStartText;
-    [SerializeField]
     public SpriteRenderer NightStartOverlay;
 
     public void SetMaxCustomers(int max) {
         maxCustomers = max;
     }
 
-    [SerializeField]
     public WaitingRoom waitingRoom;
-    [SerializeField]
     public DoorwayQueue doorwayQueue;
 
     /// <summary>References the currently active GameController singleton</summary>
@@ -101,7 +90,7 @@ public class GameController : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     public void SaveNightData() {
-        CreateNewSaveDataOnStart = false;
+        CreateNewSaveData = false;
         GameData.Export(0, gameData);
     }
     public void LoadNightData() {
@@ -278,11 +267,13 @@ public class GameController : MonoBehaviour {
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
         // Load or create game data
-        if ( CreateNewSaveDataOnStart ) {
+        if ( CreateNewSaveData ) {
             gameData = new GameData();
             gameData.bathroomSinks = 1;
             gameData.bathroomToilets = 1;
             gameData.bathroomUrinals = 1;
+
+            CreateNewSaveData = false;
         }
         else {
             LoadNightData();
@@ -324,7 +315,7 @@ public class GameController : MonoBehaviour {
             }
         }
 
-        else if ( GameEnd ) {
+        else if ( DebugEndNightNow || GameEnd ) {
             if ( !GamePaused ) {
                 if ( GameLost ) {
                     LoseGame();

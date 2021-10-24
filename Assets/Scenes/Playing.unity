@@ -2980,7 +2980,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugDisplayBuildMenuOnFirstNight: 0
   DebugCustomersWillinglyUseAny: 0
-  DisplayNightStartSplash: 1
+  DisplayNightStartSplash: 0
   SpawningEnabled: 1
   CanPause: 1
   gameData:
