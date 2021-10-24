@@ -11,6 +11,10 @@ using UnityEngine;
 namespace Assets.Scripts {
     [Serializable]
     public class GameData {
+        public static bool Exists(int saveNumber) {
+            string path = Application.persistentDataPath + $"/{saveNumber}.save";
+            return File.Exists(path);
+        }
         // https://www.youtube.com/watch?v=XOjd_qU2Ido
         public static void Export(int saveNumber, GameData data) {
             string path = Application.persistentDataPath + $"/{saveNumber}.save";

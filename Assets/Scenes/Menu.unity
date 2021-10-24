@@ -160,7 +160,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -49.579956, y: 62}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 240, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &194708220
 MonoBehaviour:
@@ -682,7 +682,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -49.579956, y: -65}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 240, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1165189917
 MonoBehaviour:
@@ -869,7 +869,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -49.579956, y: 19.680038}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 240, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1568155861
 MonoBehaviour:
@@ -1054,6 +1054,7 @@ MonoBehaviour:
   ButtonNewGame: {fileID: 1568155861}
   ButtonOptions: {fileID: 1774465294}
   ButtonQuit: {fileID: 1165189917}
+  TextContinue: {fileID: 1815577840}
 --- !u!1 &1774465292
 GameObject:
   m_ObjectHideFlags: 0
@@ -1091,7 +1092,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -49.579956, y: -22}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 240, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1774465294
 MonoBehaviour:
