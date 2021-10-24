@@ -9,4 +9,8 @@ public class BathroomEntitySpawnpoint : MonoBehaviour {
     public bool Sideways;
     public bool Occupied = false;
     public double Price;
+
+    private void Start() {
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
+    }
 }

@@ -273,9 +273,21 @@ public class GameController : MonoBehaviour {
             gameData = new GameData();
 
             // Add one sinnk, toilet, and urinal to the unlocked items list
-            gameData.UnlockedPoints.Add(Bathroom.Singleton.Spawnpoints.Where(x => x.IType == CustomerInteractable.InteractableType.Sink).First().Id);
-            gameData.UnlockedPoints.Add(Bathroom.Singleton.Spawnpoints.Where(x => x.IType == CustomerInteractable.InteractableType.Toilet).First().Id);
-            gameData.UnlockedPoints.Add(Bathroom.Singleton.Spawnpoints.Where(x => x.IType == CustomerInteractable.InteractableType.Urinal).First().Id);
+            gameData.UnlockedPoints.Add(
+                Bathroom.Singleton.Spawnpoints
+                .Where(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
+                .First()
+                .Id);
+            gameData.UnlockedPoints.Add(
+                Bathroom.Singleton.Spawnpoints
+                .Where(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
+                .First()
+                .Id);
+            gameData.UnlockedPoints.Add(
+                Bathroom.Singleton.Spawnpoints
+                .Where(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
+                .First()
+                .Id);
 
             CreateNewSaveData = false;
         }

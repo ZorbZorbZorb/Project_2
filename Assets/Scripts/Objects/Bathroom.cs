@@ -32,6 +32,10 @@ public class Bathroom : MonoBehaviour {
                 Debug.LogError($"GameData requests non-existant spawnpoint '{id}' be activated!");
                 continue;
             }
+            else if (spawnpoint.Occupied) {
+                Debug.LogError($"GameData requests activated spawnpoint '{id}' be activated?");
+                continue;
+            }
 
             // Spawn the prefab
             SpawnReliefPrefab(spawnpoint);
