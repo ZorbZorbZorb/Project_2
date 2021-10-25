@@ -781,7 +781,12 @@ public class Customer : MonoBehaviour {
         bladder.StopPeeingEarly();
         Emotes.Emote(Emote.StruggleStop);
         SetNext(0f, () => {
-            EndPeeingWithThing();
+            float t = 1f;
+            Emotes.Emote(Emote.PantsUp, t);
+            ActionState = Collections.CustomerActionState.PantsUp;
+            SetNext(t, () => {
+                EndPeeingWithThing();
+            });
         }, () => !bladder.Emptying);
         return true;
     }
