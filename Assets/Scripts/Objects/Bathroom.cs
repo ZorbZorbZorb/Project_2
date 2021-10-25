@@ -57,7 +57,6 @@ public class Bathroom : MonoBehaviour {
 
         // Tell the relif it's sideways and call it's sprite lookup constructor
         relief.Sideways = point.Sideways;
-        relief.BuildSpriteLookup();
 
         // Mark spawn point as used so next spawn doesn't try to use it and stack relief objects.
         point.Occupied = true;

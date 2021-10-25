@@ -29,10 +29,4 @@ public class WaitingSpot : CustomerInteractable {
         customer.Occupying = this;
         OccupiedBy = customer;
     }
-    public override Sprite GetCustomerSprite(Customer customer) {
-        throw new System.InvalidOperationException();
-    }
-    protected internal override void BuildSpriteLookup() {
-        throw new System.NotImplementedException();
-    }
 }

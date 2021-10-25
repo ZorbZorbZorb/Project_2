@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -16,17 +15,18 @@ public class Customer : MonoBehaviour {
 
     void Start() {
 
-        if (Destination == null) {
+        if ( Destination == null ) {
             Destination = this.transform.position;
         }
         UID = GameController.GetUid();
 
         // Set up the emotes system for this customer
         Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
-
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        marshal = CustomerSpriteMarshal.Marshals[Gender];
+
         // Get references to game objects for the customer
         BathroomMenuCanvas = gameObject.transform.Find("BathroomMenuCanvas").GetComponent<Canvas>();
         ReliefMenuCanvas = gameObject.transform.Find("ReliefMenuCanvas").GetComponent<Canvas>();
@@ -48,7 +48,7 @@ public class Customer : MonoBehaviour {
         MenuButton MenuButtonDecline = new MenuButton(this, BathroomMenu, ButtonDecline, () => { MenuOptionDismiss(); });
         MenuButton MenuButtonToilet = new MenuButton(this, BathroomMenu, ButtonToilet, () => { MenuOptionGotoToilet(); });
         MenuButton MenuButtonUrinal = new MenuButton(this, BathroomMenu, ButtonUrinal, () => { MenuOptionGotoUrinal(); }, WillUseUrinal);
-        MenuButton MenuButtonSink = new MenuButton(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); },  WillUseSink);
+        MenuButton MenuButtonSink = new MenuButton(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); }, WillUseSink);
 
         MenuButton MenuButtonReliefStop = new MenuButton(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
 
@@ -117,6 +117,7 @@ public class Customer : MonoBehaviour {
     public float LastDrinkAt = -25f;
     public float DrinkInterval = 30f;
     public int EnteredTicksElapsed = 0;
+    private CustomerSpriteMarshal marshal;
 
     private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
@@ -131,7 +132,7 @@ public class Customer : MonoBehaviour {
         else if ( bladder.FeltNeed > 0.80d ) {
             return Collections.CustomerDesperationState.State3;
         }
-        else if ( bladder.FeltNeed > 0.55d) {
+        else if ( bladder.FeltNeed > 0.55d ) {
             return Collections.CustomerDesperationState.State2;
         }
         else if ( WantsToEnterBathroom() ) {
@@ -148,7 +149,7 @@ public class Customer : MonoBehaviour {
             if ( NextDelay > 0f ) {
                 return;
             }
-            else if (NextWhenTrue == null || NextWhenTrue()) {
+            else if ( NextWhenTrue == null || NextWhenTrue() ) {
                 NextAction last = Next;
                 Next();
                 // If next was not assigned a new method from inside next clear it out.
@@ -176,7 +177,7 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        if (!AtDestination()) {
+        if ( !AtDestination() ) {
             return;
         }
 
@@ -216,7 +217,7 @@ public class Customer : MonoBehaviour {
             if ( bladder.StartedLosingControlThisFrame ) {
                 Debug.Log($"Customer {UID} trying to enter bathroom because they are losing control.");
                 bladder.ResetLossOfControlTime();
-                if (TryEnterBathroom()) {
+                if ( TryEnterBathroom() ) {
                     return true;
                 }
             }
@@ -303,7 +304,7 @@ public class Customer : MonoBehaviour {
         bool wouldNormallyLeave = stayedTooLong || noMoreFunds || tooLateAtNight;
 
         // The thought juice
-        return wetted || (!tooDesperate && wouldNormallyLeave );
+        return wetted || ( !tooDesperate && wouldNormallyLeave );
     }
     public bool WantsToBuyDrink() {
         return TotalTimeAtBar - LastDrinkAt > DrinkInterval;
@@ -312,7 +313,7 @@ public class Customer : MonoBehaviour {
 
     private Collections.CustomerActionState LastActionState;
     private void FrameActionDebug() {
-        if (!Active) {
+        if ( !Active ) {
             return;
         }
         if ( LastActionState != ActionState ) {
@@ -363,7 +364,7 @@ public class Customer : MonoBehaviour {
         else {
             // When finished peeing
             if ( !bladder.Emptying ) {
-                if (Next == null) {
+                if ( Next == null ) {
                     SetNext(0f, () => {
                         ActionState = Collections.CustomerActionState.Peeing;
                         Emotes.Emote(Emote.PantsUp);
@@ -415,7 +416,7 @@ public class Customer : MonoBehaviour {
         Destination = destination;
     }
     private void MoveUpdate() {
-        if (Navigation.Count == 0) {
+        if ( Navigation.Count == 0 ) {
             return;
         }
         Vector3 next = Navigation.First();
@@ -423,7 +424,7 @@ public class Customer : MonoBehaviour {
         if ( transform.position.x != next.x || transform.position.y != next.y ) {
             float distanceX = Math.Abs(transform.position.x - next.x);
             float distanceY = Math.Abs(transform.position.y - next.y);
-            float moveAmount = Math.Max(2.1f * (distanceX + distanceY), (float)MoveSpeed);
+            float moveAmount = Math.Max(2.1f * ( distanceX + distanceY ), (float)MoveSpeed);
             transform.position = Vector3.MoveTowards(transform.position, next, moveAmount * Time.deltaTime);
         }
         else {
@@ -446,8 +447,7 @@ public class Customer : MonoBehaviour {
     public int UID = GameController.GetUid();
     public Collections.CustomerDesperationState lastState;
     public string DisplayName { get; set; }
-    [SerializeField]
-    public char Gender { get; set; }
+    [SerializeField] public char Gender { get; set; }
     // Enum for behavior types
     public bool CanReenterBathroom = true;
     public float CanReenterBathroomIn = 0f;
@@ -491,11 +491,9 @@ public class Customer : MonoBehaviour {
     #region Sprites
     public void SpriteUpdate() {
         // Set the sprite
-        if ( Occupying != null && Occupying.ChangesCustomerSprite && AtDestination()) {
-            SRenderer.sprite = Occupying.GetCustomerSprite(this);
-        }
-        else {
-            SRenderer.sprite = Collections.GenderedDesperationSpriteLookup[Gender][DesperationState];
+        Sprite sprite = marshal.GetSprite(DesperationState, ActionState, Occupying, !AtDestination());
+        if (SRenderer.sprite != sprite) {
+            SRenderer.sprite = sprite;
         }
 
         // Sprite shaking to show desperation
@@ -543,7 +541,7 @@ public class Customer : MonoBehaviour {
     // Current willingness to use a sink for relief
     public bool WillUseSink(Customer customer) {
         // It's just a weird urinal you wash your hands in, right?
-        if ( customer.Gender == 'm') {
+        if ( customer.Gender == 'm' ) {
             return GC.DebugCustomersWillinglyUseAny || bladder.LosingControl || bladder.FeltNeed > 0.93d;
         }
         // Girls will only use the sink if they're wetting themselves
@@ -572,15 +570,15 @@ public class Customer : MonoBehaviour {
             case CustomerInteractable.ReliefType.Toilet:
             case CustomerInteractable.ReliefType.Urinal:
             case CustomerInteractable.ReliefType.Sink:
-                ActionState = Collections.CustomerActionState.PantsDown;
-                SetNext((float)UrinateStartDelay, () => {
-                    bladder.Emptying = true;
-                    Relief relief = reliefType == CustomerInteractable.ReliefType.None ? null : (Relief)Occupying;
-                    ActionState = Collections.CustomerActionState.Peeing;
-                });
+            ActionState = Collections.CustomerActionState.PantsDown;
+            SetNext((float)UrinateStartDelay, () => {
+                bladder.Emptying = true;
+                Relief relief = reliefType == CustomerInteractable.ReliefType.None ? null : (Relief)Occupying;
+                ActionState = Collections.CustomerActionState.Peeing;
+            });
             break;
             default:
-                throw new NotImplementedException();
+            throw new NotImplementedException();
         }
     }
     public void EndPeeingWithThing() {
@@ -591,7 +589,7 @@ public class Customer : MonoBehaviour {
         ActionState = Collections.CustomerActionState.None;
         if ( IsWet ) {
             if ( position != Collections.Location.Bar ) {
-                foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar) {
+                foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar ) {
                     MoveToVector3(keyframe);
                 }
             }
@@ -600,7 +598,7 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
-        else if (Bathroom.Singleton.Sinks.Line.HasOpenWaitingSpot() && !Bathroom.Singleton.Sinks.AllSinksBeingPeedIn()) {
+        else if ( Bathroom.Singleton.Sinks.Line.HasOpenWaitingSpot() && !Bathroom.Singleton.Sinks.AllSinksBeingPeedIn() ) {
             Bathroom.Singleton.Sinks.EnterLine(this);
         }
         else {
@@ -626,7 +624,7 @@ public class Customer : MonoBehaviour {
         IsWet = true;
         IsWetting = true;
         // If using something while wetting, it is now soiled.
-        if (AtDestination() && Occupying != null && Occupying.CanBeSoiled) {
+        if ( AtDestination() && Occupying != null && Occupying.CanBeSoiled ) {
             Occupying.IsSoiled = true;
         }
         ActionState = Collections.CustomerActionState.Wetting;
@@ -651,8 +649,8 @@ public class Customer : MonoBehaviour {
         if ( Occupying != null ) {
             Occupying.OccupiedBy = null;
         }
-        if (position == Collections.Location.Bar && thing.CustomerLocation != position) {
-            foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom) {
+        if ( position == Collections.Location.Bar && thing.CustomerLocation != position ) {
+            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom ) {
                 MoveToVector3(keyframe);
             }
         }
@@ -674,11 +672,11 @@ public class Customer : MonoBehaviour {
         }
 
         // Can't open menu when game paused.
-        if (GameController.GamePaused) {
+        if ( GameController.GamePaused ) {
             return;
         }
 
-        if (IsRelievingSelf) {
+        if ( IsRelievingSelf ) {
             ReliefMenu.Toggle();
         }
         else {
@@ -706,19 +704,19 @@ public class Customer : MonoBehaviour {
     /// <returns></returns>
     public bool CanDisplayBathroomMenu() {
         // Cannot be wetting or wet
-        if (IsWetting || IsWet) {
+        if ( IsWetting || IsWet ) {
             return false;
         }
         // Must have arrived at current destination
-        if (Destination != transform.position) {
+        if ( Destination != transform.position ) {
             return false;
         }
         // If in waiting room
-        if (position == Collections.Location.WaitingRoom) {
+        if ( position == Collections.Location.WaitingRoom ) {
             return true;
         }
         // If in doorway and first in line
-        if (position == Collections.Location.Doorway) {
+        if ( position == Collections.Location.Doorway ) {
             return DoorwayQueue.doorwayQueue.IsNextInLine(this);
         }
         return false;
@@ -728,7 +726,7 @@ public class Customer : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     public bool CanDisplayReliefMenu() {
-        return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && (ReliefType == CustomerInteractable.ReliefType.Urinal || ReliefType == CustomerInteractable.ReliefType.Sink);
+        return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && ( ReliefType == CustomerInteractable.ReliefType.Urinal || ReliefType == CustomerInteractable.ReliefType.Sink );
     }
 
     #endregion
@@ -754,21 +752,21 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
-        if (Bathroom.Singleton.HasToiletAvailable) {
+        if ( Bathroom.Singleton.HasToiletAvailable ) {
             EnterRelief(Bathroom.Singleton.GetToilet());
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoUrinal() {
-        if (Bathroom.Singleton.HasUrinalAvailable) {
+        if ( Bathroom.Singleton.HasUrinalAvailable ) {
             EnterRelief(Bathroom.Singleton.GetUrinal());
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoSink() {
-        if (Bathroom.Singleton.HasSinkForRelief) {
+        if ( Bathroom.Singleton.HasSinkForRelief ) {
             EnterRelief(Bathroom.Singleton.Sinks.FirstUnoccupiedSink());
             return true;
         }
@@ -830,7 +828,7 @@ public class Customer : MonoBehaviour {
     // Fully leaves the area
     public void Leave() {
         StopOccupyingAll();
-        if ( position != Collections.Location.Bar) {
+        if ( position != Collections.Location.Bar ) {
             foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar ) {
                 MoveToVector3(keyframe);
             }

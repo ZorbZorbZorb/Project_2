@@ -13,21 +13,6 @@ public class Sink : Relief {
     public override bool CanBeSoiled => false;
 
     public override bool ChangesCustomerSprite => true;
-
-    public override Sprite GetCustomerSprite(Customer customer) {
-        if (SpriteLookupM == null) {
-            BuildSpriteLookup();
-        }
-
-        if ( customer.Gender == 'm' ) {
-            return SpriteLookupM[customer.ActionState];
-        }
-        else {
-            return SpriteLookupF[customer.ActionState];
-        }
-        
-    }
-
     public void Use(Customer customer) {
         customer.ActionState = Collections.CustomerActionState.WashingHands;
         customer.NextDelay = 6f;

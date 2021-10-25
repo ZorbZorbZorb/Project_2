@@ -18,13 +18,4 @@ public class Urinal : Relief {
 
     public override bool ChangesCustomerSprite => true;
 
-    public override Sprite GetCustomerSprite(Customer customer) {
-        if ( customer.Gender == 'm' ) {
-            return SpriteLookupM[customer.ActionState];
-        }
-        else {
-            return SpriteLookupF[customer.ActionState];
-        }
-
-    }
 }

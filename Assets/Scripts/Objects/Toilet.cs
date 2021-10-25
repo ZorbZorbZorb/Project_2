@@ -36,15 +36,5 @@ public class Toilet : Relief {
     private void OnMouseExit() {
         AltSRenderer.color = new Color(1f, 1f, 1f, 1f);
     }
-
-    public override Sprite GetCustomerSprite(Customer customer) {
-        if ( customer.Gender == 'm' ) {
-            return SpriteLookupM[customer.ActionState];
-        }
-        else {
-            return SpriteLookupF[customer.ActionState];
-        }
-
-    }
 }
 

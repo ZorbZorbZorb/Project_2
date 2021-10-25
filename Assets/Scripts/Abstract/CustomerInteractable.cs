@@ -26,9 +26,7 @@ namespace Assets.Scripts.Objects {
         [SerializeField] public bool Sideways = false;
         public abstract Collections.Location CustomerLocation { get; }
         public Customer OccupiedBy;
-        public abstract Sprite GetCustomerSprite(Customer customer);
         public abstract bool ChangesCustomerSprite { get; }
-        protected internal abstract void BuildSpriteLookup();
         public abstract bool HidesCustomer { get; }
         public abstract bool CanWetHere { get; }
         public abstract bool CanBeSoiled { get; }

@@ -1,3 +1,4 @@
+using Assets.Scripts.Characters;
 using Assets.Scripts.Objects;
 using System.Collections;
 using System.Collections.Generic;
@@ -55,18 +56,5 @@ public class Seat : CustomerInteractable {
         customer.Occupying = this;
         OccupiedBy = customer;
         customer.position = Collections.Location.Bar;
-    }
-
-    public override Sprite GetCustomerSprite(Customer customer) {
-        var genderedSpriteLookup = customer.Gender == 'm' 
-            ? Collections.DesperationSeatSpriteLookupM 
-            : Collections.DesperationSeatSpriteLookupF;
-        return genderedSpriteLookup[customer.DesperationState];
-    }
-
-    protected internal override void BuildSpriteLookup() {
-        // TODO: Build this dynamically instead of storing it in Collections.cs
-        //          More classes will inherit CustomerInteractable in the future.
-        throw new System.NotImplementedException();
     }
 }
