@@ -6,9 +6,9 @@ using static Collections;
 
 namespace Assets.Scripts.Characters {
     [Serializable]
-    public class CustomerSpriteMarshal {
+    public class CustomerSpriteController {
 
-        public static Dictionary<char, CustomerSpriteMarshal> Marshals = new Dictionary<char, CustomerSpriteMarshal>();
+        public static Dictionary<char, CustomerSpriteController> Controller = new Dictionary<char, CustomerSpriteController>();
 
         public readonly string Root;
 
@@ -51,20 +51,20 @@ namespace Assets.Scripts.Characters {
             return lookup[state];
         }
 
-        public static void NewMarshal(char id, string root) {
-            if ( Marshals.ContainsKey(id) ) {
+        public static void NewController(char id, string root) {
+            if ( Controller.ContainsKey(id) ) {
                 Debug.LogError($"Marshal '{id}' already exists!");
                 return;
             }
             try {
-                CustomerSpriteMarshal marshal = new CustomerSpriteMarshal(root);
-                Marshals.Add(id, marshal);
+                CustomerSpriteController marshal = new CustomerSpriteController(root);
+                Controller.Add(id, marshal);
             }
             catch ( Exception e ) {
                 Debug.LogError($"Exception creating customer sprite marshal '{id}': '{e.Message}'");
             }
         }
-        private CustomerSpriteMarshal(string root) {
+        private CustomerSpriteController(string root) {
             Root = root;
 
             DesperationSpriteLookup = new Dictionary<CustomerDesperationState, Sprite>() {

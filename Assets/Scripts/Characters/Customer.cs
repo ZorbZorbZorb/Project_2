@@ -25,7 +25,7 @@ public class Customer : MonoBehaviour {
     }
 
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
-        marshal = CustomerSpriteMarshal.Marshals[Gender];
+        marshal = CustomerSpriteController.Controller[Gender];
 
         // Get references to game objects for the customer
         BathroomMenuCanvas = gameObject.transform.Find("BathroomMenuCanvas").GetComponent<Canvas>();
@@ -117,7 +117,7 @@ public class Customer : MonoBehaviour {
     public float LastDrinkAt = -25f;
     public float DrinkInterval = 30f;
     public int EnteredTicksElapsed = 0;
-    private CustomerSpriteMarshal marshal;
+    private CustomerSpriteController marshal;
 
     private Collections.CustomerDesperationState GetDesperationState() {
         if ( IsWetting ) {
