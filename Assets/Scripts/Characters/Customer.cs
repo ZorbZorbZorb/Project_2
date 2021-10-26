@@ -332,7 +332,7 @@ public class Customer : MonoBehaviour {
         logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(bladder.Amount)} / {bladder.Max} ({Math.Round(bladder.Percentage, 2)}%)";
         logString += $"Control: {Math.Round(bladder.ControlRemaining)}";
         logString += $"Need: {Math.Round(bladder.FeltNeed, 2)} Curve: {Math.Round(bladder.FeltNeedCurve, 2)}";
-        Debug.LogWarning(logString);
+        Debug.Log(logString);
     }
 
     private void PeeLogicUpdate() {

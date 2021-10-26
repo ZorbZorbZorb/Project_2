@@ -21,6 +21,9 @@ public class GameController : MonoBehaviour {
 
     public bool DisplayedNightStartSplashScreen = false;
 
+    [SerializeField] public Seat SeatPrefab;
+    [SerializeField] public BarTable TablePrefab;
+
     // Unique Id System
     static private int uid = 0;
     static public int GetUid() => uid++;
@@ -106,6 +109,7 @@ public class GameController : MonoBehaviour {
         GamePaused = false;
         gamePaused = false;
         customers = new List<Customer>();
+        InteractableSpawnpoint.Spawnpoints = new List<InteractableSpawnpoint>();
     }
 
     #region BuildMenu
@@ -122,6 +126,7 @@ public class GameController : MonoBehaviour {
         ReadyToStartNight = true;
         Time.timeScale = 1;
         BuildMenu.Close();
+        maxCustomers = Bar.Singleton.Seats.Count;
     }
     #endregion
 
@@ -264,7 +269,7 @@ public class GameController : MonoBehaviour {
         PauseMenu.SetUpButtons();
         BuildMenu.SetUpButtons();
 
-        maxCustomers = Bar.Singleton.Seats.Length;
+        maxCustomers = Bar.Singleton.Seats.Count;
 
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
@@ -272,22 +277,28 @@ public class GameController : MonoBehaviour {
         if ( CreateNewSaveData ) {
             gameData = new GameData();
 
-            // Add one sinnk, toilet, and urinal to the unlocked items list
+            // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
             gameData.UnlockedPoints.Add(
-                Bathroom.Singleton.Spawnpoints
+                InteractableSpawnpoint.Spawnpoints
                 .Where(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
                 .First()
                 .Id);
             gameData.UnlockedPoints.Add(
-                Bathroom.Singleton.Spawnpoints
+                InteractableSpawnpoint.Spawnpoints
                 .Where(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
                 .First()
                 .Id);
             gameData.UnlockedPoints.Add(
-                Bathroom.Singleton.Spawnpoints
+                InteractableSpawnpoint.Spawnpoints
                 .Where(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
                 .First()
                 .Id);
+            Bar.Singleton.Tables
+                .Where(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
+                .First()
+                .SeatSpawnpoints
+                .ToList()
+                .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
 
             CreateNewSaveData = false;
         }
@@ -297,7 +308,7 @@ public class GameController : MonoBehaviour {
         }
 
         // Construct the bathroom
-        Bathroom.Singleton.ConstructBathroom(gameData);
+        InteractableSpawnpoint.Build(gameData);
 
         // Start build mode if not first night
         if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
@@ -464,7 +475,7 @@ public class GameController : MonoBehaviour {
             .Count();
 
         // End the game if too many seats are soiled
-        if ( maxCustomers <= 10 ) {
+        if ( maxCustomers < (Bar.Singleton.Seats.Count / 2) ) {
             GameEnd = true;
             GameLost = true;
             return;

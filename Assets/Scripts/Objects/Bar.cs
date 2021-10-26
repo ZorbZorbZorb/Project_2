@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using Assets.Scripts.Objects;
 
 public class Bar : MonoBehaviour {
     public static Bar Singleton = null;
@@ -12,8 +13,8 @@ public class Bar : MonoBehaviour {
     [SerializeField]
     public static double DrinkAmount;
 
-    [SerializeField]
-    public Seat[] Seats;
+    [SerializeField] public List<Seat> Seats;
+    [SerializeField] public List<BarTable> Tables;
 
     public Seat GetOpenSeat() {
         var x = Seats.Where(x => x.OccupiedBy == null && !x.IsSoiled).ToArray();

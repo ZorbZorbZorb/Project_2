@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Assets.Scripts.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using Assets.Scripts.Objects;
 
 namespace Assets.Scripts {
     [Serializable]
@@ -42,18 +40,18 @@ namespace Assets.Scripts {
         public void Close() {
             // Destory the clickables we created
             clickables.ForEach(x => UnityEngine.Object.Destroy(x));
-            
+
             // Close the menu
             enabled = false;
             Canvas.SetActive(false);
         }
-        
+
         private void RebuildClickables() {
             // Destory the clickables we created
             clickables.ForEach(x => UnityEngine.Object.Destroy(x));
 
             // Place some clickables to buy things.
-            var spawnpoints = Bathroom.Singleton.Spawnpoints
+            var spawnpoints = InteractableSpawnpoint.Spawnpoints
                 .Where(x => !x.Occupied);
             foreach ( var point in spawnpoints ) {
 
@@ -68,17 +66,20 @@ namespace Assets.Scripts {
                 // Change the sprite to match what could be built there
                 switch ( point.IType ) {
                     case CustomerInteractable.InteractableType.Sink:
-                    renderer.sprite = Collections.spriteSink;
-                    break;
+                        renderer.sprite = Collections.spriteSink;
+                        break;
                     case CustomerInteractable.InteractableType.Toilet:
-                    renderer.sprite = Collections.spriteToilet;
-                    break;
+                        renderer.sprite = Collections.spriteToilet;
+                        break;
                     case CustomerInteractable.InteractableType.Urinal:
-                    renderer.sprite = point.Sideways ? Collections.spriteUrinalSideways : Collections.spriteUrinal;
-                    break;
+                        renderer.sprite = point.Sideways ? Collections.spriteUrinalSideways : Collections.spriteUrinal;
+                        break;
+                    case CustomerInteractable.InteractableType.Seat:
+                        renderer.sprite = Collections.SpriteStoolNormal;
+                        break;
                     default:
-                    Debug.LogError($"Unsupported spawnpoint type {point.IType}");
-                    break;
+                        Debug.LogError($"Unsupported spawnpoint type {point.IType}");
+                        break;
                 }
 
                 // Make it partially transparent and light green if affordable, light red if too expensive.
@@ -91,10 +92,10 @@ namespace Assets.Scripts {
 
                 // Set up the click action
                 clickable.GetComponent<BuildClickable>().OnClick = () => {
-                    if (GameController.GC.gameData.funds >= point.Price) {
+                    if ( GameController.GC.gameData.funds >= point.Price ) {
                         GameController.GC.gameData.funds -= point.Price;
                         GameController.GC.UpdateFundsDisplay();
-                        Bathroom.Singleton.SpawnReliefPrefab(point);
+                        InteractableSpawnpoint.SpawnInteractablePrefab(point);
                         GameController.GC.gameData.UnlockedPoints.Add(point.Id);
                         RebuildClickables();
                     }
