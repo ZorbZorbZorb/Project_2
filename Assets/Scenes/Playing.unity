@@ -3417,10 +3417,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0644f30cb7d1e4a8b03cd8cd900294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 200
-  fastMovementSpeed: 2000
-  zoomSensitivity: 50
-  fastZoomSensitivity: 300
+  movementSpeed: 500
+  fastMovementSpeed: 5000
+  freeLookSensitivity: 2000
+  zoomSensitivity: 100
+  fastZoomSensitivity: 500
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -3472,7 +3473,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 244, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 173412956}
@@ -6203,7 +6204,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1206431813
 SpriteRenderer:
   m_ObjectHideFlags: 0
