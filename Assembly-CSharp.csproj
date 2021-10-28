@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,9 +53,6 @@
     <UnityVersion>2021.1.17f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Assets\Scripts\Characters\Bladder.cs" />
     <Compile Include="Assets\Scripts\Abstract\Line.cs" />
     <Compile Include="Assets\Scripts\Characters\CustomerSpriteController.cs" />
@@ -66,27 +63,28 @@
     <Compile Include="Assets\Scripts\MetaObjects\InteractableSpawnpoint.cs" />
     <Compile Include="Assets\Scripts\Objects\Seat.cs" />
     <Compile Include="Assets\Scripts\Objects\Sinks.cs" />
-    <Compile Include="Assets\Scripts\MenuButton.cs" />
     <Compile Include="Assets\Scripts\GameData.cs" />
     <Compile Include="Assets\Scripts\Abstract\Relief.cs" />
-    <Compile Include="Assets\Scripts\Menu.cs" />
-    <Compile Include="Assets\Scripts\MainMenuController.cs" />
     <Compile Include="Assets\Scripts\Objects\Urinal.cs" />
     <Compile Include="Assets\Scripts\Objects\Bar.cs" />
     <Compile Include="Assets\Scripts\Objects\WaitingRoom.cs" />
     <Compile Include="Assets\Scripts\Characters\Customer.cs" />
     <Compile Include="Assets\Scripts\Objects\Sink.cs" />
     <Compile Include="Assets\Scripts\Characters\Emote.cs" />
-    <Compile Include="Assets\Scripts\BuildMenu.cs" />
     <Compile Include="Assets\Scripts\Abstract\CustomerInteractable.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\Objects\Toilet.cs" />
-    <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\Objects\BarTable.cs" />
     <Compile Include="Assets\Scripts\Extensions\RandomExtensions.cs" />
     <Compile Include="Assets\Scripts\Objects\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\Objects\DoorwayQueue.cs" />
+    <Compile Include="Assets\Scripts\Freecam.cs" />
+    <Compile Include="Assets\Scripts\Interface\PauseMenu.cs" />
+    <Compile Include="Assets\Scripts\Interface\MainMenuController.cs" />
+    <Compile Include="Assets\Scripts\Interface\BuildMenu.cs" />
+    <Compile Include="Assets\Scripts\Interface\Menu.cs" />
+    <Compile Include="Assets\Scripts\Interface\MenuButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
