@@ -25,7 +25,7 @@ namespace Assets.Scripts.Characters {
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
                 // The only time action state can be none while interacting with something where you aren't forcing standing is seated
                 //   on a stool so do we only need one of these checks in the below if?
-                if ( interactable.IType == CustomerInteractable.InteractableType.Seat && actionState == CustomerActionState.None ) {
+                if ( interactable.IType == CustomerInteractable.InteractableType.Seat && (actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting) ) {
                     return DesperationSeatSpriteLookup[desperationState];
                 }
                 else {
