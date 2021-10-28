@@ -3154,7 +3154,7 @@ MonoBehaviour:
   DebugEndNightNow: 0
   DebugDisplayBuildMenuOnFirstNight: 0
   DebugCustomersWillinglyUseAny: 0
-  DisplayNightStartSplash: 1
+  DisplayNightStartSplash: 0
   SpawningEnabled: 1
   CanPause: 1
   gameData:
@@ -3417,6 +3417,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0644f30cb7d1e4a8b03cd8cd900294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementSpeed: 200
+  fastMovementSpeed: 2000
+  zoomSensitivity: 50
+  fastZoomSensitivity: 300
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
