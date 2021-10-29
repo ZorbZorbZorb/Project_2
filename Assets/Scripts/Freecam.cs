@@ -27,8 +27,9 @@ public class Freecam : MonoBehaviour {
     private void Start() {
         // Recalculate camera size and overages
         CalculateCameraSize();
-        CalculateCameraOverages();
         UpdateCameraPositions();
+        camIsOverX = false;
+        camIsOverY = false;
 
         // Set camera bounds
         xMin = CameraBounds.bounds.min.x;
@@ -51,22 +52,19 @@ public class Freecam : MonoBehaviour {
         // Are we scrolling fast or slow?
         var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-        // Wow. This code sucks ass!
+        // Pan the camera
         if ( looking ) {
-
+            // How much to pan?
             var multiplier = freeLookSensitivity * Time.unscaledDeltaTime;
             var deltaX = Mathf.Clamp(multiplier * Input.GetAxis("Mouse X"), -9, 9);
             var deltaY = Mathf.Clamp(multiplier * Input.GetAxis("Mouse Y"), -9, 9);
 
-            UpdateCameraPositions();
-            CalculateCameraOverages();
-            CorrectCameraOverages();
-
+            // New x and y to move camera to
             float newX = Mathf.Clamp(transform.position.x + deltaX, xMin, xMax);
             float newY = Mathf.Clamp(transform.position.y + deltaY, yMin, yMax);
 
-            transform.position = new Vector3(newX, newY, -10f);
-
+            // Move the camera
+            UpdateCameraPosition(newX, newY);
         }
 
         float axis = Input.GetAxis("Mouse ScrollWheel");
@@ -78,35 +76,33 @@ public class Freecam : MonoBehaviour {
 
             // Recalculate the camera size and overages because the camera size has changed
             CalculateCameraSize();
-            CalculateCameraOverages();
-            CorrectCameraOverages();
+            UpdateCameraPosition(transform.position.x, transform.position.y);
         }
     }
 
-    private void CorrectCameraOverages() {
-        if ( camIsOverX ) {
-            transform.position = transform.position + new Vector3(-camOverX, 0f, -10f);
-            UpdateCameraPositions();
-        }
-        if ( camIsOverY ) {
-            transform.position = transform.position + new Vector3(0f, -camOverY, -10f);
-            UpdateCameraPositions();
-        }
-    }
+    private void UpdateCameraPosition(float newX, float newY) {
+        cameraLeft = newX - halfCamWidth;
+        cameraRight = newX + halfCamWidth;
+        cameraDown = newY - halfCamHeight;
+        cameraUp = newY + halfCamHeight;
 
+        bool overLeft = cameraLeft < xMin;
+        bool overDown = cameraDown < yMin;
+
+        if ( overLeft || cameraRight > xMax ) {
+            newX = newX + -( overLeft ? cameraLeft - xMin : cameraRight - xMax );
+        }
+        if ( overDown || cameraUp > yMax ) {
+            newY = newY + -( overDown ? cameraDown - yMin : cameraUp - yMax );
+        }
+
+        transform.position = new Vector3(newX, newY, -10f);
+    }
     private void CalculateCameraSize() {
         camHeight = 2 * Camera.main.orthographicSize;
         camWidth = camHeight * Camera.main.aspect;
         halfCamWidth = camWidth / 2;
         halfCamHeight = camHeight / 2;
-    }
-    private void CalculateCameraOverages() {
-        bool overLeft = cameraLeft < xMin;
-        bool overDown = cameraDown < yMin;
-        camIsOverX = overLeft || cameraRight > xMax;
-        camIsOverY = overDown || cameraUp > yMax;
-        camOverX = overLeft ? cameraLeft - xMin : cameraRight - xMax;
-        camOverY = overDown ? cameraDown - yMin : cameraUp - yMax;
     }
     private void UpdateCameraPositions() {
         cameraLeft = transform.position.x - halfCamWidth;
