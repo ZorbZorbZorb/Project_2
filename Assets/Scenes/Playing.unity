@@ -3154,7 +3154,7 @@ MonoBehaviour:
   DebugEndNightNow: 0
   DebugDisplayBuildMenuOnFirstNight: 0
   DebugCustomersWillinglyUseAny: 0
-  DisplayNightStartSplash: 0
+  DisplayNightStartSplash: 1
   SpawningEnabled: 1
   CanPause: 1
   gameData:
@@ -3420,8 +3420,8 @@ MonoBehaviour:
   movementSpeed: 500
   fastMovementSpeed: 5000
   freeLookSensitivity: 2000
-  zoomSensitivity: 100
-  fastZoomSensitivity: 500
+  zoomSens: 500
+  fastZoomSens: 5000
   CameraBounds: {fileID: 1822046891}
   cameraLeft: 0
   cameraRight: 0

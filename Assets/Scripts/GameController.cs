@@ -145,6 +145,11 @@ public class GameController : MonoBehaviour {
     void PauseGame() {
         Time.timeScale = 0;
         gamePaused = true;
+        Freecam.NoZoom = true;
+        Freecam.NoPan = true;
+        // These two shouldnt be done in production, its just a bandaid. Add a cached last pan last zoom to return to ???
+        Freecam.UnzoomCamera();
+        Freecam.UnpanCamera();
         // Close all open menus.
         Menu.CloseAllOpenMenus();
         PauseMenu.Open();
@@ -160,6 +165,8 @@ public class GameController : MonoBehaviour {
         }
         Time.timeScale = 1;
         gamePaused = false;
+        Freecam.NoZoom = false;
+        Freecam.NoPan = false;
         PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
@@ -261,6 +268,9 @@ public class GameController : MonoBehaviour {
         }
         GC = this;
         Customer.GC = this;
+
+        Freecam.NoZoom = true;
+        Freecam.NoPan = true;
 
         // Clear the menu system's caches.
         Menu.ClearForSceneReload();
