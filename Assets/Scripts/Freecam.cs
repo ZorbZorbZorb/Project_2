@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 
-// Script taken in part from from https://gist.github.com/ashleydavis/f025c03a9221bc840a2b
 public class Freecam : MonoBehaviour {
     // How fast the camera moves across the world
     public float movementSpeed;
@@ -12,10 +11,31 @@ public class Freecam : MonoBehaviour {
     public float fastZoomSensitivity;
     // Are we in free-look?
     private bool looking = false;
-    // Camera reference for zooming, set on awake
-    private Camera cam;
-    private void Awake() {
-        cam = gameObject.GetComponent<Camera>();
+
+    public BoxCollider2D CameraBounds;
+    private float xMin, xMax, yMin, yMax;
+    private float camWidth, camHeight, halfCamWidth, halfCamHeight;
+    private bool camIsOverX, camIsOverY;
+    private float camOverX, camOverY;
+
+    // For debugging without spamming the console
+    public float cameraLeft;
+    public float cameraRight;
+    public float cameraUp;
+    public float cameraDown;
+
+    private void Start() {
+        // Recalculate camera size and overages
+        CalculateCameraSize();
+        CalculateCameraOverages();
+        UpdateCameraPositions();
+
+        // Set camera bounds
+        xMin = CameraBounds.bounds.min.x;
+        xMax = CameraBounds.bounds.max.x;
+        yMin = CameraBounds.bounds.min.y;
+        yMax = CameraBounds.bounds.max.y;
+        Destroy(CameraBounds.gameObject);
     }
 
     void Update() {
@@ -28,53 +48,83 @@ public class Freecam : MonoBehaviour {
             StopLooking();
         }
 
-        // Are we moving fast or slow?
+        // Are we scrolling fast or slow?
         var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
 
-        // Move the camera
-        if ( Input.GetKey(KeyCode.A) ) {
-            transform.position = transform.position + ( ( -transform.right * Time.unscaledDeltaTime ) * movementSpeed );
-        }
-        else if ( Input.GetKey(KeyCode.D) ) {
-            transform.position = transform.position + ( ( transform.right * Time.unscaledDeltaTime ) * movementSpeed );
-        }
-        if ( Input.GetKey(KeyCode.W) ) {
-            transform.position = transform.position + ( ( Vector3.up * Time.unscaledDeltaTime ) * movementSpeed );
-        }
-        else if ( Input.GetKey(KeyCode.S) ) {
-            transform.position = transform.position + ( ( -Vector3.up * Time.unscaledDeltaTime ) * movementSpeed );
-        }
-
+        // Wow. This code sucks ass!
         if ( looking ) {
-            transform.position = transform.position + (freeLookSensitivity * Input.GetAxis("Mouse X") * Time.unscaledDeltaTime * -Vector3.right );
-            transform.position = transform.position + (freeLookSensitivity * Input.GetAxis("Mouse Y") * Time.unscaledDeltaTime * -Vector3.up );
+
+            var multiplier = freeLookSensitivity * Time.unscaledDeltaTime;
+            var deltaX = Mathf.Clamp(multiplier * Input.GetAxis("Mouse X"), -9, 9);
+            var deltaY = Mathf.Clamp(multiplier * Input.GetAxis("Mouse Y"), -9, 9);
+
+            UpdateCameraPositions();
+            CalculateCameraOverages();
+            CorrectCameraOverages();
+
+            float newX = Mathf.Clamp(transform.position.x + deltaX, xMin, xMax);
+            float newY = Mathf.Clamp(transform.position.y + deltaY, yMin, yMax);
+
+            transform.position = new Vector3(newX, newY, -10f);
+
         }
 
         float axis = Input.GetAxis("Mouse ScrollWheel");
         if ( axis != 0 ) {
-            var zoomSensitivity = fastMode ? this.fastZoomSensitivity : this.zoomSensitivity;
-            var newSize = cam.orthographicSize + ( -axis * zoomSensitivity );
-            cam.orthographicSize = Math.Max(Math.Min(newSize, 600f), 200f);
+            // Zoom the camera
+            var zoomSensitivity = fastMode ? fastZoomSensitivity : this.zoomSensitivity;
+            var newSize = Camera.main.orthographicSize + ( -axis * zoomSensitivity );
+            Camera.main.orthographicSize = Math.Max(Math.Min(newSize, 600f), 200f);
+
+            // Recalculate the camera size and overages because the camera size has changed
+            CalculateCameraSize();
+            CalculateCameraOverages();
+            CorrectCameraOverages();
         }
+    }
+
+    private void CorrectCameraOverages() {
+        if ( camIsOverX ) {
+            transform.position = transform.position + new Vector3(-camOverX, 0f, -10f);
+            UpdateCameraPositions();
+        }
+        if ( camIsOverY ) {
+            transform.position = transform.position + new Vector3(0f, -camOverY, -10f);
+            UpdateCameraPositions();
+        }
+    }
+
+    private void CalculateCameraSize() {
+        camHeight = 2 * Camera.main.orthographicSize;
+        camWidth = camHeight * Camera.main.aspect;
+        halfCamWidth = camWidth / 2;
+        halfCamHeight = camHeight / 2;
+    }
+    private void CalculateCameraOverages() {
+        bool overLeft = cameraLeft < xMin;
+        bool overDown = cameraDown < yMin;
+        camIsOverX = overLeft || cameraRight > xMax;
+        camIsOverY = overDown || cameraUp > yMax;
+        camOverX = overLeft ? cameraLeft - xMin : cameraRight - xMax;
+        camOverY = overDown ? cameraDown - yMin : cameraUp - yMax;
+    }
+    private void UpdateCameraPositions() {
+        cameraLeft = transform.position.x - halfCamWidth;
+        cameraRight = transform.position.x + halfCamWidth;
+        cameraDown = transform.position.y - halfCamHeight;
+        cameraUp = transform.position.y + halfCamHeight;
     }
 
     void OnDisable() {
         StopLooking();
     }
 
-    /// <summary>
-    /// Enable free looking.
-    /// </summary>
     public void StartLooking() {
         looking = true;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    /// <summary>
-    /// Disable free looking.
-    /// </summary>
     public void StopLooking() {
         looking = false;
         Cursor.visible = true;
