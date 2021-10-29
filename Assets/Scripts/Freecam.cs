@@ -78,7 +78,7 @@ public class Freecam : MonoBehaviour {
 
     private void PanCamera() {
         // How much to pan?
-        var multiplier = freeLookSensitivity * Time.unscaledDeltaTime;
+        var multiplier = freeLookSensitivity * Time.fixedDeltaTime;
         // The clamp will prevent the camera from 'snapping' when alt-tabbing and disorienting the player
         var deltaX = -Mathf.Clamp(multiplier * Input.GetAxis("Mouse X"), -50, 50);
         var deltaY = -Mathf.Clamp(multiplier * Input.GetAxis("Mouse Y"), -50, 50);
