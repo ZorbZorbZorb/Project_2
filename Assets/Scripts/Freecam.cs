@@ -14,9 +14,7 @@ public class Freecam : MonoBehaviour {
 
     public BoxCollider2D CameraBounds;
     private float xMin, xMax, yMin, yMax;
-    private float camWidth, camHeight, halfCamWidth, halfCamHeight;
-    private bool camIsOverX, camIsOverY;
-    private float camOverX, camOverY;
+    private float halfCamWidth, halfCamHeight;
 
     // For debugging without spamming the console
     public float cameraLeft;
@@ -28,8 +26,6 @@ public class Freecam : MonoBehaviour {
         // Recalculate camera size and overages
         CalculateCameraSize();
         UpdateCameraPositions();
-        camIsOverX = false;
-        camIsOverY = false;
 
         // Set camera bounds
         xMin = CameraBounds.bounds.min.x;
@@ -99,10 +95,8 @@ public class Freecam : MonoBehaviour {
         transform.position = new Vector3(newX, newY, -10f);
     }
     private void CalculateCameraSize() {
-        camHeight = 2 * Camera.main.orthographicSize;
-        camWidth = camHeight * Camera.main.aspect;
-        halfCamWidth = camWidth / 2;
-        halfCamHeight = camHeight / 2;
+        halfCamHeight = Camera.main.orthographicSize;
+        halfCamWidth = halfCamHeight * Camera.main.aspect;
     }
     private void UpdateCameraPositions() {
         cameraLeft = transform.position.x - halfCamWidth;
