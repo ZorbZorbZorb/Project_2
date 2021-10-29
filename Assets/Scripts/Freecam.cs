@@ -22,7 +22,7 @@ public class Freecam : MonoBehaviour {
     public float cameraUp;
     public float cameraDown;
 
-    private void Start() {
+    private void Awake() {
         // Recalculate camera size and overages
         CalculateCameraSize();
         UpdateCameraPositions();
