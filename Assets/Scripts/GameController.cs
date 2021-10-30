@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
-
+    public bool DebugSpawnOneCustomerOnly = false;
     public bool DebugEndNightNow = false;
     public bool DebugDisplayBuildMenuOnFirstNight = false;
     public bool DebugCustomersWillinglyUseAny = false;
@@ -290,22 +290,18 @@ public class GameController : MonoBehaviour {
             // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
             gameData.UnlockedPoints.Add(
                 InteractableSpawnpoint.Spawnpoints
-                .Where(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
-                .First()
+                .First(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
                 .Id);
             gameData.UnlockedPoints.Add(
                 InteractableSpawnpoint.Spawnpoints
-                .Where(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
-                .First()
+                .First(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
                 .Id);
             gameData.UnlockedPoints.Add(
                 InteractableSpawnpoint.Spawnpoints
-                .Where(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
-                .First()
+                .First(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
                 .Id);
             Bar.Singleton.Tables
-                .Where(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
-                .First()
+                .First(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
                 .SeatSpawnpoints
                 .ToList()
                 .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
@@ -396,6 +392,11 @@ public class GameController : MonoBehaviour {
 
         Customer firstCustomer = CreateCustomer();
         firstCustomer.Active = true;
+
+        if (DebugSpawnOneCustomerOnly) {
+            DebugSpawnOneCustomerOnly = false;
+            SpawningEnabled = false;
+        }
     }
 
     public int nightMaxTime = 30;
@@ -534,7 +535,7 @@ public class GameController : MonoBehaviour {
     }
     public Customer SpawnCustomerInBar(bool desperate) {
         Customer newCustomer = Instantiate(templateCustomer);
-        newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
+        newCustomer.Gender = 'f'; //Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
         if ( desperate ) {
             newCustomer.SetupCustomer(80, 100);
