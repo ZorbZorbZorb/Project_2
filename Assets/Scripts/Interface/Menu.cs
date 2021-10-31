@@ -44,7 +44,7 @@ namespace Assets.Scripts {
         /// <para>The canvas is enabled or disabled to open and close the menu.</para>
         /// </summary>
         [SerializeField]
-        private Canvas canvas;
+        private readonly Canvas canvas;
         /// <summary>
         /// Code to call when checking if the menu can be opened right now
         /// <para>Accepts any function that returns bool</para>

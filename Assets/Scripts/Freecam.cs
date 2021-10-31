@@ -17,7 +17,7 @@ public class Freecam : MonoBehaviour {
     public float freeLookSensitivity;
     // How fast the camera zooms in and out of the world
     public float zoomSens;
-    public float fastZoomSens;
+    //public float fastZoomSens;
     // Are we in free-look?
     private bool panning = false;
 
@@ -91,7 +91,7 @@ public class Freecam : MonoBehaviour {
         UpdateCameraPosition(newX, newY);
     }
     private void ZoomCamera(float axis) {
-        var zoomSensitivity = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? fastZoomSens : zoomSens;
+        //var zoomSensitivity = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? fastZoomSens : zoomSens;
         var newSize = Camera.main.orthographicSize + ( -axis * zoomSens );
         Camera.main.orthographicSize = Mathf.Clamp(newSize, MaxZoom, MinZoom);
 
@@ -109,10 +109,10 @@ public class Freecam : MonoBehaviour {
         bool overDown = cameraDown < yMin;
 
         if ( overLeft || cameraRight > xMax ) {
-            newX = newX + -( overLeft ? cameraLeft - xMin : cameraRight - xMax );
+            newX -= ( overLeft ? cameraLeft - xMin : cameraRight - xMax );
         }
         if ( overDown || cameraUp > yMax ) {
-            newY = newY + -( overDown ? cameraDown - yMin : cameraUp - yMax );
+            newY -= ( overDown ? cameraDown - yMin : cameraUp - yMax );
         }
 
         transform.position = new Vector3(newX, newY, Depth);

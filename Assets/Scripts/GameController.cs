@@ -401,11 +401,6 @@ public class GameController : MonoBehaviour {
 
     public int nightMaxTime = 30;
     public int nightMaxCustomerSpawnTime = 20;
-    public double GetCustomerSpawnFactor(int currentTime, int endTime) {
-        return currentTime >= endTime
-            ? 0d
-            : Math.Sin(( currentTime / endTime ) * Math.PI);
-    }
 
     // Think only once a second for better game performance.
     float timeAcc = 0f;
@@ -429,20 +424,9 @@ public class GameController : MonoBehaviour {
             RemoveCustomer(target);
         }
     }
-    private int CustomersInBarNotDesperate() {
-        return customers
-            .Where(x => x.DesperationState == Collections.CustomerDesperationState.State0 || x.DesperationState == Collections.CustomerDesperationState.State1)
-            .Count();
-    }
-    private int CustomersInBarDesperate() {
-        return customers
-            .Where(x =>
-            x.DesperationState == Collections.CustomerDesperationState.State3 ||
-                x.DesperationState != Collections.CustomerDesperationState.State4)
-            .Count();
-    }
     private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Collections.Location.Bar);
-    private IEnumerable<Customer> CustomersInBathroom() => customers.Where(x => x.position == Collections.Location.Doorway || x.position == Collections.Location.Relief || x.position == Collections.Location.WaitingRoom);
+    private IEnumerable<Customer> CustomersInBathroom() => customers
+        .Where(x => x.position == Collections.Location.Doorway || x.position == Collections.Location.Relief || x.position == Collections.Location.WaitingRoom);
     private int GetCustomersAboutToWetCount() {
         return customers
             .Where(x =>
@@ -530,9 +514,6 @@ public class GameController : MonoBehaviour {
         }
     }
 
-    public Customer SpawnCustomerInBar(double metric) {
-        throw new NotImplementedException();
-    }
     public Customer SpawnCustomerInBar(bool desperate) {
         Customer newCustomer = Instantiate(templateCustomer);
         newCustomer.Gender = 'f'; //Random.Range(0, 3) == 0 ? 'm' : 'f';
