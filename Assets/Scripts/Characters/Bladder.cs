@@ -58,8 +58,11 @@ public class Bladder {
 
         // If Emptying
         if (Emptying) {
+            // Calculate the normalized amount emptied. It's okay to do it this way for now, because it only matters
+            //   for wettings or determining how much someone has emptied BEFORE having them stop.
             NormalizedPercentEmptiedStart = Mathf.Max(NormalizedPercentEmptiedStart, (float)Amount);
             NormalizedPercentEmptied = 1f - ( (float)Amount / NormalizedPercentEmptiedStart );
+
             if (StruggleStopPeeing) {
                 // If finished struggling to stop peeing
                 if (DrainRateNow <= 0d) {
@@ -125,6 +128,9 @@ public class Bladder {
     /// </summary>
     private void DoBladderFill() {
         double amountToAdd = FillRate * Time.deltaTime;
+        if ( GameController.GC.DebugRapidFill ) {
+            amountToAdd *= 3;
+        }
         Amount += amountToAdd;
         if (Stomach > 0) {
             amountToAdd = Time.deltaTime * (2 + (Stomach/200));
@@ -150,6 +156,9 @@ public class Bladder {
     /// </summary>
     private void DoBladderEmpty() {
         double amountToRemove = Math.Min(DrainRateNow * Time.deltaTime, Amount);
+        if (GameController.GC.DebugRapidPee) {
+            amountToRemove *= 3;
+        }
         Amount -= amountToRemove;
         if (Percentage < 0.9d) {
             LosingControl = false;

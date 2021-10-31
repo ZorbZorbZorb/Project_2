@@ -9,6 +9,9 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
+    public bool DebugRapidFill = false;
+    public bool DebugRapidPee = false;
+    public bool DebugNoLose = false;
     public bool DebugSpawnOneCustomerOnly = false;
     public bool DebugEndNightNow = false;
     public bool DebugDisplayBuildMenuOnFirstNight = false;
@@ -471,9 +474,11 @@ public class GameController : MonoBehaviour {
 
         // End the game if too many seats are soiled
         if ( maxCustomers < (Bar.Singleton.Seats.Count / 2) ) {
-            GameEnd = true;
-            GameLost = true;
-            return;
+            if ( !DebugNoLose ) {
+                GameEnd = true;
+                GameLost = true;
+                return;
+            }
         }
 
         // Stop spawning customers when its too late
