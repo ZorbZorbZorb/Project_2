@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static Collections;
+using Random = UnityEngine.Random;
+using UnityEngine.Animations;
 
 namespace Assets.Scripts.Characters {
     [Serializable]
@@ -22,6 +24,7 @@ namespace Assets.Scripts.Characters {
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
 
+        float accTest = 0f;
         public void Update() {
             animationStateName = GetAnimation(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
             
@@ -40,7 +43,33 @@ namespace Assets.Scripts.Characters {
 
 
             // Is this state's animation controlled manually?
+            switch (customer.DesperationState) {
+                case CustomerDesperationState.State5:
+                    animator.Play(animationStateName, 0, customer.bladder.NormalizedPercentEmptied);
+                    break;
+            }
 
+            // Sprite shaking to show desperation
+            // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
+            // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
+            // Do not run if paused.
+            if ( !GameController.GamePaused ) {
+                switch ( customer.DesperationState ) {
+                    case CustomerDesperationState.State4:
+                        if ( Time.frameCount % 4 == 0 ) {
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-2, 3), Random.Range(-2, 3), 0);
+                        }
+                        break;
+                    case CustomerDesperationState.State3:
+                        if ( Time.frameCount % 40 == 0 ) {
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), 0, 0);
+                        }
+                        break;
+                    default:
+                        renderer.transform.position = customer.gameObject.transform.position;
+                        break;
+                }
+            }
         }
 
         public CustomerAnimator(Customer _customer, SpriteRenderer _renderer, Animator _animator, CustomerSpriteController _marshal) {

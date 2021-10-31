@@ -33,6 +33,10 @@ public class Customer : MonoBehaviour {
         // Update bladder
         bladder.Update();
 
+        if ( !bladder.ShouldWetNow ) {
+            UpdateDesperationState();
+        }
+
         // Update peeing logic
         PeeLogicUpdate();
 
@@ -339,7 +343,6 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        UpdateDesperationState();
 
         // Can customer relieve themselves now?
         CustomerInteractable.ReliefType reliefType = Occupying?.RType ?? CustomerInteractable.ReliefType.None;

@@ -16,6 +16,8 @@ public class Bladder {
     public double Max;
     public double DrainRate;
     public double DrainRateNow;
+    public float NormalizedPercentEmptied;
+    public float NormalizedPercentEmptiedStart;
     public double FillRate;
     public double FeltNeedCurve;  // Changes how badly this customer feels the need to go. multiplier.
     public double FeltNeed;  // How badly this customer thinks they need to go, 0.0 to 1.0
@@ -56,6 +58,8 @@ public class Bladder {
 
         // If Emptying
         if (Emptying) {
+            NormalizedPercentEmptiedStart = Mathf.Max(NormalizedPercentEmptiedStart, (float)Amount);
+            NormalizedPercentEmptied = 1f - ( (float)Amount / NormalizedPercentEmptiedStart );
             if (StruggleStopPeeing) {
                 // If finished struggling to stop peeing
                 if (DrainRateNow <= 0d) {
