@@ -44,7 +44,7 @@ public class Customer : MonoBehaviour {
         Think();
 
         // Update anim
-        SpriteUpdate();
+        customerAnimator.Update();
         // Emote think
         Emotes.Update();
 
@@ -490,40 +490,6 @@ public class Customer : MonoBehaviour {
     public double MoveSpeed;
 
     #region Sprites
-    public void SpriteUpdate() {
-        // Set the sprite
-
-        //Sprite sprite = marshal.GetSprite(DesperationState, ActionState, Occupying, !AtDestination());
-        //if ( SRenderer.sprite != sprite ) {
-        //    SRenderer.sprite = sprite;
-        //}
-
-        //string stateName = marshal.GetAnimation(DesperationState, ActionState, Occupying, !AtDestination());
-        //animator.Play(stateName);
-        customerAnimator.Update();
-
-        // Sprite shaking to show desperation
-        // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
-        // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
-        // Do not run if paused.
-        if ( !GameController.GamePaused ) {
-            switch ( DesperationState ) {
-                case Collections.CustomerDesperationState.State4:
-                    if ( Time.frameCount % 2 == 0 ) {
-                        SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 5), Random.Range(0, 5), 0);
-                    }
-                    break;
-                case Collections.CustomerDesperationState.State3:
-                    if ( Time.frameCount % 20 == 0 ) {
-                        SRenderer.transform.position = this.gameObject.transform.position + new Vector3(Random.Range(0, 4), 0, 0);
-                    }
-                    break;
-                default:
-                    SRenderer.transform.position = this.gameObject.transform.position;
-                    break;
-            }
-        }
-    }
 
     // Class that contains all of the emotes / thought bubbles / etc for the person
     [SerializeField] public RectTransform BladderCircleTransform;
