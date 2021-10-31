@@ -213,7 +213,7 @@ public class Bladder {
         DrinksHad = (int)Math.Round(1 + Math.Pow((Percentage + 1), 2.6));
 
         double secondsSincePastPee = ( Amount / FillRate ) + ((( Max * 0.4d ) / FillRate) * FeltNeedCurve );
-        secondsSincePastPee = secondsSincePastPee * 3.5d;
+        secondsSincePastPee *= 3.5d;
         LastPeedAt = DateTime.Now.AddSeconds(-Math.Round(secondsSincePastPee));
     }
 

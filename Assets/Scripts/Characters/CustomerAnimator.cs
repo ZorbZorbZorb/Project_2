@@ -21,9 +21,12 @@ namespace Assets.Scripts.Characters {
         private string animationStateName;
         private string animationStateNameLast;
 
+        private static Color normalColor = new Color(1f, 1f, 1f);
+        private static Color femaleColor = new Color(1f, 175f / 255f, 175f / 255f);
+        private static Color maleColor = new Color(175f / 255f, 175f / 255f, 255f);
+
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
-        float accTest = 0f;
         public void Update() {
             animationStateName = GetAnimation(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
             
@@ -40,10 +43,13 @@ namespace Assets.Scripts.Characters {
                 if ( clipNames.Contains(animationStateName) ) {
                     animator.enabled = true;
                     animator.Play(animationStateName);
+                    // For debugging, we only have one animation set right now. Change the color of the animation so it matches the genderand isnt confusing.
+                    renderer.color = customer.Gender == 'm' ? maleColor : femaleColor;
                 }
                 else {
                     animator.enabled = false;
                     renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
+                    renderer.color = normalColor;
                 }
             }
         }
