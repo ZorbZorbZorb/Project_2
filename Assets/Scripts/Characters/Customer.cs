@@ -99,6 +99,7 @@ public class Customer : MonoBehaviour {
         UrinateStopDelay = 6d;
 
         bladder.Update();
+        UpdateDesperationState();
         PeeLogicUpdate();
     }
     #region NextAction
