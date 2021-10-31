@@ -344,7 +344,6 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-
         // Can customer relieve themselves now?
         CustomerInteractable.ReliefType reliefType = Occupying?.RType ?? CustomerInteractable.ReliefType.None;
 
@@ -634,6 +633,7 @@ public class Customer : MonoBehaviour {
         if ( AtDestination() && Occupying != null && Occupying.CanBeSoiled ) {
             Occupying.IsSoiled = true;
         }
+        DesperationState = Collections.CustomerDesperationState.State5;
         ActionState = Collections.CustomerActionState.Wetting;
     }
     public void EndPeeingSelf() {

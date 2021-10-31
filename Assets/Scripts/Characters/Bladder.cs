@@ -129,7 +129,7 @@ public class Bladder {
     private void DoBladderFill() {
         double amountToAdd = FillRate * Time.deltaTime;
         if ( GameController.GC.DebugRapidFill ) {
-            amountToAdd *= 3;
+            amountToAdd *= 10;
         }
         Amount += amountToAdd;
         if (Stomach > 0) {
@@ -157,7 +157,7 @@ public class Bladder {
     private void DoBladderEmpty() {
         double amountToRemove = Math.Min(DrainRateNow * Time.deltaTime, Amount);
         if (GameController.GC.DebugRapidPee) {
-            amountToRemove *= 3;
+            amountToRemove *= 4;
         }
         Amount -= amountToRemove;
         if (Percentage < 0.9d) {

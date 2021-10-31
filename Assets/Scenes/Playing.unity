@@ -729,7 +729,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &173412956
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3151,12 +3151,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugRapidFill: 1
+  DebugRapidPee: 1
+  DebugNoLose: 1
   DebugSpawnOneCustomerOnly: 1
   DebugEndNightNow: 0
   DebugDisplayBuildMenuOnFirstNight: 0
   DebugCustomersWillinglyUseAny: 0
   DisplayNightStartSplash: 0
-  SpawningEnabled: 1
+  SpawningEnabled: 0
   CanPause: 1
   gameData:
     night: 1
@@ -3418,15 +3421,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0644f30cb7d1e4a8b03cd8cd900294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 500
-  fastMovementSpeed: 5000
-  freeLookSensitivity: 1000
-  zoomSens: 500
+  FreeLookSensitivity: 500
+  ZoomSens: 1000
+  ZoomLerp: 100
+  zoomIntent: 0
+  zoomCurrent: 0
+  zooming: 0
   CameraBounds: {fileID: 1822046891}
-  cameraLeft: 0
-  cameraRight: 0
-  cameraUp: 0
-  cameraDown: 0
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -4959,7 +4960,7 @@ GameObject:
   - component: {fileID: 986688706}
   - component: {fileID: 986688705}
   - component: {fileID: 986688704}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: BathroomMenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5282,7 +5283,7 @@ GameObject:
   - component: {fileID: 1062059281}
   - component: {fileID: 1062059280}
   - component: {fileID: 1062059279}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: ReliefMenuCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9056,6 +9057,8 @@ MonoBehaviour:
     Max: 650
     DrainRate: 30
     DrainRateNow: 30
+    NormalizedPercentEmptied: 0
+    NormalizedPercentEmptiedStart: 0
     FillRate: 0.8
     FeltNeedCurve: 0
     FeltNeed: 0
