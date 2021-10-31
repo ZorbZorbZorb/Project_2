@@ -20,9 +20,9 @@ public class Freecam : MonoBehaviour {
     /// <summary>Smooth scrolling speed</summary>
     public float ZoomLerp;
     /// <summary>What is the zoom the camera is lerping towords?</summary>
-    private float zoomIntent;
-    private float zoomCurrent;
-    private bool zooming;
+    public float zoomIntent;
+    public float zoomCurrent;
+    public bool zooming;
 
     public BoxCollider2D CameraBounds;
     private float xMin, xMax, yMin, yMax;
@@ -36,6 +36,10 @@ public class Freecam : MonoBehaviour {
 
     private void Awake() {
         this.Camera = GetComponent<Camera>();
+
+        zoomCurrent = this.Camera.orthographicSize;
+        zoomIntent = this.Camera.orthographicSize;
+        zooming = false;
 
         Center = transform.position;
 
@@ -86,9 +90,14 @@ public class Freecam : MonoBehaviour {
             if ( axis != 0 ) {
                 ZoomCamera(axis);
             }
-            else if ( zoomIntent != zoomCurrent ) {
+            else if ( zooming ) {
                 ApproachZoom();
             }
+        }
+        // If not allowed to zoom camera, stop zooming now.
+        else {
+            zoomIntent = zoomCurrent;
+            zooming = false;
         }
     }
 
@@ -107,30 +116,23 @@ public class Freecam : MonoBehaviour {
         UpdateCameraPosition(newX, newY);
     }
     private void ZoomCamera(float axis) {
-        zoomIntent = Mathf.Clamp(-axis * ZoomSens, MaxZoom, MinZoom);
-        if (zoomIntent != zoomCurrent) {
+        zoomIntent = Mathf.Clamp(zoomIntent + (-axis * ZoomSens), MaxZoom, MinZoom);
+        if ( zoomIntent != zoomCurrent ) {
             zooming = true;
             ApproachZoom();
         }
-
-        //var newSize = Camera.main.orthographicSize + ( -axis * ZoomSens );
-        //Camera.main.orthographicSize = Mathf.Clamp(newSize, MaxZoom, MinZoom);
-
-        // Recalculate the camera size and overages because the camera size has changed
-        //CalculateCameraSize();
-        //UpdateCameraPosition(transform.position.x, transform.position.y);
     }
     private void ApproachZoom() {
         // Approach the intended zoom amount
         float difference = ( zoomIntent - zoomCurrent );
-        float zoomAmount = difference * Time.fixedDeltaTime;
-        float newSize = Mathf.Clamp(Camera.main.orthographicSize + zoomAmount, MaxZoom, MinZoom);
-        Camera.main.orthographicSize = newSize;
+        float zoomAmount = (difference * Time.fixedDeltaTime) + 0.1f * Mathf.Sign(difference);
+        zoomCurrent = Mathf.Clamp(Camera.main.orthographicSize + zoomAmount, MaxZoom, MinZoom);
+        Camera.main.orthographicSize = zoomCurrent;
 
         // Stop zooming if finished approaching
-        if (newSize == MaxZoom || newSize == MinZoom) {
+        if ( Mathf.Abs( zoomCurrent - zoomIntent ) < 0.2f ) {
             zooming = false;
-            zoomIntent = newSize;
+            zoomIntent = zoomCurrent;
         }
 
         // Recalculate the camera size and overages because the camera size has changed
@@ -199,28 +201,36 @@ public class Freecam : MonoBehaviour {
     }
     /// <summary>
     /// Unzooms the camera to MinZoom
-    /// <para>Uses the current main camera. Must to call GetComponent. Please use <see cref="UnZoomCamera(Freecam)"/> instead.</para>
+    /// <para>Uses the current main camera. Must to call GetComponent. Please consider keeping a reference to your 
+    /// freecamera and using <see cref="UnZoomCamera(Freecam)"/> instead.</para>
     /// </summary>
     public static void UnzoomCamera() {
         Camera camera = Camera.main;
-        // There's little way around this one besides a singleton, sorry.
-        camera.GetComponent<Freecam>().zoomIntent = MinZoom;
         camera.orthographicSize = MinZoom;
+        // There's little way around this one, sorry.
+        StopZoom(camera.GetComponent<Freecam>());
     }
     /// <summary>
     /// Unzooms the camera to MinZoom
-    /// <para>Must to call GetComponent. Please use <see cref="UnZoomCamera(Freecam)"/> instead.</para>
+    /// <para>Must to call GetComponent. Please consider keeping a reference to your 
+    /// freecamera and using <see cref="UnZoomCamera(Freecam)"/> instead.</para>
     /// </summary>
     public static void UnzoomCamera(Camera camera) {
-        // There's little way around this one besides a singleton, sorry.
-        camera.GetComponent<Freecam>().zoomIntent = MinZoom;
         camera.orthographicSize = MinZoom;
+        // There's little way around this one, sorry.
+        StopZoom(camera.GetComponent<Freecam>());
     }
     /// <summary>
     /// Unzooms the camera to MinZoom
     /// </summary>
     public static void UnZoomCamera(Freecam camera) {
-        camera.zoomIntent = MinZoom;
         camera.Camera.orthographicSize = MinZoom;
+        StopZoom(camera);
+    }
+
+    private static void StopZoom(Freecam freecam) {
+        freecam.zoomIntent = MinZoom;
+        freecam.zooming = false;
+        freecam.zoomCurrent = MinZoom;
     }
 }
