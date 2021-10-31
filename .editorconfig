@@ -2,3 +2,12 @@
 
 # IDE0045: Convert to conditional expression
 dotnet_diagnostic.IDE0045.severity = silent
+
+# IDE0078: Use pattern matching
+dotnet_diagnostic.IDE0078.severity = silent
+
+# IDE0066: Convert switch statement to expression
+dotnet_diagnostic.IDE0066.severity = silent
+
+# IDE0046: Convert to conditional expression
+dotnet_diagnostic.IDE0046.severity = silent
