@@ -23,15 +23,21 @@ namespace Assets.Scripts.Characters {
 
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
-
         float accTest = 0f;
         public void Update() {
             animationStateName = GetAnimation(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
             
+            SetAnimationOrSprite();
+
+            ManuallyControlAnimations();
+
+            ShakeSprite();
+        }
+        private void SetAnimationOrSprite() {
             // Set animation or sprite
-            if (animationStateNameLast != animationStateName) {
+            if ( animationStateNameLast != animationStateName ) {
                 animationStateNameLast = animationStateName;
-                if (clipNames.Contains(animationStateName)) {
+                if ( clipNames.Contains(animationStateName) ) {
                     animator.enabled = true;
                     animator.Play(animationStateName);
                 }
@@ -40,15 +46,16 @@ namespace Assets.Scripts.Characters {
                     renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
                 }
             }
-
-
+        }
+        private void ManuallyControlAnimations() {
             // Is this state's animation controlled manually?
-            switch (customer.DesperationState) {
+            switch ( customer.DesperationState ) {
                 case CustomerDesperationState.State5:
                     animator.Play(animationStateName, 0, customer.bladder.NormalizedPercentEmptied);
                     break;
             }
-
+        }
+        private void ShakeSprite() {
             // Sprite shaking to show desperation
             // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
             // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
@@ -56,13 +63,13 @@ namespace Assets.Scripts.Characters {
             if ( !GameController.GamePaused ) {
                 switch ( customer.DesperationState ) {
                     case CustomerDesperationState.State4:
-                        if ( Time.frameCount % 4 == 0 ) {
-                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-2, 3), Random.Range(-2, 3), 0);
+                        if ( Time.frameCount % 20 == 0 ) {
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
                         }
                         break;
                     case CustomerDesperationState.State3:
-                        if ( Time.frameCount % 40 == 0 ) {
-                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), 0, 0);
+                        if ( Time.frameCount % 60 == 0 ) {
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(0, 2), 0, 0);
                         }
                         break;
                     default:
@@ -71,7 +78,6 @@ namespace Assets.Scripts.Characters {
                 }
             }
         }
-
         public CustomerAnimator(Customer _customer, SpriteRenderer _renderer, Animator _animator, CustomerSpriteController _marshal) {
             customer = _customer;
             renderer = _renderer;
