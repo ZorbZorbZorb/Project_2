@@ -12,12 +12,12 @@ namespace Assets.Scripts.Characters {
 
         public readonly string Root;
 
-        private Dictionary<CustomerDesperationState, Sprite> DesperationSpriteLookup;
-        private Dictionary<CustomerDesperationState, Sprite> DesperationSeatSpriteLookup;
-        private Dictionary<CustomerActionState, Sprite> PantsSpriteLookup;
-        private Dictionary<CustomerActionState, Sprite> PantsSidewaysSpriteLookup;
-        private Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSpriteLookup;
-        private Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSidewaysSpriteLookup;
+        private readonly Dictionary<CustomerDesperationState, Sprite> DesperationSpriteLookup;
+        private readonly Dictionary<CustomerDesperationState, Sprite> DesperationSeatSpriteLookup;
+        private readonly Dictionary<CustomerActionState, Sprite> PantsSpriteLookup;
+        private readonly Dictionary<CustomerActionState, Sprite> PantsSidewaysSpriteLookup;
+        private readonly Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSpriteLookup;
+        private readonly Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSidewaysSpriteLookup;
 
         public Sprite GetSprite<T>(CustomerDesperationState desperationState, CustomerActionState actionState, T interactable, bool forceStandingSprite)
             where T : CustomerInteractable {
@@ -25,12 +25,9 @@ namespace Assets.Scripts.Characters {
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
                 // The only time action state can be none while interacting with something where you aren't forcing standing is seated
                 //   on a stool so do we only need one of these checks in the below if?
-                if ( interactable.IType == CustomerInteractable.InteractableType.Seat && (actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting) ) {
-                    return DesperationSeatSpriteLookup[desperationState];
-                }
-                else {
-                    return GetActionSprite(actionState, interactable);
-                }
+                return interactable.IType == CustomerInteractable.InteractableType.Seat && ( actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting )
+                    ? DesperationSeatSpriteLookup[desperationState]
+                    : GetActionSprite(actionState, interactable);
             }
             else {
                 return DesperationSpriteLookup[desperationState];
@@ -113,7 +110,6 @@ namespace Assets.Scripts.Characters {
             ActionStateSidewaysSpriteLookup.Add(CustomerInteractable.InteractableType.Urinal, new Dictionary<CustomerActionState, Sprite>() {
                 { CustomerActionState.Peeing, Resources.Load<Sprite>($"{root}/act/peeing_urinal_side") },
             });
-
         }
     }
 }
