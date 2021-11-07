@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WaitingSpot : CustomerInteractable {
-
+    public Bathroom SpotBathroom;
     public override InteractableType IType => InteractableType.WaitingSpot;
     public override Collections.Location CustomerLocation => Collections.Location.WaitingRoom;
     public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 100, z = 0 };
@@ -21,7 +21,7 @@ public class WaitingSpot : CustomerInteractable {
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
         if ( customer.position == Collections.Location.Bar ) {
-            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom) {
+            foreach ( Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBarToBathroom ) {
                 customer.MoveToVector3(keyframe);
             }
         }

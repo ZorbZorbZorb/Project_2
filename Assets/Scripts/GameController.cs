@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour {
     public bool DebugInfiniteMoney = false;
     public bool DebugBuildAll = false;
     public bool DebugCustomersWillinglyUseAny = false;
+    public bool DebugStateLogging = false;
     public bool DisplayNightStartSplash = true;
     public bool SpawningEnabled = true;
     public bool CanPause = true;

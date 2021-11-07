@@ -8,7 +8,7 @@ using Assets.Scripts.Objects;
 
 [Serializable]
 public class WaitingRoom {
-    public static Bathroom Bathroom;
+    public Bathroom Bathroom;
     public List<WaitingSpot> WaitingSpots = new List<WaitingSpot>();
 
     public int UID => _uid;

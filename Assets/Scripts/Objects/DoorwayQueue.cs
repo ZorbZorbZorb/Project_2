@@ -8,16 +8,17 @@ using UnityEngine;
 
 [Serializable]
 public class DoorwayQueue {
-    public static Bathroom Bathroom;
+    public Bathroom Bathroom;
     public List<WaitingSpot> waitingSpots = new List<WaitingSpot>();
 
     public void Update() {
         // Advance queue
         AdvanceQueue();
     }
-
+    
     public int UID => _uid;
     private readonly int _uid = GameController.GetUid();
+
 
     public bool IsNextInLine(Customer customer) {
         for ( int i = 0; i < waitingSpots.Count(); i++ ) {

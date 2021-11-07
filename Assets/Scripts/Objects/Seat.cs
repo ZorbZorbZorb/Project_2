@@ -48,7 +48,7 @@ public class Seat : CustomerInteractable {
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
         if (customer.position != Collections.Location.Bar) {
-            foreach (Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar) {
+            foreach (Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBathroomToBar) {
                 customer.MoveToVector3(keyframe);
             }
         }

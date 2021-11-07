@@ -84,16 +84,6 @@ public class Collections : MonoBehaviour {
         Wetting
     }
 
-    public static readonly Vector3[] NavigationKeyframesFromBarToBathroom = {
-        new Vector3(80,-300,0),
-        new Vector3(80,-500,0)
-    };
-    public static readonly Vector3[] NavigationKeyframesFromBathroomToBar = {
-        new Vector3(-160,-500,0),
-        new Vector3(80,-500,0),
-        new Vector3(80,-300,0)
-    };
-
     public static Sprite spriteToilet;
     public static Sprite spriteUrinal;
     public static Sprite spriteUrinalSideways;

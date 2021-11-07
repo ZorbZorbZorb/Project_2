@@ -17,7 +17,7 @@ namespace Assets.Scripts.Characters {
         private readonly CustomerSpriteController marshal;
 
         private readonly string[] clipNames;
-        
+
         private string animationStateName;
         private string animationStateNameLast;
 
@@ -32,7 +32,9 @@ namespace Assets.Scripts.Characters {
             
             SetAnimationOrSprite();
 
-            ManuallyControlAnimations();
+            if ( animator.enabled ) {
+                ManuallyControlAnimations();
+            }
 
             ShakeSprite();
         }

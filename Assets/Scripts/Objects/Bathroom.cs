@@ -23,8 +23,13 @@ public class Bathroom : MonoBehaviour {
 
     public Line SinksLine;
 
-    public DoorwayQueue DoorwayQueue;
-    public WaitingRoom WaitingRoom;
+    public DoorwayQueue doorwayQueue;
+    public WaitingRoom waitingRoom;
+
+    public List<Vector3> NavigationKeyframesFromBarToBathroom;
+    public List<Vector3> NavigationKeyframesFromBathroomToBar;
+    public List<NavigationKeyframe> navigationKeyframesFromBarToBathroom;
+    public List<NavigationKeyframe> navigationKeyframesFromBathroomToBar;
 
     // Several of these are checked once per tick by each customer.
     public bool HasToiletAvailable { get; private set; }
@@ -65,9 +70,17 @@ public class Bathroom : MonoBehaviour {
     }
 
     void Awake() {
-        DoorwayQueue.Bathroom = this;
-        WaitingRoom.Bathroom = this;
+        // Get the transform position for the navigation keyframes
+        navigationKeyframesFromBarToBathroom.ForEach(x => NavigationKeyframesFromBarToBathroom.Add(x.transform.position));
+        navigationKeyframesFromBathroomToBar.ForEach(x => NavigationKeyframesFromBathroomToBar.Add(x.transform.position));
+
+        // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
+        doorwayQueue.Bathroom = this;
+        waitingRoom.Bathroom = this;
         Spawnpoints.ForEach(x => x.Bathroom = this);
+        doorwayQueue.waitingSpots.ForEach(x => x.SpotBathroom = this);
+        waitingRoom.WaitingSpots.ForEach(x => x.SpotBathroom = this);
+        SinksLine.Items.ForEach(x => x.SpotBathroom = this);
 
         // If this is the first bathroom to initialize, set both singletons to this (incase unisex)
         if ( BathroomM == null && BathroomF == null ) {
@@ -86,7 +99,7 @@ public class Bathroom : MonoBehaviour {
     void Update() {
 
         // Update doorway queue
-        DoorwayQueue.Update();
+        doorwayQueue.Update();
 
         // Dequeue sinks line into sinks
         if ( SinksLine.HasAnyoneInLine() ) {

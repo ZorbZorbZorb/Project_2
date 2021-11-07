@@ -56,7 +56,10 @@ public class Customer : MonoBehaviour {
         MoveUpdate();
 
         // Debug logging
-        FrameActionDebug();
+        if ( GameController.GC.DebugStateLogging ) {
+            FrameActionDebug();
+        }
+
     }
     public static GameController GC = null;
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
@@ -262,8 +265,6 @@ public class Customer : MonoBehaviour {
         }
 
         bool TryEnterBathroom() {
-
-
             if ( !EnterDoorway() ) {
                 MinTimeAtBarNow = MinTimeAtBar / 1.5f;
                 return false;
@@ -564,7 +565,7 @@ public class Customer : MonoBehaviour {
         ActionState = Collections.CustomerActionState.None;
         if ( IsWet ) {
             if ( position != Collections.Location.Bar ) {
-                foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar ) {
+                foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
                     MoveToVector3(keyframe);
                 }
             }
@@ -626,7 +627,7 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
         }
         if ( position == Collections.Location.Bar && thing.CustomerLocation != position ) {
-            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBarToBathroom ) {
+            foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBarToBathroom ) {
                 MoveToVector3(keyframe);
             }
         }
@@ -692,7 +693,7 @@ public class Customer : MonoBehaviour {
             return true;
         }
         // If in doorway and first in line
-        return position == Collections.Location.Doorway && CurrentBathroom.DoorwayQueue.IsNextInLine(this);
+        return position == Collections.Location.Doorway && CurrentBathroom.doorwayQueue.IsNextInLine(this);
     }
     /// <summary>
     /// Code for if relief menu can be displayed
@@ -712,8 +713,8 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the waiting room
     public WaitingSpot MenuOptionGotoWaiting() {
-        if ( CurrentBathroom.WaitingRoom.HasOpenWaitingSpot() ) {
-            WaitingSpot waitingSpot = CurrentBathroom.WaitingRoom.GetNextWaitingSpot();
+        if ( CurrentBathroom.waitingRoom.HasOpenWaitingSpot() ) {
+            WaitingSpot waitingSpot = CurrentBathroom.waitingRoom.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.WaitingRoom;
             return waitingSpot;
@@ -777,10 +778,10 @@ public class Customer : MonoBehaviour {
         CurrentBathroom = Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
         OtherBathroom = Gender == 'm' ? Bathroom.BathroomF : Bathroom.BathroomM;
 
-        if ( CurrentBathroom.DoorwayQueue.HasOpenWaitingSpot() ) {
+        if ( CurrentBathroom.doorwayQueue.HasOpenWaitingSpot() ) {
             // Makes customer hold on for a while longer when entering doorway.
             bladder.ResetLossOfControlTime();
-            WaitingSpot waitingSpot = CurrentBathroom.DoorwayQueue.GetNextWaitingSpot();
+            WaitingSpot waitingSpot = CurrentBathroom.doorwayQueue.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.Doorway;
             CanReenterBathroom = false;
@@ -811,7 +812,7 @@ public class Customer : MonoBehaviour {
     public void Leave() {
         StopOccupyingAll();
         if ( position != Collections.Location.Bar ) {
-            foreach ( Vector3 keyframe in Collections.NavigationKeyframesFromBathroomToBar ) {
+            foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
                 MoveToVector3(keyframe);
             }
         }
