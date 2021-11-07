@@ -435,7 +435,7 @@ public class GameController : MonoBehaviour {
 
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
     private void DespawnCustomerOutside() {
-        Customer[] targets = customers.Where(x => x.position == Collections.Location.Outside && x.AtDestination() && x.Active).ToArray();
+        Customer[] targets = customers.Where(x => x.position == Collections.Location.Outside && x.AtDestination && x.Active).ToArray();
         foreach ( Customer target in targets ) {
             RemoveCustomer(target);
         }

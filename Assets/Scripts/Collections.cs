@@ -134,7 +134,7 @@ public class Collections : MonoBehaviour {
         }
 
         // Bubble displays early if they are about to wet themselves
-        if (customer.DesperationState == CustomerDesperationState.State5 || customer.AtDestination()) {
+        if (customer.DesperationState == CustomerDesperationState.State5 || customer.AtDestination) {
             return GenderedBubbleSpriteLookup[customer.Gender][customer.ActionState];
         }
 

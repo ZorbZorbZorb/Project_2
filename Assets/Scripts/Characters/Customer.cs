@@ -171,7 +171,7 @@ public class Customer : MonoBehaviour {
         }
 
         // If about to leave or has left
-        if ( position == Collections.Location.Outside && AtDestination() && transform.position == Collections.OffScreenTop ) {
+        if ( position == Collections.Location.Outside && AtDestination && transform.position == Collections.OffScreenTop ) {
             GC.RemoveCustomer(this);
         }
 
@@ -184,7 +184,7 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        if ( !AtDestination() ) {
+        if ( !AtDestination ) {
             return;
         }
 
@@ -421,9 +421,11 @@ public class Customer : MonoBehaviour {
         Destination = destination;
     }
     private void MoveUpdate() {
-        if ( Navigation.Count == 0 ) {
+        AtDestination = Navigation.Count == 0;
+        if ( AtDestination ) {
             return;
         }
+
         Vector3 next = Navigation.First();
 
         if ( transform.position.x != next.x || transform.position.y != next.y ) {
@@ -436,9 +438,7 @@ public class Customer : MonoBehaviour {
             Navigation.Remove(next);
         }
     }
-    public bool AtDestination() {
-        return transform.position == Destination && Navigation.Count() < 2;
-    }
+    public bool AtDestination { get; private set; }
 
     public SpriteRenderer SRenderer;
     public Animator animator;
@@ -599,7 +599,7 @@ public class Customer : MonoBehaviour {
         IsWet = true;
         IsWetting = true;
         // If using something while wetting, it is now soiled.
-        if ( AtDestination() && Occupying != null && Occupying.CanBeSoiled ) {
+        if ( AtDestination && Occupying != null && Occupying.CanBeSoiled ) {
             Occupying.IsSoiled = true;
         }
         DesperationState = Collections.CustomerDesperationState.State5;

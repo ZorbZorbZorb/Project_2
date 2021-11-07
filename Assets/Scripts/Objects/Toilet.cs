@@ -18,7 +18,7 @@ public class Toilet : Relief {
     // TODO: This doesn't need to be an on update. I was just lazy.
     private void Update() {
         // Open or close the stall door
-        if (OccupiedBy != null && !doorClosed && OccupiedBy.AtDestination()) {
+        if (OccupiedBy != null && !doorClosed && OccupiedBy.AtDestination) {
             AltSRenderer.sprite = Collections.spriteStallClosed;
             doorClosed = true;
         }

@@ -28,7 +28,7 @@ namespace Assets.Scripts.Characters {
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
         public void Update() {
-            animationStateName = GetAnimation(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
+            animationStateName = GetAnimation(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination);
             
             SetAnimationOrSprite();
 
@@ -48,7 +48,7 @@ namespace Assets.Scripts.Characters {
                 }
                 else {
                     animator.enabled = false;
-                    renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination());
+                    renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination);
                     renderer.color = normalColor;
                 }
             }

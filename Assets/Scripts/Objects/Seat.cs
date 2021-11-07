@@ -29,7 +29,7 @@ public class Seat : CustomerInteractable {
     }
 
     private void Update() {
-        if (OccupiedBy != null && OccupiedBy.AtDestination()) {
+        if (OccupiedBy != null && OccupiedBy.AtDestination) {
             Renderer.enabled = false;
             return;
         }
