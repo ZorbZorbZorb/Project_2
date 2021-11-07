@@ -9,6 +9,133 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
+    void Start() {
+        if ( GC != null ) {
+            Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
+        }
+        GC = this;
+        Customer.GC = this;
+
+        Freecam.NoZoom = true;
+        Freecam.NoPan = true;
+
+        // Clear the menu system's caches.
+        Menu.ClearForSceneReload();
+
+        // Set the callbacks for the pause menu buttons. (restart and main menu)
+        PauseMenu.SetUpButtons();
+        BuildMenu.SetUpButtons();
+
+        maxCustomers = Bar.Singleton.Seats.Count;
+
+        barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
+
+        // Load or create game data
+        if ( CreateNewSaveData ) {
+            gameData = new GameData();
+
+            // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
+            gameData.UnlockedPoints.Add(
+                InteractableSpawnpoint.Spawnpoints
+                .First(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
+                .Id);
+            gameData.UnlockedPoints.Add(
+                InteractableSpawnpoint.Spawnpoints
+                .First(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
+                .Id);
+            gameData.UnlockedPoints.Add(
+                InteractableSpawnpoint.Spawnpoints
+                .First(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
+                .Id);
+            Bar.Singleton.Tables
+                .First(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
+                .SeatSpawnpoints
+                .ToList()
+                .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
+
+            CreateNewSaveData = false;
+            SaveNightData();
+        }
+        else {
+            LoadNightData();
+            UpdateFundsDisplay();
+        }
+
+        // Construct the bathroom
+        InteractableSpawnpoint.Build(gameData);
+
+        // Cheat construct bathroom if toggled when starting
+        if ( DebugBuildAll ) {
+            InteractableSpawnpoint.BuildAll();
+            DebugBuildAll = false;
+        }
+
+        // Start build mode if not first night
+        if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
+            StartBuildMode();
+        }
+        else {
+            ReadyToStartNight = true;
+        }
+    }
+    void Update() {
+        if ( DebugBuildAll ) {
+            InteractableSpawnpoint.BuildAll();
+            DebugBuildAll = false;
+        }
+
+        HandleKeypresses();
+
+        if ( !ReadyToStartNight ) {
+            return;
+        }
+
+        // Display the night start splash screen
+        if ( DisplayNightStartSplash && !DisplayedNightStartSplashScreen ) {
+            NightStartCanvas.gameObject.SetActive(true);
+            NightStartText.text = $"Night {gameData.night}";
+        }
+
+        if ( !GameStarted ) {
+            if ( FadeOutNightStartScreen() ) {
+                DisplayedNightStartSplashScreen = true;
+                StartGame();
+            }
+            else {
+                return;
+            }
+        }
+
+        else if ( DebugEndNightNow || GameEnd ) {
+            if ( !GamePaused ) {
+                if ( GameLost ) {
+                    LoseGame();
+                }
+                else {
+                    EndGame();
+                }
+            }
+            else if ( FadeToBlack ) {
+                PauseMenu.FadeOverlayToBlack();
+                if ( PauseMenu.FadeOverlayComplete() ) {
+                    FadeToBlack = true;
+                }
+            }
+        }
+
+        runTime += Time.deltaTime;
+        timeAcc += Time.deltaTime;
+        if ( timeAcc >= 1 ) {
+            timeAcc -= 1;
+            DespawnCustomerOutside();
+            Think();
+
+            // Update time and funds display once per second.
+            barTimeDisplay.text = barTime.ToString("hh:mm tt");
+        }
+
+    }
+
     public bool DebugRapidFill = false;
     public bool DebugRapidPee = false;
     public bool DebugNoLose = false;
@@ -268,132 +395,6 @@ public class GameController : MonoBehaviour {
         GC.gameData.wettings++;
     }
 
-    void Start() {
-        if ( GC != null ) {
-            Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
-        }
-        GC = this;
-        Customer.GC = this;
-
-        Freecam.NoZoom = true;
-        Freecam.NoPan = true;
-
-        // Clear the menu system's caches.
-        Menu.ClearForSceneReload();
-
-        // Set the callbacks for the pause menu buttons. (restart and main menu)
-        PauseMenu.SetUpButtons();
-        BuildMenu.SetUpButtons();
-
-        maxCustomers = Bar.Singleton.Seats.Count;
-
-        barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
-
-        // Load or create game data
-        if ( CreateNewSaveData ) {
-            gameData = new GameData();
-
-            // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
-            gameData.UnlockedPoints.Add(
-                InteractableSpawnpoint.Spawnpoints
-                .First(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
-                .Id);
-            gameData.UnlockedPoints.Add(
-                InteractableSpawnpoint.Spawnpoints
-                .First(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
-                .Id);
-            gameData.UnlockedPoints.Add(
-                InteractableSpawnpoint.Spawnpoints
-                .First(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
-                .Id);
-            Bar.Singleton.Tables
-                .First(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
-                .SeatSpawnpoints
-                .ToList()
-                .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
-
-            CreateNewSaveData = false;
-        }
-        else {
-            LoadNightData();
-            UpdateFundsDisplay();
-        }
-
-        // Construct the bathroom
-        InteractableSpawnpoint.Build(gameData);
-
-        // Cheat construct bathroom if toggled when starting
-        if ( DebugBuildAll ) {
-            InteractableSpawnpoint.BuildAll();
-            DebugBuildAll = false;
-        }
-
-        // Start build mode if not first night
-        if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
-            StartBuildMode();
-        }
-        else {
-            ReadyToStartNight = true;
-        }
-    }
-
-    void Update() {
-        if (DebugBuildAll) {
-            InteractableSpawnpoint.BuildAll();
-            DebugBuildAll = false;
-        }
-
-        HandleKeypresses();
-
-        if ( !ReadyToStartNight ) {
-            return;
-        }
-
-        // Display the night start splash screen
-        if ( DisplayNightStartSplash && !DisplayedNightStartSplashScreen ) {
-            NightStartCanvas.gameObject.SetActive(true);
-            NightStartText.text = $"Night {gameData.night}";
-        }
-
-        if ( !GameStarted ) {
-            if ( FadeOutNightStartScreen() ) {
-                DisplayedNightStartSplashScreen = true;
-                StartGame();
-            }
-            else {
-                return;
-            }
-        }
-
-        else if ( DebugEndNightNow || GameEnd ) {
-            if ( !GamePaused ) {
-                if ( GameLost ) {
-                    LoseGame();
-                }
-                else {
-                    EndGame();
-                }
-            }
-            else if ( FadeToBlack ) {
-                PauseMenu.FadeOverlayToBlack();
-                if ( PauseMenu.FadeOverlayComplete() ) {
-                    FadeToBlack = true;
-                }
-            }
-        }
-
-        runTime += Time.deltaTime;
-        timeAcc += Time.deltaTime;
-        if ( timeAcc >= 1 ) {
-            timeAcc -= 1;
-            DespawnCustomerOutside();
-            Think();
-
-            // Update time and funds display once per second.
-            barTimeDisplay.text = barTime.ToString("hh:mm tt");
-        }
-
-    }
 
     /// <summary>
     /// This function is called once at the start of each scene to start the night
