@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Objects {
@@ -23,7 +24,7 @@ namespace Assets.Scripts.Objects {
         public abstract ReliefType RType { get; }
         public virtual Vector3 CustomerPositionF { get; }
         public virtual Vector3 CustomerPositionM { get; }
-        [SerializeField] public bool Sideways = false;
+        public bool Sideways = false;
         public abstract Collections.Location CustomerLocation { get; }
         public Customer OccupiedBy;
         public abstract bool ChangesCustomerSprite { get; }
@@ -34,8 +35,8 @@ namespace Assets.Scripts.Objects {
         public int UID { get => uid; }
         private readonly int uid = GameController.GetUid();
         public abstract string DisplayName { get; }
+        public bool Unoccupied => OccupiedBy == null;
 
-        [SerializeField]
         public SpriteRenderer MainSRenderer;
         public SpriteRenderer AltSRenderer;
         public Sprite[] MainSprites;

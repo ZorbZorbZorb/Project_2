@@ -15,6 +15,8 @@ public class GameController : MonoBehaviour {
     public bool DebugSpawnOneCustomerOnly = false;
     public bool DebugEndNightNow = false;
     public bool DebugDisplayBuildMenuOnFirstNight = false;
+    public bool DebugInfiniteMoney = false;
+    public bool DebugBuildAll = false;
     public bool DebugCustomersWillinglyUseAny = false;
     public bool DisplayNightStartSplash = true;
     public bool SpawningEnabled = true;
@@ -319,6 +321,12 @@ public class GameController : MonoBehaviour {
         // Construct the bathroom
         InteractableSpawnpoint.Build(gameData);
 
+        // Cheat construct bathroom if toggled when starting
+        if ( DebugBuildAll ) {
+            InteractableSpawnpoint.BuildAll();
+            DebugBuildAll = false;
+        }
+
         // Start build mode if not first night
         if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
             StartBuildMode();
@@ -329,6 +337,11 @@ public class GameController : MonoBehaviour {
     }
 
     void Update() {
+        if (DebugBuildAll) {
+            InteractableSpawnpoint.BuildAll();
+            DebugBuildAll = false;
+        }
+
         HandleKeypresses();
 
         if ( !ReadyToStartNight ) {
@@ -437,12 +450,12 @@ public class GameController : MonoBehaviour {
                 x.bladder.LosingControl)
             .Count();
     }
-    private int GetReliefAvailableCount() {
-        return Bathroom.Singleton.Toilets.Count() + Bathroom.Singleton.Urinals.Count() + Bathroom.Singleton.Sinks.Items.Count();
-    }
-    private int GetCustomersPeeingCount() {
-        return customers.Where(x => x.bladder.Emptying).Count();
-    }
+    //private int GetReliefAvailableCount() {
+    //    return Bathroom.Singleton.Toilets.Count() + Bathroom.Singleton.Urinals.Count() + Bathroom.Singleton.Sinks.Items.Count();
+    //}
+    //private int GetCustomersPeeingCount() {
+    //    return customers.Where(x => x.bladder.Emptying).Count();
+    //}
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
@@ -500,16 +513,18 @@ public class GameController : MonoBehaviour {
                 ticksSinceLastSpawn = 0;
                 //int customersDesperateCount = CustomersInBarDesperate();
                 //int customersNotDesperateCount = CustomersInBarNotDesperate();
-                int reliefCount = GetReliefAvailableCount();
-                int aboutToWetCount = GetCustomersAboutToWetCount();
-                int customersPeeing = GetCustomersPeeingCount();
-                //if (((customersNotDesperateCount / 2) > customersDesperateCount) && (aboutToWetCount < reliefCount)) {
-                if ( aboutToWetCount + customersPeeing <= reliefCount ) {
-                    Customer customer = SpawnCustomerInBar(desperate: true);
-                }
-                else {
-                    Customer customer = SpawnCustomerInBar(desperate: false);
-                }
+
+                //int reliefCount = GetReliefAvailableCount();
+                //int aboutToWetCount = GetCustomersAboutToWetCount();
+                //int customersPeeing = GetCustomersPeeingCount();
+                //if ( aboutToWetCount + customersPeeing <= reliefCount ) {
+                //    Customer customer = SpawnCustomerInBar(desperate: true);
+                //}
+                //else {
+                //    Customer customer = SpawnCustomerInBar(desperate: false);
+                //}
+
+                Customer customer = SpawnCustomerInBar(desperate: false);
             }
         }
 

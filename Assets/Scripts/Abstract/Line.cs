@@ -16,8 +16,8 @@ namespace Assets.Scripts {
         public int UID => _uid;
         private readonly int _uid = GameController.GetUid();
 
-        public bool Any() {
-            return Items.Where(x => x.OccupiedBy != null).Any();
+        public bool HasAnyoneInLine() {
+            return Items.Any(x => x.OccupiedBy != null);
         }
         public bool IsNextInLine(Customer customer) {
             for ( int i = 0; i < Items.Count(); i++ ) {

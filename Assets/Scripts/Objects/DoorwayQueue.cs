@@ -6,20 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DoorwayQueue : MonoBehaviour {
-    public static DoorwayQueue doorwayQueue = null;
+[Serializable]
+public class DoorwayQueue {
+    public static Bathroom Bathroom;
     public List<WaitingSpot> waitingSpots = new List<WaitingSpot>();
 
-    void Start() {
-        if (doorwayQueue == null) {
-            doorwayQueue = this;
-        }
-        else {
-            throw new Exception("Only one doorway queue can exist");
-        }
-    }
-
-    void Update() {
+    public void Update() {
         // Advance queue
         AdvanceQueue();
     }
@@ -43,7 +35,7 @@ public class DoorwayQueue : MonoBehaviour {
     }
 
     public bool HasOpenWaitingSpot() {
-        return waitingSpots.Where(x => x.OccupiedBy == null).Any();
+        return waitingSpots.Any(x => x.Unoccupied);
     }
 
     public WaitingSpot GetNextWaitingSpot() {

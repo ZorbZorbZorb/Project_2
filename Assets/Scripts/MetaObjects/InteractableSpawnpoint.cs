@@ -14,6 +14,7 @@ public class InteractableSpawnpoint : MonoBehaviour {
     public bool Sideways;
     public bool Occupied = false;
     public double Price;
+    public Bathroom Bathroom;
 
     private void Start() {
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
@@ -24,6 +25,12 @@ public class InteractableSpawnpoint : MonoBehaviour {
         }
     }
 
+    /// <summary>This is a cheat that builds everything possible when called</summary>
+    public static void BuildAll() {
+        foreach (var spawnpoint in Spawnpoints.Where(x => !x.Occupied )) {
+            SpawnInteractablePrefab(spawnpoint);
+        }
+    }
     public static void Build(GameData gameData) {
         foreach ( int id in gameData.UnlockedPoints ) {
             // Lookup the point
@@ -68,16 +75,16 @@ public class InteractableSpawnpoint : MonoBehaviour {
         CustomerInteractable item;
         switch ( point.IType ) {
             case CustomerInteractable.InteractableType.Sink:
-                item = SpawnInteractablePrefab(Bathroom.Singleton.PrefabSink, point);
-                Bathroom.Singleton.Sinks.Items.Add(item as Sink);
+                item = SpawnInteractablePrefab(point.Bathroom.PrefabSink, point);
+                point.Bathroom.Sinks.Add(item as Sink);
                 break;
             case CustomerInteractable.InteractableType.Toilet:
-                item = SpawnInteractablePrefab(Bathroom.Singleton.PrefabToilet, point);
-                Bathroom.Singleton.Toilets.Add(item as Toilet);
+                item = SpawnInteractablePrefab(point.Bathroom.PrefabToilet, point);
+                point.Bathroom.Toilets.Add(item as Toilet);
                 break;
             case CustomerInteractable.InteractableType.Urinal:
-                item = SpawnInteractablePrefab(Bathroom.Singleton.PrefabUrinal, point);
-                Bathroom.Singleton.Urinals.Add(item as Urinal);
+                item = SpawnInteractablePrefab(point.Bathroom.PrefabUrinal, point);
+                point.Bathroom.Urinals.Add(item as Urinal);
                 break;
             case CustomerInteractable.InteractableType.Seat:
                 item = SpawnInteractablePrefab(GameController.GC.SeatPrefab, point);

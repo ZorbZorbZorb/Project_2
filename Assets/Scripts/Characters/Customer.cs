@@ -102,6 +102,7 @@ public class Customer : MonoBehaviour {
         UpdateDesperationState();
         PeeLogicUpdate();
     }
+
     #region NextAction
     public bool HasNext = false;
     public delegate void NextAction();
@@ -116,6 +117,9 @@ public class Customer : MonoBehaviour {
         Next = d;
     }
     #endregion
+
+    public Bathroom CurrentBathroom = null;
+    public Bathroom OtherBathroom = null;
     public double Funds = 0d;
     public float LastDrinkAt = -25f;
     public float DrinkInterval = 30f;
@@ -258,6 +262,8 @@ public class Customer : MonoBehaviour {
         }
 
         bool TryEnterBathroom() {
+
+
             if ( !EnterDoorway() ) {
                 MinTimeAtBarNow = MinTimeAtBar / 1.5f;
                 return false;
@@ -403,9 +409,7 @@ public class Customer : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Updates the customers desperation state and state machine
-    /// </summary>
+    /// <summary>Updates the customers desperation state and state machine</summary>
     private void UpdateDesperationState() {
         DesperationState = GetDesperationState();
         DesperationStateChangeThisUpdate = DesperationState != LastDesperationState;
@@ -486,7 +490,6 @@ public class Customer : MonoBehaviour {
     // Movement
     public Vector3 Destination;
     public List<Vector3> Navigation = new List<Vector3>();
-    [SerializeField]
     public double MoveSpeed;
 
     #region Sprites
@@ -570,8 +573,8 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
-        else if ( Bathroom.Singleton.Sinks.Line.HasOpenWaitingSpot() && !Bathroom.Singleton.Sinks.AllSinksBeingPeedIn() ) {
-            Bathroom.Singleton.Sinks.EnterLine(this);
+        else if ( CurrentBathroom.SinksLine.HasOpenWaitingSpot() ) {
+            CurrentBathroom.EnterSinkQueue(this);
         }
         else {
             ActionState = Collections.CustomerActionState.None;
@@ -689,7 +692,7 @@ public class Customer : MonoBehaviour {
             return true;
         }
         // If in doorway and first in line
-        return position == Collections.Location.Doorway && DoorwayQueue.doorwayQueue.IsNextInLine(this);
+        return position == Collections.Location.Doorway && CurrentBathroom.DoorwayQueue.IsNextInLine(this);
     }
     /// <summary>
     /// Code for if relief menu can be displayed
@@ -709,8 +712,8 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the waiting room
     public WaitingSpot MenuOptionGotoWaiting() {
-        if ( WaitingRoom.waitingRoom.HasOpenWaitingSpot() ) {
-            WaitingSpot waitingSpot = WaitingRoom.waitingRoom.GetNextWaitingSpot();
+        if ( CurrentBathroom.WaitingRoom.HasOpenWaitingSpot() ) {
+            WaitingSpot waitingSpot = CurrentBathroom.WaitingRoom.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.WaitingRoom;
             return waitingSpot;
@@ -722,22 +725,22 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
-        if ( Bathroom.Singleton.HasToiletAvailable ) {
-            EnterRelief(Bathroom.Singleton.GetToilet());
+        if ( CurrentBathroom.HasToiletAvailable ) {
+            EnterRelief(CurrentBathroom.GetToilet());
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoUrinal() {
-        if ( Bathroom.Singleton.HasUrinalAvailable ) {
-            EnterRelief(Bathroom.Singleton.GetUrinal());
+        if ( CurrentBathroom.HasUrinalAvailable ) {
+            EnterRelief(CurrentBathroom.GetUrinal());
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoSink() {
-        if ( Bathroom.Singleton.HasSinkForRelief ) {
-            EnterRelief(Bathroom.Singleton.Sinks.FirstUnoccupiedSink());
+        if ( CurrentBathroom.HasSinkForRelief ) {
+            EnterRelief(CurrentBathroom.GetSink());
             return true;
         }
         return false;
@@ -771,15 +774,19 @@ public class Customer : MonoBehaviour {
     }
     // Goes to the doorway queue
     public bool EnterDoorway() {
-        if ( DoorwayQueue.doorwayQueue.HasOpenWaitingSpot() ) {
+        CurrentBathroom = Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
+        OtherBathroom = Gender == 'm' ? Bathroom.BathroomF : Bathroom.BathroomM;
+
+        if ( CurrentBathroom.DoorwayQueue.HasOpenWaitingSpot() ) {
             // Makes customer hold on for a while longer when entering doorway.
             bladder.ResetLossOfControlTime();
-            WaitingSpot waitingSpot = DoorwayQueue.doorwayQueue.GetNextWaitingSpot();
+            WaitingSpot waitingSpot = CurrentBathroom.DoorwayQueue.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
             position = Collections.Location.Doorway;
             CanReenterBathroom = false;
             return true;
         }
+        #warning Hey, this is where you add the code to make them use the opposite sex's restroom
         // If queue in doorway is full this counts as instantly getting sent away.
         else {
             CanReenterBathroom = false;
