@@ -154,8 +154,8 @@ public class GameController : MonoBehaviour {
 
     public bool DisplayedNightStartSplashScreen = false;
 
-    [SerializeField] public Seat SeatPrefab;
-    [SerializeField] public BarTable TablePrefab;
+    public Seat SeatPrefab;
+    public BarTable TablePrefab;
 
     // Unique Id System
     static private int uid = 0;
@@ -246,8 +246,8 @@ public class GameController : MonoBehaviour {
     }
 
     #region BuildMenu
-    [SerializeField] public bool InBuildMenu;
-    [SerializeField] public BuildMenu BuildMenu;
+    public bool InBuildMenu;
+    public BuildMenu BuildMenu;
     public void StartBuildMode() {
         InBuildMenu = true;
         CanPause = false;
@@ -264,7 +264,6 @@ public class GameController : MonoBehaviour {
     #endregion
 
     #region PauseMenu
-    [SerializeField]
     public PauseMenu PauseMenu;
     private static bool gamePaused = false;
     public static bool GamePaused {
@@ -445,13 +444,13 @@ public class GameController : MonoBehaviour {
     private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Collections.Location.Bar);
     private IEnumerable<Customer> CustomersInBathroom() => customers
         .Where(x => x.position == Collections.Location.Doorway || x.position == Collections.Location.Relief || x.position == Collections.Location.WaitingRoom);
-    private int GetCustomersAboutToWetCount() {
-        return customers
-            .Where(x =>
-                x.bladder.Percentage > 1d ||
-                x.bladder.LosingControl)
-            .Count();
-    }
+    //private int GetCustomersAboutToWetCount() {
+    //    return customers
+    //        .Where(x =>
+    //            x.bladder.Percentage > 1d ||
+    //            x.bladder.LosingControl)
+    //        .Count();
+    //}
     //private int GetReliefAvailableCount() {
     //    return Bathroom.Singleton.Toilets.Count() + Bathroom.Singleton.Urinals.Count() + Bathroom.Singleton.Sinks.Items.Count();
     //}

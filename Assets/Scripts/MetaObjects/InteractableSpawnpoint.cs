@@ -7,7 +7,7 @@ using UnityEngine;
 
 [Serializable]
 public class InteractableSpawnpoint : MonoBehaviour {
-    [SerializeField] public static List<InteractableSpawnpoint> Spawnpoints = new List<InteractableSpawnpoint>();
+    public static List<InteractableSpawnpoint> Spawnpoints = new List<InteractableSpawnpoint>();
 
     public int Id;
     public CustomerInteractable.InteractableType IType;
