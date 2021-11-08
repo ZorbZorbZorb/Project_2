@@ -77,10 +77,16 @@ public class Bathroom : MonoBehaviour {
         // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
         doorwayQueue.Bathroom = this;
         waitingRoom.Bathroom = this;
-        Spawnpoints.ForEach(x => x.Bathroom = this);
         doorwayQueue.waitingSpots.ForEach(x => x.SpotBathroom = this);
         waitingRoom.WaitingSpots.ForEach(x => x.SpotBathroom = this);
         SinksLine.Items.ForEach(x => x.SpotBathroom = this);
+        // I've messed this up in the past, so drop an error in the console if I forget to change the list size for spawnpoints
+        if (Spawnpoints.Any(x => x == null)) {
+            Debug.LogError("Spawnpoint was null. Is list size too large or was spawnpoint deleted?");
+        }
+        Spawnpoints.Where(x => x != null)
+            .ToList()
+            .ForEach(x => x.Bathroom = this);
 
         // If this is the first bathroom to initialize, set both singletons to this (incase unisex)
         if ( BathroomM == null && BathroomF == null ) {
