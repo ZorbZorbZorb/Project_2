@@ -565,6 +565,7 @@ public class GameController : MonoBehaviour {
         return newCustomer;
     }
 
+    [Obsolete("Duplicate of GameController::SpawnCustomerInBar(bool)")]
     public Customer CreateCustomer() {
         Customer newCustomer = Instantiate(templateCustomer);
         newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
