@@ -536,8 +536,8 @@ public class GameController : MonoBehaviour {
     }
 
     public Customer SpawnCustomerInBar(bool desperate) {
-        Customer newCustomer = Instantiate(templateCustomer);
-        newCustomer.Gender = 'f'; //Random.Range(0, 3) == 0 ? 'm' : 'f';
+        Customer newCustomer = Instantiate(templateCustomer, Collections.OffScreenTop, templateCustomer.transform.rotation);
+        newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
         if ( desperate ) {
             newCustomer.SetupCustomer(80, 100);
@@ -566,7 +566,7 @@ public class GameController : MonoBehaviour {
 
     [Obsolete("Duplicate of GameController::SpawnCustomerInBar(bool)")]
     public Customer CreateCustomer() {
-        Customer newCustomer = Instantiate(templateCustomer);
+        Customer newCustomer = Instantiate(templateCustomer, Collections.OffScreenTop, templateCustomer.transform.rotation);
         newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
 
