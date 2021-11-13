@@ -444,19 +444,6 @@ public class GameController : MonoBehaviour {
     private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Collections.Location.Bar);
     private IEnumerable<Customer> CustomersInBathroom() => customers
         .Where(x => x.position == Collections.Location.Doorway || x.position == Collections.Location.Relief || x.position == Collections.Location.WaitingRoom);
-    //private int GetCustomersAboutToWetCount() {
-    //    return customers
-    //        .Where(x =>
-    //            x.bladder.Percentage > 1d ||
-    //            x.bladder.LosingControl)
-    //        .Count();
-    //}
-    //private int GetReliefAvailableCount() {
-    //    return Bathroom.Singleton.Toilets.Count() + Bathroom.Singleton.Urinals.Count() + Bathroom.Singleton.Sinks.Items.Count();
-    //}
-    //private int GetCustomersPeeingCount() {
-    //    return customers.Where(x => x.bladder.Emptying).Count();
-    //}
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
@@ -512,19 +499,6 @@ public class GameController : MonoBehaviour {
             bool spawnNow = Random.Range(0, 6) == 0;
             if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
                 ticksSinceLastSpawn = 0;
-                //int customersDesperateCount = CustomersInBarDesperate();
-                //int customersNotDesperateCount = CustomersInBarNotDesperate();
-
-                //int reliefCount = GetReliefAvailableCount();
-                //int aboutToWetCount = GetCustomersAboutToWetCount();
-                //int customersPeeing = GetCustomersPeeingCount();
-                //if ( aboutToWetCount + customersPeeing <= reliefCount ) {
-                //    Customer customer = SpawnCustomerInBar(desperate: true);
-                //}
-                //else {
-                //    Customer customer = SpawnCustomerInBar(desperate: false);
-                //}
-
                 Customer customer = SpawnCustomerInBar(desperate: false);
             }
         }
@@ -583,7 +557,6 @@ public class GameController : MonoBehaviour {
             min = 85;
             max = 98;
         }
-        //Debug.LogWarning($"{min}, {max}");
 
         newCustomer.SetupCustomer(min, max);
         Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
@@ -591,8 +564,6 @@ public class GameController : MonoBehaviour {
 
         // If customer enters bar and needs to go badly try to enter bathroom right away
         bool enteredDoorway = false;
-        //Debug.Log($"Customer {newCustomer.UID} {( newCustomer.FeelsNeedToGo ? "does" : "does-not" )} need to go and is at state {newCustomer.DesperationState}");
-        //Debug.Log($"{newCustomer.bladder.FeltNeed}");
         if ( newCustomer.WantsToEnterBathroom() &&
             newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
