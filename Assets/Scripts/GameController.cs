@@ -32,29 +32,7 @@ public class GameController : MonoBehaviour {
 
         // Load or create game data
         if ( CreateNewSaveData ) {
-            gameData = new GameData();
-
-            // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
-            gameData.UnlockedPoints.Add(
-                InteractableSpawnpoint.Spawnpoints
-                .First(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
-                .Id);
-            gameData.UnlockedPoints.Add(
-                InteractableSpawnpoint.Spawnpoints
-                .First(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
-                .Id);
-            gameData.UnlockedPoints.Add(
-                InteractableSpawnpoint.Spawnpoints
-                .First(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
-                .Id);
-            Bar.Singleton.Tables
-                .First(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
-                .SeatSpawnpoints
-                .ToList()
-                .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
-
-            CreateNewSaveData = false;
-            SaveNightData();
+            CreateAndSaveNewSaveData();
         }
         else {
             LoadNightData();
@@ -78,6 +56,33 @@ public class GameController : MonoBehaviour {
             ReadyToStartNight = true;
         }
     }
+
+    private void CreateAndSaveNewSaveData() {
+        gameData = new GameData();
+
+        // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
+        gameData.UnlockedPoints.Add(
+            InteractableSpawnpoint.Spawnpoints
+            .First(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
+            .Id);
+        gameData.UnlockedPoints.Add(
+            InteractableSpawnpoint.Spawnpoints
+            .First(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
+            .Id);
+        gameData.UnlockedPoints.Add(
+            InteractableSpawnpoint.Spawnpoints
+            .First(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
+            .Id);
+        Bar.Singleton.Tables
+            .First(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
+            .SeatSpawnpoints
+            .ToList()
+            .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
+
+        CreateNewSaveData = false;
+        SaveNightData();
+    }
+
     void Update() {
         if ( DebugBuildAll ) {
             InteractableSpawnpoint.BuildAll();
