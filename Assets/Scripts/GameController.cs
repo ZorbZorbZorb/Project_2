@@ -58,28 +58,15 @@ public class GameController : MonoBehaviour {
     }
 
     private void CreateAndSaveNewSaveData() {
+        // Make a new game data
+        CreateNewSaveData = false;
         gameData = new GameData();
-
-        // Add two seats, one sink, one toilet, and one urinal to the unlocked items list
-        gameData.UnlockedPoints.Add(
-            InteractableSpawnpoint.Spawnpoints
-            .First(x => x.IType == CustomerInteractable.InteractableType.Sink && !x.Occupied)
-            .Id);
-        gameData.UnlockedPoints.Add(
-            InteractableSpawnpoint.Spawnpoints
-            .First(x => x.IType == CustomerInteractable.InteractableType.Toilet && !x.Occupied)
-            .Id);
-        gameData.UnlockedPoints.Add(
-            InteractableSpawnpoint.Spawnpoints
-            .First(x => x.IType == CustomerInteractable.InteractableType.Urinal && !x.Occupied)
-            .Id);
-        Bar.Singleton.Tables
-            .First(x => x.SeatSpawnpoints.Where(y => !y.Occupied).Count() == 2)
-            .SeatSpawnpoints
+        // Add all points that start unlocked
+        InteractableSpawnpoint.Spawnpoints
+            .Where(x => x.StartsUnlocked)
             .ToList()
             .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
-
-        CreateNewSaveData = false;
+        // Save the new data
         SaveNightData();
     }
 
@@ -163,8 +150,8 @@ public class GameController : MonoBehaviour {
     public BarTable TablePrefab;
 
     // Unique Id System
-    static private int uid = 0;
-    static public int GetUid() => uid++;
+    private static int uid = 0;
+    public static int GetUid() => uid++;
 
     public float runTime = 0f;
     public int timeTicksElapsed = 0;
@@ -415,7 +402,7 @@ public class GameController : MonoBehaviour {
         Customer firstCustomer = CreateCustomer();
         firstCustomer.Active = true;
 
-        if (DebugSpawnOneCustomerOnly) {
+        if ( DebugSpawnOneCustomerOnly ) {
             DebugSpawnOneCustomerOnly = false;
             SpawningEnabled = false;
         }
@@ -479,7 +466,7 @@ public class GameController : MonoBehaviour {
             .Count();
 
         // End the game if too many seats are soiled
-        if ( maxCustomers < (Bar.Singleton.Seats.Count / 2) ) {
+        if ( maxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
             if ( !DebugNoLose ) {
                 GameEnd = true;
                 GameLost = true;

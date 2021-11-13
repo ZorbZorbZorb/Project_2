@@ -14,6 +14,7 @@ public class InteractableSpawnpoint : MonoBehaviour {
     public bool Sideways;
     public bool Occupied = false;
     public double Price;
+    public bool StartsUnlocked = false;
     public Bathroom Bathroom;
 
     private void Start() {
