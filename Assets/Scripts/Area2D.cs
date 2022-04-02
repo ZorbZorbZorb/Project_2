@@ -6,8 +6,13 @@ namespace Assets.Scripts {
     public class Area2D {
         [SerializeField]
         public BoxCollider2D Area;
-        [SerializeField]
-        public (double, double) gridScale;
+        public double GridScaleX;
+        public double GridScaleY;
+        public double LengthX => Area.bounds.max.x - Area.bounds.min.x;
+        public double LengthY => Area.bounds.max.y - Area.bounds.min.y;
+        public int GridPointsX => (int)Math.Floor(LengthX / GridScaleX);
+        public int GridPointsY => (int)Math.Floor(LengthY / GridScaleY);
+
         public bool InBounds(Vector2 vector) {
             return vector.x >= Area.bounds.min.x && Area.bounds.max.x >= vector.x
                 && vector.y >= Area.bounds.min.y && Area.bounds.max.y >= vector.y;
@@ -18,11 +23,13 @@ namespace Assets.Scripts {
             return vector;
         }
         public Vector2 GetGridPosition((int, int) position) {
-            return new Vector2(Area.bounds.min.x * (float)gridScale.Item1, Area.bounds.min.y * (float)gridScale.Item2);
+
+            return new Vector2(Area.bounds.min.x + (position.Item1 * (float)GridScaleX), Area.bounds.min.y + (position.Item2 * (float)GridScaleY));
         }
         public Area2D(BoxCollider2D area) {
             Area = area;
-            gridScale = (1d, 1d);
+            GridScaleX = 1;
+            GridScaleY = 1;
         }
     }
 }
