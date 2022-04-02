@@ -1,5 +1,4 @@
 using Assets.Scripts.Objects;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Toilet : Relief {
@@ -18,14 +17,8 @@ public class Toilet : Relief {
     // TODO: This doesn't need to be an on update. I was just lazy.
     private void Update() {
         // Open or close the stall door
-        if (OccupiedBy != null && !doorClosed && OccupiedBy.AtDestination) {
-            AltSRenderer.sprite = Collections.spriteStallClosed;
-            doorClosed = true;
-        }
-        else if(doorClosed && OccupiedBy == null) {
-            AltSRenderer.sprite = Collections.spriteStallOpened;
-            doorClosed = false;
-        }
+        doorClosed = OccupiedBy != null && OccupiedBy.AtDestination;
+        AltSRenderer.sprite = doorClosed ? Collections.spriteStallClosed : Collections.spriteStallOpened;
     }
 
     private void OnMouseOver() {
