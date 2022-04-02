@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Assets.Scripts.Objects;
+using Assets.Scripts;
 
 public class Bar : MonoBehaviour {
     public static Bar Singleton = null;
+    
+    [SerializeField]
+    public Area2D Area;
 
     [SerializeField]
     public static double DrinkCost;

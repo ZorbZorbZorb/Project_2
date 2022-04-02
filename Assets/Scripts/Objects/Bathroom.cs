@@ -10,7 +10,9 @@ public class Bathroom : MonoBehaviour {
     public bool ThisBathroomIsMensRoom = true;
     public static Bathroom BathroomM;
     public static Bathroom BathroomF;
-
+    public Area2D BathroomMArea;
+    public Area2D BathroomFArea;
+    
     public Toilet PrefabToilet;
     public Urinal PrefabUrinal;
     public Sink PrefabSink;
