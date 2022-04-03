@@ -50,7 +50,7 @@ public class Bathroom : MonoBehaviour {
         return Sinks.First(x => x.OccupiedBy == null);
     }
     public void EnterSinkQueue(Customer customer) {
-        if ( customer.Occupying.IType == CustomerInteractable.InteractableType.Sink ) {
+        if ( customer.Occupying.IType == InteractableType.Sink ) {
             Sink sink = (Sink)customer.Occupying;
             customer.UseInteractable(sink);
             sink.UseForWash(customer);

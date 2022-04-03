@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Objects;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,23 @@ public class GameController : MonoBehaviour {
 
         // Construct the bathroom
         InteractableSpawnpoint.Build(gameData);
+
+        // Debugging shenanigans
+        var area = Bathroom.BathroomM.BathroomMArea;
+        area.GridScaleY = 140;
+        area.GridScaleX = 140;
+        var point = InteractableSpawnpoint.Spawnpoints.First(x => x.IType == InteractableType.Toilet);
+        var prefabs = new Relief[] { Bathroom.BathroomF.PrefabSink, Bathroom.BathroomF.PrefabToilet, Bathroom.BathroomF.PrefabUrinal };
+        for ( int i = 0; i < area.GridPointsX; i++ ) {
+            for ( int j = 0; j < area.GridPointsY; j++ ) {
+                var position = area.GetGridPosition((i, j));
+                var vector = new Vector3(position.x, position.y);
+                var prefab = Instantiate(prefabs.Random(), vector, point.transform.rotation);
+                prefab.Sideways = RandomExtensions.Bool();
+                
+            }
+        }
+        
 
         // Cheat construct bathroom if toggled when starting
         if ( DebugBuildAll ) {

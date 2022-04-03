@@ -10,7 +10,7 @@ public class InteractableSpawnpoint : MonoBehaviour {
     public static List<InteractableSpawnpoint> Spawnpoints = new List<InteractableSpawnpoint>();
 
     public int Id;
-    public CustomerInteractable.InteractableType IType;
+    public InteractableType IType;
     public bool Sideways;
     public bool Occupied = false;
     public double Price;
@@ -75,19 +75,19 @@ public class InteractableSpawnpoint : MonoBehaviour {
     public static CustomerInteractable SpawnInteractablePrefab(InteractableSpawnpoint point) {
         CustomerInteractable item;
         switch ( point.IType ) {
-            case CustomerInteractable.InteractableType.Sink:
+            case InteractableType.Sink:
                 item = SpawnInteractablePrefab(point.Bathroom.PrefabSink, point);
                 point.Bathroom.Sinks.Add(item as Sink);
                 break;
-            case CustomerInteractable.InteractableType.Toilet:
+            case InteractableType.Toilet:
                 item = SpawnInteractablePrefab(point.Bathroom.PrefabToilet, point);
                 point.Bathroom.Toilets.Add(item as Toilet);
                 break;
-            case CustomerInteractable.InteractableType.Urinal:
+            case InteractableType.Urinal:
                 item = SpawnInteractablePrefab(point.Bathroom.PrefabUrinal, point);
                 point.Bathroom.Urinals.Add(item as Urinal);
                 break;
-            case CustomerInteractable.InteractableType.Seat:
+            case InteractableType.Seat:
                 item = SpawnInteractablePrefab(GameController.GC.SeatPrefab, point);
                 Bar.Singleton.Seats.Add(item as Seat);
                 break;

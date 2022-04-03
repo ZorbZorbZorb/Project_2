@@ -16,8 +16,8 @@ namespace Assets.Scripts.Characters {
         private readonly Dictionary<CustomerDesperationState, Sprite> DesperationSeatSpriteLookup;
         private readonly Dictionary<CustomerActionState, Sprite> PantsSpriteLookup;
         private readonly Dictionary<CustomerActionState, Sprite> PantsSidewaysSpriteLookup;
-        private readonly Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSpriteLookup;
-        private readonly Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSidewaysSpriteLookup;
+        private readonly Dictionary<InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSpriteLookup;
+        private readonly Dictionary<InteractableType, Dictionary<CustomerActionState, Sprite>> ActionStateSidewaysSpriteLookup;
 
         public Sprite GetSprite<T>(CustomerDesperationState desperationState, CustomerActionState actionState, T interactable, bool forceStandingSprite)
             where T : CustomerInteractable {
@@ -25,7 +25,7 @@ namespace Assets.Scripts.Characters {
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
                 // The only time action state can be none while interacting with something where you aren't forcing standing is seated
                 //   on a stool so do we only need one of these checks in the below if?
-                return interactable.IType == CustomerInteractable.InteractableType.Seat && ( actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting )
+                return interactable.IType == InteractableType.Seat && ( actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting )
                     ? DesperationSeatSpriteLookup[desperationState]
                     : GetActionSprite(actionState, interactable);
             }
@@ -90,24 +90,24 @@ namespace Assets.Scripts.Characters {
                 { CustomerActionState.PantsDown, Resources.Load<Sprite>($"{root}/act/pants_down_side") },
                 { CustomerActionState.PantsUp, Resources.Load<Sprite>($"{root}/act/pants_up_side") }
             };
-            ActionStateSpriteLookup = new Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>>();
-            ActionStateSidewaysSpriteLookup = new Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, Sprite>>();
+            ActionStateSpriteLookup = new Dictionary<InteractableType, Dictionary<CustomerActionState, Sprite>>();
+            ActionStateSidewaysSpriteLookup = new Dictionary<InteractableType, Dictionary<CustomerActionState, Sprite>>();
 
             // Front facing sink
-            ActionStateSpriteLookup.Add(CustomerInteractable.InteractableType.Sink, new Dictionary<CustomerActionState, Sprite>() {
+            ActionStateSpriteLookup.Add(InteractableType.Sink, new Dictionary<CustomerActionState, Sprite>() {
                 { CustomerActionState.Peeing, Resources.Load<Sprite>($"{root}/act/peeing_sink") },
                 {CustomerActionState.WashingHands, Resources.Load<Sprite>($"{root}/act/wash") }
             });
             // Front facing toilet
-            ActionStateSpriteLookup.Add(CustomerInteractable.InteractableType.Toilet, new Dictionary<CustomerActionState, Sprite>() {
+            ActionStateSpriteLookup.Add(InteractableType.Toilet, new Dictionary<CustomerActionState, Sprite>() {
                 { CustomerActionState.Peeing, Resources.Load<Sprite>($"{root}/act/peeing_toilet") },
             });
             // Front facing urinal
-            ActionStateSpriteLookup.Add(CustomerInteractable.InteractableType.Urinal, new Dictionary<CustomerActionState, Sprite>() {
+            ActionStateSpriteLookup.Add(InteractableType.Urinal, new Dictionary<CustomerActionState, Sprite>() {
                 { CustomerActionState.Peeing, Resources.Load<Sprite>($"{root}/act/peeing_urinal") },
             });
             // Side facing urinal
-            ActionStateSidewaysSpriteLookup.Add(CustomerInteractable.InteractableType.Urinal, new Dictionary<CustomerActionState, Sprite>() {
+            ActionStateSidewaysSpriteLookup.Add(InteractableType.Urinal, new Dictionary<CustomerActionState, Sprite>() {
                 { CustomerActionState.Peeing, Resources.Load<Sprite>($"{root}/act/peeing_urinal_side") },
             });
         }

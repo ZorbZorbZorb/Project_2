@@ -65,16 +65,16 @@ namespace Assets.Scripts {
 
                 // Change the sprite to match what could be built there
                 switch ( point.IType ) {
-                    case CustomerInteractable.InteractableType.Sink:
+                    case InteractableType.Sink:
                         renderer.sprite = Collections.spriteSink;
                         break;
-                    case CustomerInteractable.InteractableType.Toilet:
+                    case InteractableType.Toilet:
                         renderer.sprite = Collections.spriteToilet;
                         break;
-                    case CustomerInteractable.InteractableType.Urinal:
+                    case InteractableType.Urinal:
                         renderer.sprite = point.Sideways ? Collections.spriteUrinalSideways : Collections.spriteUrinal;
                         break;
-                    case CustomerInteractable.InteractableType.Seat:
+                    case InteractableType.Seat:
                         renderer.sprite = Collections.SpriteStoolNormal;
                         break;
                     default:

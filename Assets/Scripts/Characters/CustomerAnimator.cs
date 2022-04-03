@@ -104,14 +104,14 @@ namespace Assets.Scripts.Characters {
         private static readonly Dictionary<CustomerDesperationState, string> DesperationSeatAnimationClipLookup;
         private static readonly Dictionary<CustomerActionState, string> PantsAnimationClipLookup;
         private static readonly Dictionary<CustomerActionState, string> PantsSidewaysAnimationClipLookup;
-        private static readonly Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, string>> ActionStateAnimationClipLookup;
-        private static readonly Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, string>> ActionStateSidewaysAnimationClipLookup;
+        private static readonly Dictionary<InteractableType, Dictionary<CustomerActionState, string>> ActionStateAnimationClipLookup;
+        private static readonly Dictionary<InteractableType, Dictionary<CustomerActionState, string>> ActionStateSidewaysAnimationClipLookup;
 
         public static string GetAnimation<T>(CustomerDesperationState desperationState, CustomerActionState actionState, T interactable, bool forceStandingSprite)
             where T : CustomerInteractable {
 
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
-                if ( interactable.IType == CustomerInteractable.InteractableType.Seat && ( actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting ) ) {
+                if ( interactable.IType == InteractableType.Seat && ( actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting ) ) {
                     return DesperationSeatAnimationClipLookup[desperationState];
                 }
                 else {
@@ -163,24 +163,24 @@ namespace Assets.Scripts.Characters {
                 { CustomerActionState.PantsDown, "pants_down_side" },
                 { CustomerActionState.PantsUp, "pants_up_side"}
             };
-            ActionStateAnimationClipLookup = new Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, string>>();
-            ActionStateSidewaysAnimationClipLookup = new Dictionary<CustomerInteractable.InteractableType, Dictionary<CustomerActionState, string>>();
+            ActionStateAnimationClipLookup = new Dictionary<InteractableType, Dictionary<CustomerActionState, string>>();
+            ActionStateSidewaysAnimationClipLookup = new Dictionary<InteractableType, Dictionary<CustomerActionState, string>>();
 
             // Front facing sink
-            ActionStateAnimationClipLookup.Add(CustomerInteractable.InteractableType.Sink, new Dictionary<CustomerActionState, string>() {
+            ActionStateAnimationClipLookup.Add(InteractableType.Sink, new Dictionary<CustomerActionState, string>() {
                 { CustomerActionState.Peeing, "peeing_sink"},
                 {CustomerActionState.WashingHands, "wash"}
             });
             // Front facing toilet
-            ActionStateAnimationClipLookup.Add(CustomerInteractable.InteractableType.Toilet, new Dictionary<CustomerActionState, string>() {
+            ActionStateAnimationClipLookup.Add(InteractableType.Toilet, new Dictionary<CustomerActionState, string>() {
                 { CustomerActionState.Peeing, "peeing_toilet" },
             });
             // Front facing urinal
-            ActionStateAnimationClipLookup.Add(CustomerInteractable.InteractableType.Urinal, new Dictionary<CustomerActionState, string>() {
+            ActionStateAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerActionState, string>() {
                 { CustomerActionState.Peeing, "peeing_urinal" },
             });
             // Side facing urinal
-            ActionStateSidewaysAnimationClipLookup.Add(CustomerInteractable.InteractableType.Urinal, new Dictionary<CustomerActionState, string>() {
+            ActionStateSidewaysAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerActionState, string>() {
                 { CustomerActionState.Peeing, "peeing_urinal_side" },
             });
         }
