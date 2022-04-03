@@ -633,9 +633,9 @@ public class Customer : MonoBehaviour {
         }
         MoveToVector3(Gender == 'f' ? thing.CustomerPositionF : thing.CustomerPositionM);
 
+        position = thing.CustomerLocation;
         Occupying = thing;
         thing.OccupiedBy = this;
-        position = thing.CustomerLocation;
         CanWetNow = thing.CanWetHere;
     }
     #endregion
