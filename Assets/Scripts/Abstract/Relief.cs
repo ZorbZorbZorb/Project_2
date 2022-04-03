@@ -10,7 +10,21 @@ namespace Assets.Scripts.Objects {
         public override bool CanWetHere => false;
 
         private void Start() {
-            MainSRenderer.sprite = Sideways ? MainSpritesSideways[0] : MainSprites[0];
+            switch (Orientation) {
+                case Orientation.North:
+                    MainSRenderer.sprite = MainSprites[0];
+                    break;
+                case Orientation.South:
+                    throw new System.NotImplementedException("Relief :: Start() -- South facing sprites are not implemented.");
+                case Orientation.West:
+                    MainSRenderer.sprite = MainSpritesSideways[0];
+                    break;
+                case Orientation.East:
+                    MainSRenderer.sprite = MainSpritesSideways[0];
+                    var eulerAngles = MainSRenderer.transform.localRotation.eulerAngles;
+                    transform.localRotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + 180, eulerAngles.z);
+                    break;
+            }
         }
     }
 }

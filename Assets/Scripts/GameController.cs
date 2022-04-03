@@ -54,8 +54,7 @@ public class GameController : MonoBehaviour {
                 var position = area.GetGridPosition((i, j));
                 var vector = new Vector3(position.x, position.y);
                 var prefab = Instantiate(prefabs.Random(), vector, point.transform.rotation);
-                prefab.Sideways = RandomExtensions.Bool();
-                
+                prefab.Orientation = new Orientation[] { Orientation.North, Orientation.East, Orientation.West }.Random();
             }
         }
         

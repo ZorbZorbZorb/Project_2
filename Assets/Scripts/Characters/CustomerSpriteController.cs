@@ -38,10 +38,14 @@ namespace Assets.Scripts.Characters {
             switch ( state ) {
                 case CustomerActionState.PantsDown:
                 case CustomerActionState.PantsUp:
-                    lookup = interactable.Sideways ? PantsSidewaysSpriteLookup : PantsSpriteLookup;
+                    lookup = interactable.Alignment == Alignment.Vertical 
+                        ? PantsSpriteLookup 
+                        : PantsSidewaysSpriteLookup;
                     break;
                 default:
-                    lookup = interactable.Sideways ? ActionStateSidewaysSpriteLookup[interactable.IType] : ActionStateSpriteLookup[interactable.IType];
+                    lookup = interactable.Alignment == Alignment.Vertical
+                        ? ActionStateSpriteLookup[interactable.IType]
+                        : ActionStateSidewaysSpriteLookup[interactable.IType];
                     break;
             }
 

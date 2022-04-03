@@ -64,7 +64,7 @@ public class InteractableSpawnpoint : MonoBehaviour {
         }
 
         // Tell the relif it's sideways and call it's sprite lookup constructor
-        relief.Sideways = point.Sideways;
+        relief.Orientation = point.Sideways ? Orientation.East : Orientation.North;
 
         // Mark spawn point as used so next spawn doesn't try to use it and stack relief objects.
         point.Occupied = true;

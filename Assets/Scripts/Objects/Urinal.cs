@@ -1,16 +1,43 @@
 using Assets.Scripts.Objects;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Urinal : Relief {
     public override InteractableType IType => InteractableType.Urinal;
-    public override Vector3 CustomerPositionF => Sideways 
-        ? transform.position + new Vector3() { x = -40, y = 25, z = -1.1f } 
-        : transform.position + new Vector3() { x = 0, y = -5, z = -1 };
-    public override Vector3 CustomerPositionM => Sideways 
-        ? transform.position + new Vector3() { x = -45, y = 15, z = -1.1f }
-        : transform.position + new Vector3() { x = 0, y = -10, z = -1 };
+    public override Vector3 CustomerPositionF { 
+        get { 
+            switch (Orientation) {
+                case Orientation.North:
+                    return transform.position + new Vector3() { x = 0, y = -5, z = -1 };
+                case Orientation.South:
+                    throw new NotImplementedException();
+                case Orientation.West:
+                    return transform.position + new Vector3() { x = 40, y = 25, z = -1.1f };
+                case Orientation.East:
+                    return transform.position + new Vector3() { x = -40, y = 25, z = -1.1f };
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+    }
+    public override Vector3 CustomerPositionM {
+        get {
+            switch ( Orientation ) {
+                case Orientation.North:
+                    return transform.position + new Vector3() { x = 0, y = -10, z = -1 };
+                case Orientation.South:
+                    throw new NotImplementedException();
+                case Orientation.West:
+                    return transform.position + new Vector3() { x = 45, y = 15, z = -1.1f };
+                case Orientation.East:
+                    return transform.position + new Vector3() { x = -45, y = 15, z = -1.1f };
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+    }
     public override ReliefType RType => ReliefType.Urinal;
     public override bool HidesCustomer => false;
     public override string DisplayName => "Urinal";

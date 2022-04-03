@@ -24,14 +24,20 @@ namespace Assets.Scripts.Objects {
         East,
         West,
     }
+    public enum Alignment {
+        Vertical,
+        Horizontal
+    }
     public abstract class CustomerInteractable : MonoBehaviour {
         // TODO: There has to be a better way than having two enums with intersecting values...
         public abstract InteractableType IType { get; }
         public abstract ReliefType RType { get; }
         public virtual Vector3 CustomerPositionF { get; }
         public virtual Vector3 CustomerPositionM { get; }
-        public bool Sideways = false;
         public Orientation Orientation { get; set; }
+        public Alignment Alignment => Orientation == Orientation.North || Orientation == Orientation.South 
+            ? Alignment.Vertical 
+            : Alignment.Horizontal;
         public abstract Collections.Location CustomerLocation { get; }
         public Customer OccupiedBy;
         public abstract bool ChangesCustomerSprite { get; }
