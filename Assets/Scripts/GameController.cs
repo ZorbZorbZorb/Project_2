@@ -27,9 +27,6 @@ public class GameController : MonoBehaviour {
         PauseMenu.SetUpButtons();
         BuildMenu.SetUpButtons();
 
-        maxCustomers = Bar.Singleton.Seats.Count;
-
-        barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
         // Load or create game data
         if ( CreateNewSaveData ) {
@@ -42,12 +39,17 @@ public class GameController : MonoBehaviour {
 
         // Construct the bathroom
         InteractableSpawnpoint.Build(gameData);
+        layout.Apply();
 
         // Cheat construct bathroom if toggled when starting
         if ( DebugBuildAll ) {
             InteractableSpawnpoint.BuildAll();
             DebugBuildAll = false;
         }
+
+        // Set max customers and initialize bar time
+        maxCustomers = Bar.Singleton.Seats.Count;
+        barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
         // Start build mode if not first night
         if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
@@ -69,6 +71,9 @@ public class GameController : MonoBehaviour {
             .ForEach(x => gameData.UnlockedPoints.Add(x.Id));
         // Save the new data
         SaveNightData();
+        #warning change this in production. Creating layout static
+        string json = Resources.Load<TextAsset>(@"Configs\bathroomsDefault").text;
+        layout = Layout.FromJson(json);
     }
 
     void Update() {
@@ -143,7 +148,10 @@ public class GameController : MonoBehaviour {
     public bool SpawningEnabled = true;
     public bool CanPause = true;
     public static bool CreateNewSaveData = true;  // Hey, turn this off on build
+    
+    // Save data
     public GameData gameData;
+    public Layout layout;
 
     public bool DisplayedNightStartSplashScreen = false;
 
@@ -226,6 +234,9 @@ public class GameController : MonoBehaviour {
     }
     public void LoadNightData() {
         gameData = GameData.Import(0);
+        # warning change this in production. Should be handled by GameData.Import(0);
+        string json = Resources.Load<TextAsset>(@"Configs\bathrooms").text;
+        layout = Layout.FromJson(json);
     }
     /// <summary>
     /// Resets static properties between scene reloads
@@ -387,7 +398,6 @@ public class GameController : MonoBehaviour {
         GC.gameData.wettings++;
     }
 
-
     /// <summary>
     /// This function is called once at the start of each scene to start the night
     /// </summary>
@@ -458,46 +468,9 @@ public class GameController : MonoBehaviour {
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
-    // Debugging shenanigans
-    List<CustomerInteractable> debugs = new List<CustomerInteractable>();
 
     // Thinks about what should happen next, spawning customers
     private void Think() {
-        // Debugging shenanigans
-        var area = Bathroom.BathroomM.BathroomMArea;
-        var prefabs = new Relief[] { Bathroom.BathroomF.PrefabSink, Bathroom.BathroomF.PrefabToilet, Bathroom.BathroomF.PrefabUrinal };
-        
-        string json = Resources.Load<TextAsset>(@"Configs\bathrooms").text;
-        Layout layout = Layout.FromJson(json);
-        foreach ( var item in debugs ) {
-            Destroy(item.gameObject);
-        }
-        debugs.Clear();
-        foreach ( Layout.Option Option in layout.Mens.Options ) {
-            Vector2 position = area.GetGridPosition((Option.X, Option.Y));
-            Vector3 vector = new Vector3(position.x, position.y);
-            CustomerInteractable prefab;
-            if (Option.Current == null) {
-                continue;
-            }
-            switch (Option.Current) {
-                case ReliefType.Sink:
-                    prefab = Bathroom.BathroomM.PrefabSink;
-                    break;
-                case ReliefType.Toilet:
-                    prefab = Bathroom.BathroomM.PrefabToilet;
-                    break;
-                case ReliefType.Urinal:
-                    prefab = Bathroom.BathroomM.PrefabUrinal;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-            var interactable = Instantiate(prefab, vector, Quaternion.identity);
-            interactable.Orientation = Option.Orientation;
-            debugs.Add(interactable);
-        }
-
         // Update max seating in bar
         maxCustomers = Bar.Singleton.Seats
             .Where(x => !x.IsSoiled)

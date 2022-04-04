@@ -40,6 +40,25 @@ public class Bathroom : MonoBehaviour {
     public bool HasSinkForWash { get; private set; }
     public bool HasSinkForAny { get; private set; }
 
+    /// <summary>
+    /// Adds the provided interactable to the room and handles rigging it up for use by customers
+    /// </summary>
+    /// <param name="interactable">interactable to add to this room</param>
+    public void AddInteractable(CustomerInteractable interactable) {
+        switch ( interactable.IType ) {
+            case InteractableType.Sink:
+                Sinks.Add(interactable as Sink);
+                break;
+            case InteractableType.Toilet:
+                Toilets.Add(interactable as Toilet);
+                break;
+            case InteractableType.Urinal:
+                Urinals.Add(interactable as Urinal);
+                break;
+            default:
+                throw new NotImplementedException($"Type {interactable.IType} is not supported.");
+        }
+    }
     public Toilet GetToilet() {
         return Toilets.First(x => x.OccupiedBy == null);
     }
