@@ -172,8 +172,6 @@ public class GameController : MonoBehaviour {
     public int AdvanceBarTimeEveryXSeconds;
     public int AdvanceBarTimeByXMinutes;
 
-    public Customer templateCustomer;
-
     public static List<Customer> customers = new List<Customer>();
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
@@ -515,7 +513,7 @@ public class GameController : MonoBehaviour {
     }
 
     public Customer SpawnCustomerInBar(bool desperate) {
-        Customer newCustomer = Instantiate(templateCustomer, Collections.OffScreenTop, templateCustomer.transform.rotation);
+        Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Collections.OffScreenTop, Quaternion.identity);
         newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
         if ( desperate ) {
@@ -545,7 +543,7 @@ public class GameController : MonoBehaviour {
 
     [Obsolete("Duplicate of GameController::SpawnCustomerInBar(bool)")]
     public Customer CreateCustomer() {
-        Customer newCustomer = Instantiate(templateCustomer, Collections.OffScreenTop, templateCustomer.transform.rotation);
+        Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Collections.OffScreenTop, Quaternion.identity);
         newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
 
@@ -554,6 +552,7 @@ public class GameController : MonoBehaviour {
         // Customer count changes range of bladder fullness for next customer to enter
         int min = 35;
         int max = 105;
+#warning hardcoded values bad
         if ( customers.Count() > 8 ) {
             min = 10;
             max = 80;
