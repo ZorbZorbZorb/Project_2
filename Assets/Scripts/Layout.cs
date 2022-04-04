@@ -32,8 +32,7 @@ namespace Assets.Scripts {
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots and line spots
             Vector2 position = bathroom.BathroomMArea.GetGridPosition((0, -1.5));
-            Vector3 vector = new Vector3(position.x, position.y);
-            CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
+            CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, position, Quaternion.identity);
             instance.Facing = Orientation.South;
 
             // Set up BathroomF
@@ -46,8 +45,7 @@ namespace Assets.Scripts {
         static private List<CustomerInteractable> ApplyToArea(Area2D area, List<Option> options) {
             List<CustomerInteractable> results = new List<CustomerInteractable>();
             foreach ( Option option in options ) {
-                Vector2 position = area.GetGridPosition((option.X, option.Y));
-                Vector3 vector = new Vector3(position.x, position.y);
+                Vector2 vector = area.GetGridPosition((option.X, option.Y));
                 CustomerInteractable prefab;
                 if ( option.Current == null ) {
                     continue;
