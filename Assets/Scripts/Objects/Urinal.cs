@@ -8,11 +8,11 @@ public class Urinal : Relief {
     public override InteractableType IType => InteractableType.Urinal;
     public override Vector3 CustomerPositionF { 
         get { 
-            switch (Orientation) {
+            switch (Facing) {
                 case Orientation.North:
-                    return transform.position + new Vector3() { x = 0, y = -5, z = -1 };
-                case Orientation.South:
                     throw new NotImplementedException();
+                case Orientation.South:
+                    return transform.position + new Vector3() { x = 0, y = -5, z = -1 };
                 case Orientation.West:
                     return transform.position + new Vector3() { x = 40, y = 25, z = -1.1f };
                 case Orientation.East:
@@ -24,11 +24,11 @@ public class Urinal : Relief {
     }
     public override Vector3 CustomerPositionM {
         get {
-            switch ( Orientation ) {
+            switch ( Facing ) {
                 case Orientation.North:
-                    return transform.position + new Vector3() { x = 0, y = -10, z = -1 };
-                case Orientation.South:
                     throw new NotImplementedException();
+                case Orientation.South:
+                    return transform.position + new Vector3() { x = 0, y = -10, z = -1 };
                 case Orientation.West:
                     return transform.position + new Vector3() { x = 45, y = 15, z = -1.1f };
                 case Orientation.East:

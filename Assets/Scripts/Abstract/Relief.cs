@@ -10,12 +10,12 @@ namespace Assets.Scripts.Objects {
         public override bool CanWetHere => false;
 
         private void Start() {
-            switch (Orientation) {
+            switch (Facing) {
                 case Orientation.North:
+                    throw new System.NotImplementedException("Relief :: Start() -- North facing sprites are not implemented.");
+                case Orientation.South:
                     MainSRenderer.sprite = MainSprites[0];
                     break;
-                case Orientation.South:
-                    throw new System.NotImplementedException("Relief :: Start() -- South facing sprites are not implemented.");
                 case Orientation.West:
                     MainSRenderer.sprite = MainSpritesSideways[0];
                     break;

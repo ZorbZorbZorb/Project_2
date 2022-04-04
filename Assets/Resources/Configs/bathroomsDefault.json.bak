@@ -4,59 +4,58 @@
 		{
 			"X":0,
 			"Y":4,
-			"Options":["Toilet"],
+			"Options":["Toilet", "Urinal"],
 			"Current":"Toilet",
-			"Orientation":"North"
+			"Facing":"South"
 		},
 		{
 			"X":1,
 			"Y":4,
-			"Options":["Toilet"],
+			"Options":["Toilet", "Urinal"],
 			"Current":null,
-			"Orientation":"North"
+			"Facing":"South"
 		},
 		{
 			"X":2,
 			"Y":4,
 			"Options":["Toilet", "Urinal"],
 			"Current":null,
-			"Orientation":"North"
+			"Facing":"South"
 		},		
 		{
 			"X":3,
 			"Y":4,
-			"Options":["Toilet", "Urinal"],
+			"Options":["Toilet", "Urinal", "Sink"],
 			"Current":null,
-			"Orientation":"North"
+			"Facing":"South"
 		},
 		{
 			"X":4,
 			"Y":4,
-			"Options":["Sink", "Urinal"],
+			"Options":["Toilet", "Urinal", "Sink"],
 			"Current":null,
-			"Orientation":"North"
+			"Facing":"South"
 		},
 		{
 			"X":5,
 			"Y":4,
 			"Options":["Sink"],
 			"Current":"Sink",
-			"Orientation":"North"
+			"Facing":"South"
 		},
 		{
 			"X":5,
 			"Y":2,
 			"Options":["Urinal"],
 			"Current":"Urinal",
-			"Orientation":"East"
-		}
-		,
+			"Facing":"West"
+		},
 		{
 			"X":5,
 			"Y":0,
 			"Options":["Urinal"],
 			"Current":"Urinal",
-			"Orientation":"East"
+			"Facing":"West"
 		}
 	]
   },

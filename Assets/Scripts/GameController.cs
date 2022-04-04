@@ -27,6 +27,8 @@ public class GameController : MonoBehaviour {
         PauseMenu.SetUpButtons();
         BuildMenu.SetUpButtons();
 
+        // Load the prefabs
+        Prefabs.Load();
 
         // Load or create game data
         if ( CreateNewSaveData ) {

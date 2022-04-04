@@ -17,21 +17,31 @@ namespace Assets.Scripts {
             public int Y;
             public List<InteractableType> Options;
             public InteractableType? Current;
-            public Orientation Orientation;
+            public Orientation Facing;
         }
         public Section Mens;
         public Section Womens;
 
         public void Apply() {
             List<CustomerInteractable> instances;
-            instances = ApplyToArea(Bathroom.BathroomM.BathroomMArea, Mens.Options);
-            foreach ( var item in instances ) {
-                Bathroom.BathroomM.AddInteractable(item);
-            }
+            Bathroom bathroom;
+            
+            // Set up BathroomM
+            bathroom = Bathroom.BathroomM;
+            instances = ApplyToArea(bathroom.BathroomMArea, Mens.Options);
+            instances.ForEach(x => bathroom.AddInteractable(x));
+            // Add waiting spots and line spots
+            Vector2 position = bathroom.BathroomMArea.GetGridPosition((0, -1.5));
+            Vector3 vector = new Vector3(position.x, position.y);
+            CustomerInteractable instance = UnityEngine.Object.Instantiate(bathroom.PrefabSpot, vector, Quaternion.identity);
+            instance.Facing = Orientation.South;
+
+            // Set up BathroomF
+            bathroom = Bathroom.BathroomF;
             instances = ApplyToArea(Bathroom.BathroomF.BathroomFArea, Womens.Options);
-            foreach ( var item in instances ) {
-                Bathroom.BathroomF.AddInteractable(item);
-            }
+            instances.ForEach(x => bathroom.AddInteractable(x));
+            // Add waiting spots and line spots
+
         }
         public override string ToString() {
 
@@ -63,7 +73,7 @@ namespace Assets.Scripts {
                         throw new NotImplementedException();
                 }
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
-                instance.Orientation = option.Orientation;
+                instance.Facing = option.Facing;
                 results.Add(instance);
             }
             return results;

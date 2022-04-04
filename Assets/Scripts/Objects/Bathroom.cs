@@ -16,6 +16,7 @@ public class Bathroom : MonoBehaviour {
     public Toilet PrefabToilet;
     public Urinal PrefabUrinal;
     public Sink PrefabSink;
+    public WaitingSpot PrefabSpot;
 
     public List<InteractableSpawnpoint> Spawnpoints;
 

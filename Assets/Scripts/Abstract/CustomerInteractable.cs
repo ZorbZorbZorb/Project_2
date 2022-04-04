@@ -32,8 +32,8 @@ namespace Assets.Scripts.Objects {
         public abstract ReliefType RType { get; }
         public virtual Vector3 CustomerPositionF { get; }
         public virtual Vector3 CustomerPositionM { get; }
-        public Orientation Orientation { get; set; }
-        public Alignment Alignment => Orientation == Orientation.North || Orientation == Orientation.South 
+        public Orientation Facing { get; set; }
+        public Alignment Alignment => Facing == Orientation.North || Facing == Orientation.South 
             ? Alignment.Vertical 
             : Alignment.Horizontal;
         public abstract Collections.Location CustomerLocation { get; }

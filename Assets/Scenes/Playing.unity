@@ -495,8 +495,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 2
+  Wet: 0
 --- !u!1 &112079803
 GameObject:
   m_ObjectHideFlags: 0
@@ -822,8 +822,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 2
+  Wet: 0
 --- !u!1 &164342451
 GameObject:
   m_ObjectHideFlags: 0
@@ -1775,8 +1775,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!4 &309379262
 Transform:
   m_ObjectHideFlags: 0
@@ -2594,8 +2594,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!1 &447158260
 GameObject:
   m_ObjectHideFlags: 0
@@ -5294,8 +5294,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!1 &894812656
 GameObject:
   m_ObjectHideFlags: 0
@@ -5738,8 +5738,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!4 &941971011
 Transform:
   m_ObjectHideFlags: 0
@@ -5913,8 +5913,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!1 &981079174
 GameObject:
   m_ObjectHideFlags: 0
@@ -6166,6 +6166,7 @@ MonoBehaviour:
   PrefabToilet: {fileID: 1248710655}
   PrefabUrinal: {fileID: 1293586734}
   PrefabSink: {fileID: 364851229}
+  PrefabSpot: {fileID: 0}
   Spawnpoints: []
   Toilets: []
   Urinals: []
@@ -6175,7 +6176,7 @@ MonoBehaviour:
     - {fileID: 978614711}
     - {fileID: 1652432302}
   doorwayQueue:
-    Bathroom: {fileID: 0}
+    Bathroom: {fileID: 1013489707}
     waitingSpots:
     - {fileID: 1306932260}
     - {fileID: 1113688027}
@@ -7036,8 +7037,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 2
+  Wet: 0
 --- !u!1 &1156393446
 GameObject:
   m_ObjectHideFlags: 0
@@ -8464,8 +8465,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 2
+  Wet: 0
 --- !u!1 &1314317486
 GameObject:
   m_ObjectHideFlags: 0
@@ -9199,8 +9200,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!1 &1409330501
 GameObject:
   m_ObjectHideFlags: 0
@@ -9544,8 +9545,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 2
+  Wet: 0
 --- !u!1 &1477518642
 GameObject:
   m_ObjectHideFlags: 0
@@ -9718,8 +9719,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 2
+  Wet: 0
 --- !u!4 &1498109884
 Transform:
   m_ObjectHideFlags: 0
@@ -11156,6 +11157,7 @@ MonoBehaviour:
   PrefabToilet: {fileID: 1248710655}
   PrefabUrinal: {fileID: 1293586734}
   PrefabSink: {fileID: 364851229}
+  PrefabSpot: {fileID: 0}
   Spawnpoints:
   - {fileID: 1183636056}
   - {fileID: 55505722}
@@ -11286,8 +11288,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!1 &1658574697
 GameObject:
   m_ObjectHideFlags: 0
@@ -13839,8 +13841,8 @@ MonoBehaviour:
   AltSprites: []
   AltSpritesSideways: []
   SpotBathroom: {fileID: 0}
-  Wet: 0
   CustomerState: 3
+  Wet: 0
 --- !u!1 &2060830481
 GameObject:
   m_ObjectHideFlags: 0
