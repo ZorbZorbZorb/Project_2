@@ -43,22 +43,6 @@ public class GameController : MonoBehaviour {
         // Construct the bathroom
         InteractableSpawnpoint.Build(gameData);
 
-        // Debugging shenanigans
-        var area = Bathroom.BathroomM.BathroomMArea;
-        area.GridScaleY = 140;
-        area.GridScaleX = 140;
-        var point = InteractableSpawnpoint.Spawnpoints.First(x => x.IType == InteractableType.Toilet);
-        var prefabs = new Relief[] { Bathroom.BathroomF.PrefabSink, Bathroom.BathroomF.PrefabToilet, Bathroom.BathroomF.PrefabUrinal };
-        for ( int i = 0; i < area.GridPointsX; i++ ) {
-            for ( int j = 0; j < area.GridPointsY; j++ ) {
-                var position = area.GetGridPosition((i, j));
-                var vector = new Vector3(position.x, position.y);
-                var prefab = Instantiate(prefabs.Random(), vector, point.transform.rotation);
-                prefab.Orientation = new Orientation[] { Orientation.North, Orientation.East, Orientation.West }.Random();
-            }
-        }
-        
-
         // Cheat construct bathroom if toggled when starting
         if ( DebugBuildAll ) {
             InteractableSpawnpoint.BuildAll();
@@ -474,9 +458,46 @@ public class GameController : MonoBehaviour {
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
+    // Debugging shenanigans
+    List<CustomerInteractable> debugs = new List<CustomerInteractable>();
 
     // Thinks about what should happen next, spawning customers
     private void Think() {
+        // Debugging shenanigans
+        var area = Bathroom.BathroomM.BathroomMArea;
+        var prefabs = new Relief[] { Bathroom.BathroomF.PrefabSink, Bathroom.BathroomF.PrefabToilet, Bathroom.BathroomF.PrefabUrinal };
+        
+        string json = Resources.Load<TextAsset>(@"Configs\bathrooms").text;
+        Layout layout = Layout.FromJson(json);
+        foreach ( var item in debugs ) {
+            Destroy(item.gameObject);
+        }
+        debugs.Clear();
+        foreach ( Layout.Option Option in layout.Mens.Options ) {
+            Vector2 position = area.GetGridPosition((Option.X, Option.Y));
+            Vector3 vector = new Vector3(position.x, position.y);
+            CustomerInteractable prefab;
+            if (Option.Current == null) {
+                continue;
+            }
+            switch (Option.Current) {
+                case ReliefType.Sink:
+                    prefab = Bathroom.BathroomM.PrefabSink;
+                    break;
+                case ReliefType.Toilet:
+                    prefab = Bathroom.BathroomM.PrefabToilet;
+                    break;
+                case ReliefType.Urinal:
+                    prefab = Bathroom.BathroomM.PrefabUrinal;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            var interactable = Instantiate(prefab, vector, Quaternion.identity);
+            interactable.Orientation = Option.Orientation;
+            debugs.Add(interactable);
+        }
+
         // Update max seating in bar
         maxCustomers = Bar.Singleton.Seats
             .Where(x => !x.IsSoiled)

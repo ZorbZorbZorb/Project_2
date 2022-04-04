@@ -1,0 +1,5 @@
+- At the end of the day fixtures may break down dependent on how often they were used that night.
+  - Display a warning on them if they're used too often
+  - Sinks lower durability
+  - Sinks exempt when used to wash hands
+  - Costs money to repair or remains broken to next night

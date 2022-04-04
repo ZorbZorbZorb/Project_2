@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Area2D.cs" />
-    <Compile Include="Assets\Scripts\Enums.cs" />
+    <Compile Include="Assets\Scripts\Layout.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\NavigationKeyframe.cs" />
     <Compile Include="Assets\Scripts\Characters\Bladder.cs" />
     <Compile Include="Assets\Scripts\Abstract\Line.cs" />
@@ -129,7 +129,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Build\Project_2_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>Assets\Plugins\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.AppContext">
       <HintPath>C:\Program Files\UnityEditor\2021.1.17f1\Editor\Data\NetStandard\compat\2.0.0\shims\netstandard\System.AppContext.dll</HintPath>

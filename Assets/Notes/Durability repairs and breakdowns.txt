@@ -1,0 +1,9 @@
+- At the end of the day fixtures may break down dependent on how often they were used that night.
+  - Display a warning on them if they're used too often
+  - Sinks lower durability
+  - Sinks exempt when used to wash hands
+  - Maybe more sinks, but there are only 1-2 uses for them?
+    - Multiple uses for guys but one for girls before they break?
+	- Lower repair cost
+  - Sinks should take much longer and display a progress bar if there are  more of them
+  - Costs money to repair or remains broken to next night
