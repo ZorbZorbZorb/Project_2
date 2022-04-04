@@ -2828,8 +2828,6 @@ MonoBehaviour:
     Womens:
       Options: []
   DisplayedNightStartSplashScreen: 0
-  SeatPrefab: {fileID: 0}
-  TablePrefab: {fileID: 0}
   runTime: 0
   timeTicksElapsed: 0
   barTimeDisplay: {fileID: 248144060}
@@ -5274,7 +5272,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 981079174}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 470, y: 100, z: 0}
+  m_LocalPosition: {x: 465, y: 100, z: 0}
   m_LocalScale: {x: 100, y: 800, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5391,10 +5389,6 @@ MonoBehaviour:
     Area: {fileID: 1648521059}
     GridScaleX: 140
     GridScaleY: 140
-  PrefabToilet: {fileID: 0}
-  PrefabUrinal: {fileID: 0}
-  PrefabSink: {fileID: 0}
-  PrefabSpot: {fileID: 2264547218129535670, guid: cd626917be24b0b43bb7c1df7cc2d88d, type: 3}
   Spawnpoints: []
   Toilets: []
   Urinals: []
@@ -5436,7 +5430,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 50}
+  m_Offset: {x: 5, y: 50}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -8780,10 +8774,6 @@ MonoBehaviour:
     Area: {fileID: 1648521059}
     GridScaleX: 140
     GridScaleY: 140
-  PrefabToilet: {fileID: 0}
-  PrefabUrinal: {fileID: 0}
-  PrefabSink: {fileID: 0}
-  PrefabSpot: {fileID: 0}
   Spawnpoints:
   - {fileID: 1183636056}
   - {fileID: 55505722}
@@ -10115,7 +10105,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1825230799}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -470, y: 100, z: 0}
+  m_LocalPosition: {x: -465, y: 100, z: 0}
   m_LocalScale: {x: 100, y: 800, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

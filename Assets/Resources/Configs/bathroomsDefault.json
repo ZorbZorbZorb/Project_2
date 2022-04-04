@@ -57,6 +57,15 @@
 			"Current":"Urinal",
 			"Facing":"East"
 		}
+		
+		
+		,{
+			"X":5,
+			"Y":0,
+			"Options":["Urinal"],
+			"Current":"Urinal",
+			"Facing":"West"
+		}
 	]
   },
   "Womens": {
