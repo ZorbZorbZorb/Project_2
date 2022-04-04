@@ -42,7 +42,5 @@ public class Urinal : Relief {
     public override bool HidesCustomer => false;
     public override string DisplayName => "Urinal";
     public override bool CanBeSoiled => false;
-
     public override bool ChangesCustomerSprite => true;
-
 }

@@ -10,7 +10,6 @@ public class Sink : Relief {
     public override bool HidesCustomer => false;
     public override string DisplayName => "Sink";
     public override bool CanBeSoiled => false;
-
     public override bool ChangesCustomerSprite => true;
     public void UseForWash(Customer customer) {
         customer.UseInteractable(this);

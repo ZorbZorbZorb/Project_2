@@ -1,7 +1,4 @@
-using Assets.Scripts.Characters;
 using Assets.Scripts.Objects;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Seat : CustomerInteractable {
@@ -29,7 +26,7 @@ public class Seat : CustomerInteractable {
     }
 
     private void Update() {
-        if (OccupiedBy != null && OccupiedBy.AtDestination) {
+        if ( OccupiedBy != null && OccupiedBy.AtDestination ) {
             Renderer.enabled = false;
             return;
         }
@@ -47,8 +44,8 @@ public class Seat : CustomerInteractable {
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
-        if (customer.position != Collections.Location.Bar) {
-            foreach (Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBathroomToBar) {
+        if ( customer.position != Collections.Location.Bar ) {
+            foreach ( Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
                 customer.MoveToVector3(keyframe);
             }
         }

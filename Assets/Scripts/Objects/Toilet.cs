@@ -30,4 +30,3 @@ public class Toilet : Relief {
         AltSRenderer.color = new Color(1f, 1f, 1f, 1f);
     }
 }
-

@@ -33,7 +33,7 @@ namespace Assets.Scripts {
             // Add waiting spots and line spots
             Vector2 position = bathroom.BathroomMArea.GetGridPosition((0, -1.5));
             Vector3 vector = new Vector3(position.x, position.y);
-            CustomerInteractable instance = UnityEngine.Object.Instantiate(bathroom.PrefabSpot, vector, Quaternion.identity);
+            CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
             instance.Facing = Orientation.South;
 
             // Set up BathroomF
@@ -42,13 +42,6 @@ namespace Assets.Scripts {
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots and line spots
 
-        }
-        public override string ToString() {
-
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
-        }
-        static public Layout FromJson(string json) {
-            return JsonConvert.DeserializeObject<Layout>(json);
         }
         static private List<CustomerInteractable> ApplyToArea(Area2D area, List<Option> options) {
             List<CustomerInteractable> results = new List<CustomerInteractable>();
@@ -61,13 +54,13 @@ namespace Assets.Scripts {
                 }
                 switch ( option.Current ) {
                     case InteractableType.Sink:
-                        prefab = Bathroom.BathroomM.PrefabSink;
+                        prefab = Prefabs.PrefabSink;
                         break;
                     case InteractableType.Toilet:
-                        prefab = Bathroom.BathroomM.PrefabToilet;
+                        prefab = Prefabs.PrefabToilet;
                         break;
                     case InteractableType.Urinal:
-                        prefab = Bathroom.BathroomM.PrefabUrinal;
+                        prefab = Prefabs.PrefabUrinal;
                         break;
                     default:
                         throw new NotImplementedException();
@@ -77,6 +70,13 @@ namespace Assets.Scripts {
                 results.Add(instance);
             }
             return results;
+        }
+        public override string ToString() {
+
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
+        }
+        static public Layout FromJson(string json) {
+            return JsonConvert.DeserializeObject<Layout>(json);
         }
     }
 }

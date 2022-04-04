@@ -76,15 +76,15 @@ public class InteractableSpawnpoint : MonoBehaviour {
         CustomerInteractable item;
         switch ( point.IType ) {
             case InteractableType.Sink:
-                item = SpawnInteractablePrefab(point.Bathroom.PrefabSink, point);
+                item = SpawnInteractablePrefab(Prefabs.PrefabSink, point);
                 point.Bathroom.Sinks.Add(item as Sink);
                 break;
             case InteractableType.Toilet:
-                item = SpawnInteractablePrefab(point.Bathroom.PrefabToilet, point);
+                item = SpawnInteractablePrefab(Prefabs.PrefabToilet, point);
                 point.Bathroom.Toilets.Add(item as Toilet);
                 break;
             case InteractableType.Urinal:
-                item = SpawnInteractablePrefab(point.Bathroom.PrefabUrinal, point);
+                item = SpawnInteractablePrefab(Prefabs.PrefabUrinal, point);
                 point.Bathroom.Urinals.Add(item as Urinal);
                 break;
             case InteractableType.Seat:
