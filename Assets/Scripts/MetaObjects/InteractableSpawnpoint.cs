@@ -88,7 +88,7 @@ public class InteractableSpawnpoint : MonoBehaviour {
                 point.Bathroom.Urinals.Add(item as Urinal);
                 break;
             case InteractableType.Seat:
-                item = SpawnInteractablePrefab(GameController.GC.SeatPrefab, point);
+                item = SpawnInteractablePrefab(Prefabs.PrefabSeat, point);
                 Bar.Singleton.Seats.Add(item as Seat);
                 break;
             default:

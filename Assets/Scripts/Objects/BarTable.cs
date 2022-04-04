@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.Objects {
@@ -15,9 +12,8 @@ namespace Assets.Scripts.Objects {
             return SeatSpawnpoints.Where(x => !x.Occupied).Any();
         }
         public Seat UnlockAndSpawnSeat(InteractableSpawnpoint point) {
-            GameObject gameObject = Instantiate(GameController.GC.SeatPrefab.gameObject, point.transform.position, point.transform.rotation);
-            Seat seat = gameObject.GetComponent<Seat>();
-            Bar.Singleton.Seats.Add(seat);
+            Seat seat = Instantiate(Prefabs.PrefabSeat, point.transform.position, point.transform.rotation);
+            Seats.Add(seat);
             point.Occupied = true;
             GameController.GC.gameData.UnlockedPoints.Add(point.Id);
             return seat;

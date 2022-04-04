@@ -43,4 +43,15 @@ public class Urinal : Relief {
     public override string DisplayName => "Urinal";
     public override bool CanBeSoiled => false;
     public override bool ChangesCustomerSprite => true;
+    public new void Start() {
+        base.Start();
+        switch (Facing) {
+            case Orientation.West:
+                transform.position += new Vector3(40, 0, 0);
+                break;
+            case Orientation.East:
+                transform.position += new Vector3(-40, 0, 0);
+                break;
+        }
+    }
 }

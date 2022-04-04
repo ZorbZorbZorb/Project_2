@@ -9,7 +9,7 @@ namespace Assets.Scripts.Objects {
         // Confucius says, Man whos dick is out of pants, cannot piss in pants
         public override bool CanWetHere => false;
 
-        private void Start() {
+        public void Start() {
             switch (Facing) {
                 case Orientation.North:
                     throw new System.NotImplementedException("Relief :: Start() -- North facing sprites are not implemented.");

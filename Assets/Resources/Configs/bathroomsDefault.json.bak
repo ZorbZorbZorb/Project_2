@@ -32,7 +32,7 @@
 		{
 			"X":4,
 			"Y":4,
-			"Options":["Toilet", "Urinal", "Sink"],
+			"Options":["Urinal", "Sink"],
 			"Current":null,
 			"Facing":"South"
 		},
@@ -44,18 +44,18 @@
 			"Facing":"South"
 		},
 		{
-			"X":5,
+			"X":0,
 			"Y":2,
 			"Options":["Urinal"],
 			"Current":"Urinal",
-			"Facing":"West"
+			"Facing":"East"
 		},
 		{
-			"X":5,
+			"X":0,
 			"Y":0,
 			"Options":["Urinal"],
 			"Current":"Urinal",
-			"Facing":"West"
+			"Facing":"East"
 		}
 	]
   },

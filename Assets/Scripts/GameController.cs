@@ -157,9 +157,6 @@ public class GameController : MonoBehaviour {
 
     public bool DisplayedNightStartSplashScreen = false;
 
-    public Seat SeatPrefab;
-    public BarTable TablePrefab;
-
     // Unique Id System
     private static int uid = 0;
     public static int GetUid() => uid++;
