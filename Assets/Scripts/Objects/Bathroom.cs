@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Collections;
 
 public class Bathroom : MonoBehaviour {
     // I'm just going to follow K.I.S.S. and use two singletons for this.
@@ -51,9 +52,15 @@ public class Bathroom : MonoBehaviour {
             case InteractableType.Urinal:
                 Urinals.Add(interactable as Urinal);
                 break;
+            case InteractableType.WaitingSpot:
+                waitingRoom.WaitingSpots.Add(interactable as WaitingSpot);
+                break;
             default:
                 throw new NotImplementedException($"Type {interactable.IType} is not supported.");
         }
+    }
+    public void AddLineSpot(WaitingSpot spot) {
+        doorwayQueue.waitingSpots.Add(spot);
     }
     public Toilet GetToilet() {
         return Toilets.First(x => x.OccupiedBy == null);

@@ -13,8 +13,8 @@ public class WaitingSpot : CustomerInteractable {
     public override Collections.Location CustomerLocation => Collections.Location.WaitingRoom;
     [Obsolete("These two need to go")]
     public Collections.Location CustomerState = Collections.Location.WaitingRoom;
-    public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 100, z = 0 };
-    public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = 100, z = 0 };
+    public override Vector3 CustomerPositionF => transform.position;
+    public override Vector3 CustomerPositionM => transform.position;
     public override bool HidesCustomer => false;
     public override bool CanWetHere => true;
     public override string DisplayName => "Queuing spot";  // How Bri-ish'

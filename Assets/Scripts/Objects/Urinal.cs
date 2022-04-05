@@ -14,9 +14,9 @@ public class Urinal : Relief {
                 case Orientation.South:
                     return transform.position + new Vector3() { x = 0, y = -5, z = -1 };
                 case Orientation.West:
-                    return transform.position + new Vector3() { x = 40, y = 25, z = -1.1f };
-                case Orientation.East:
                     return transform.position + new Vector3() { x = -40, y = 25, z = -1.1f };
+                case Orientation.East:
+                    return transform.position + new Vector3() { x = 40, y = 25, z = -1.1f };
                 default:
                     throw new NotImplementedException();
             }
@@ -30,9 +30,9 @@ public class Urinal : Relief {
                 case Orientation.South:
                     return transform.position + new Vector3() { x = 0, y = -10, z = -1 };
                 case Orientation.West:
-                    return transform.position + new Vector3() { x = 45, y = 15, z = -1.1f };
-                case Orientation.East:
                     return transform.position + new Vector3() { x = -45, y = 15, z = -1.1f };
+                case Orientation.East:
+                    return transform.position + new Vector3() { x = 45, y = 15, z = -1.1f };
                 default:
                     throw new NotImplementedException();
             }

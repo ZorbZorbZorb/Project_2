@@ -52,19 +52,10 @@
 		},
 		{
 			"X":0,
-			"Y":0,
+			"Y":1,
 			"Options":["Urinal"],
 			"Current":"Urinal",
 			"Facing":"East"
-		}
-		
-		
-		,{
-			"X":5,
-			"Y":0,
-			"Options":["Urinal"],
-			"Current":"Urinal",
-			"Facing":"West"
 		}
 	]
   },

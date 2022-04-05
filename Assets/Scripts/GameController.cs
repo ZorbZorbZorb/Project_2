@@ -541,7 +541,8 @@ public class GameController : MonoBehaviour {
     [Obsolete("Duplicate of GameController::SpawnCustomerInBar(bool)")]
     public Customer CreateCustomer() {
         Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Collections.OffScreenTop, Quaternion.identity);
-        newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
+        //newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
+        newCustomer.Gender = 'm';
         customers.Add(newCustomer);
 
         newCustomer.EnteredTicksElapsed = timeTicksElapsed;
