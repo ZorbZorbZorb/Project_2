@@ -174,7 +174,7 @@ public class Customer : MonoBehaviour {
         }
 
         // If about to leave or has left
-        if ( position == Location.Outside && AtDestination && transform.position == Collections.OffScreenTop ) {
+        if ( Location == Location.Outside && AtDestination && transform.position == Collections.OffScreenTop ) {
             GC.RemoveCustomer(this);
         }
 
@@ -192,7 +192,7 @@ public class Customer : MonoBehaviour {
         }
 
         // If in bar...
-        if ( position == Location.Bar ) {
+        if ( Location == Location.Bar ) {
             ThinkAboutThingsInBar();
         }
     }
@@ -429,7 +429,7 @@ public class Customer : MonoBehaviour {
     /// position properties if available
     /// </param>
     public void MoveTo(CustomerInteractable target) {
-        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(position, target.Location);
+        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, target.Location);
         vectors.Add(Gender == 'm' ? target.CustomerPositionM : target.CustomerPositionF);
         Navigation.AddRange(vectors);
         Destination = vectors.Last();
@@ -447,7 +447,7 @@ public class Customer : MonoBehaviour {
     /// position properties if available
     /// </param>
     public void MoveTo(Location location) {
-        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(position, location);
+        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, location);
         if ( vectors.Any() ) {
             Navigation.AddRange(vectors);
             Destination = vectors.Last();
@@ -524,7 +524,7 @@ public class Customer : MonoBehaviour {
 
     // Position
     public Collections.CustomerActionState ActionState = Collections.CustomerActionState.None;
-    public Location position = Location.Bar;
+    public Location Location = Location.Bar;
     public CustomerInteractable Occupying;
 
     // Movement
@@ -604,7 +604,7 @@ public class Customer : MonoBehaviour {
         ActionState = Collections.CustomerActionState.None;
         if ( IsWet ) {
             MoveTo(Location.Outside);
-            position = Location.Outside;
+            Location = Location.Outside;
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
@@ -661,13 +661,14 @@ public class Customer : MonoBehaviour {
         if ( Occupying != null ) {
             Occupying.OccupiedBy = null;
         }
+        Location = thing.Location;
         MoveTo(thing);
         // Move the customer to the thing. Flip sprite if necessary
         if (thing.Alignment == Alignment.Horizontal) {
             SRenderer.flipX = thing.Facing == Orientation.West;
         }
 
-        position = thing.Location;
+        Location = thing.Location;
         Occupying = thing;
         thing.OccupiedBy = this;
         CanWetNow = thing.CanWetHere;
@@ -714,20 +715,10 @@ public class Customer : MonoBehaviour {
     /// </summary>
     /// <returns></returns>
     public bool CanDisplayBathroomMenu() {
-        // Cannot be wetting or wet
-        if ( IsWetting || IsWet ) {
-            return false;
-        }
-        // Must have arrived at current destination
-        if ( Destination != transform.position ) {
-            return false;
-        }
-        // If in waiting room
-        if ( position == Location.WaitingRoom ) {
-            return true;
-        }
-        // If in doorway and first in line
-        return position == Location.Doorway && CurrentBathroom.doorwayQueue.IsNextInLine(this);
+        bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
+        bool firstInLine = CurrentBathroom != null && CurrentBathroom.doorwayQueue.IsNextInLine(this);
+        bool wet = IsWet || IsWetting;
+        return AtDestination && !wet && ( inBathroom || firstInLine );
     }
     /// <summary>
     /// Code for if relief menu can be displayed
@@ -736,7 +727,6 @@ public class Customer : MonoBehaviour {
     public bool CanDisplayReliefMenu() {
         return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && ( ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink );
     }
-
     #endregion
 
     #region MenuActions
@@ -750,7 +740,7 @@ public class Customer : MonoBehaviour {
         if ( CurrentBathroom.waitingRoom.HasOpenWaitingSpot() ) {
             WaitingSpot waitingSpot = CurrentBathroom.waitingRoom.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
-            position = Location.WaitingRoom;
+            Location = CurrentBathroom.Location;
             return waitingSpot;
         }
         else {
@@ -803,7 +793,6 @@ public class Customer : MonoBehaviour {
     #region CustomerPhysicalActions
     // Sends this customer to relief
     public void EnterRelief(Relief relief) {
-        position = Location.Relief;
         UseInteractable(relief);
         BeginPeeingWithThing();
     }
@@ -817,7 +806,7 @@ public class Customer : MonoBehaviour {
             bladder.ResetLossOfControlTime();
             WaitingSpot waitingSpot = CurrentBathroom.doorwayQueue.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
-            position = Location.Doorway;
+            Location = Location.Hallway;
             CanReenterBathroom = false;
             return true;
         }
@@ -847,7 +836,7 @@ public class Customer : MonoBehaviour {
         StopOccupyingAll();
         MoveTo(Location.Outside);
         SetNext(0f, () => { 
-            position = Location.Outside; 
+            Location = Location.Outside; 
         }, () => AtDestination );
     }
     #endregion

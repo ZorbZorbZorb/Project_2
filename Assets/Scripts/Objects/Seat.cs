@@ -45,8 +45,8 @@ public class Seat : CustomerInteractable {
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
-        if ( customer.position != Location.Bar ) {
-            foreach ( Vector3 vector in Navigation.Navigate(customer.position, Location) ) {
+        if ( customer.Location != Location.Bar ) {
+            foreach ( Vector3 vector in Navigation.Navigate(customer.Location, Location) ) {
                 customer.MoveTo(vector);
             }
         }
@@ -54,6 +54,6 @@ public class Seat : CustomerInteractable {
         customer.MoveTo(customer.Gender == 'm' ? CustomerPositionM : CustomerPositionF);
         customer.Occupying = this;
         OccupiedBy = customer;
-        customer.position = Location.Bar;
+        customer.Location = Location.Bar;
     }
 }

@@ -1,7 +1,8 @@
 ﻿public enum Location {
-    Outside,
-    Bar,
-    Doorway,
-    WaitingRoom,
-    Relief
+    None,
+    Outside, 
+    Bar, 
+    Hallway, 
+    BathroomM, 
+    BathroomF
 }

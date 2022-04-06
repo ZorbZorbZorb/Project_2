@@ -4,11 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static Collections;
 
 public class Bathroom : MonoBehaviour {
-    // I'm just going to follow K.I.S.S. and use two singletons for this.
-    public bool ThisBathroomIsMensRoom = true;
     public static Bathroom BathroomM;
     public static Bathroom BathroomF;
     public Area2D BathroomMArea;
@@ -25,7 +22,7 @@ public class Bathroom : MonoBehaviour {
     public DoorwayQueue doorwayQueue;
     public WaitingRoom waitingRoom;
 
-    public Location Location { get; }
+    public Location Location;
 
     // Several of these are checked once per tick by each customer.
     public bool HasToiletAvailable { get; private set; }
@@ -105,18 +102,21 @@ public class Bathroom : MonoBehaviour {
             .ToList()
             .ForEach(x => x.Bathroom = this);
 
-        // If this is the first bathroom to initialize, set both singletons to this (incase unisex)
-        if ( BathroomM == null && BathroomF == null ) {
-            BathroomM = this;
-            BathroomF = this;
-        }
-        else {
-            if ( ThisBathroomIsMensRoom ) {
+        switch (Location) {
+            case Location.BathroomM:
+                if (BathroomM != null) {
+                    throw new InvalidOperationException($"BathroomM was already set. Second Bathroom trying to set.");
+                }
                 BathroomM = this;
-            }
-            else {
+                break;
+            case Location.BathroomF:
+                if ( BathroomF != null ) {
+                    throw new InvalidOperationException($"BathroomM was already set. Second Bathroom trying to set.");
+                }
                 BathroomF = this;
-            }
+                break;
+            default:
+                throw new InvalidOperationException($"Bathroom was set to unexpected location {Location}");
         }
     }
     void Update() {

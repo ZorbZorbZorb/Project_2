@@ -5,8 +5,8 @@ namespace Assets.Scripts.MetaObjects {
     [Serializable]
     public class NavigationPoint {
         [SerializeField]
-        public Transform Transform { get; set; }
+        public Transform Transform;
         [SerializeField]
-        public Location Location { get; set; }
+        public Location Location;
     }
 }
