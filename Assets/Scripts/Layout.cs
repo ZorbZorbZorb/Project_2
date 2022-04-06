@@ -28,43 +28,46 @@ namespace Assets.Scripts {
 
             // Set up BathroomM
             bathroom = Bathroom.BathroomM;
-            instances = ApplyToArea(bathroom.BathroomMArea, Mens.Options);
+            instances = ApplyToArea(bathroom, Mens.Options);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
-            AddSpot((5d, 1d), bathroom, bathroom.BathroomMArea, false);
-            AddSpot((4d, 1d), bathroom, bathroom.BathroomMArea, false);
+            AddSpot((5d, 1d), bathroom, false);
+            AddSpot((4d, 1d), bathroom, false);
             // Add line spots
-            AddSpot((2d, -0.5d), bathroom, bathroom.BathroomMArea, true);
-            AddSpot((1d, -0.5d), bathroom, bathroom.BathroomMArea, true);
-            AddSpot((0d, -0.5d), bathroom, bathroom.BathroomMArea, true);
+            AddSpot((2d, -0.5d), bathroom, true);
+            AddSpot((1d, -0.5d), bathroom, true);
+            AddSpot((0d, -0.5d), bathroom, true);
 
             // Set up BathroomF
             bathroom = Bathroom.BathroomF;
-            instances = ApplyToArea(Bathroom.BathroomF.BathroomFArea, Womens.Options);
+            instances = ApplyToArea(bathroom, Womens.Options);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
-            AddSpot((5d, 1d), bathroom, bathroom.BathroomFArea, false);
-            AddSpot((4d, 1d), bathroom, bathroom.BathroomFArea, false);
+            AddSpot((5d, 1d), bathroom, false);
+            AddSpot((4d, 1d), bathroom, false);
             // Add line spots
-            AddSpot((2d, -0.5d), bathroom, bathroom.BathroomFArea, true);
-            AddSpot((1d, -0.5d), bathroom, bathroom.BathroomFArea, true);
-            AddSpot((0d, -0.5d), bathroom, bathroom.BathroomFArea, true);
+            AddSpot((2d, -0.5d), bathroom, true);
+            AddSpot((1d, -0.5d), bathroom, true);
+            AddSpot((0d, -0.5d), bathroom, true);
 
-            void AddSpot((double, double) position, Bathroom bathroom, Area2D area, bool isLine) {
-                Vector2 vector = area.GetGridPosition(position);
+            void AddSpot((double, double) position, Bathroom bathroom, bool isLine) {
+                Vector2 vector = bathroom.Area.GetGridPosition(position);
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
                 instance.Facing = Orientation.South;
                 if ( isLine ) {
+                    instance.Location = Location.Hallway;
                     bathroom.AddLineSpot(instance as WaitingSpot);
                 }
                 else {
+                    instance.Location = bathroom.Location;
                     bathroom.AddInteractable(instance);
                 }
             }
         }
-        static private List<CustomerInteractable> ApplyToArea(Area2D area, List<Option> options) {
+        static private List<CustomerInteractable> ApplyToArea(Bathroom bathroom, List<Option> options) {
             List<CustomerInteractable> results = new List<CustomerInteractable>();
             foreach ( Option option in options ) {
+                Area2D area = bathroom.Area;
                 Vector2 vector = area.GetGridPosition((option.X, option.Y));
                 CustomerInteractable prefab;
                 if ( option.Current == null ) {
@@ -85,6 +88,7 @@ namespace Assets.Scripts {
                 }
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
                 instance.Facing = option.Facing;
+                instance.Location = bathroom.Location;
                 results.Add(instance);
             }
             return results;

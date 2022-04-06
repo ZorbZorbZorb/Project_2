@@ -8,8 +8,7 @@ using UnityEngine;
 public class Bathroom : MonoBehaviour {
     public static Bathroom BathroomM;
     public static Bathroom BathroomF;
-    public Area2D BathroomMArea;
-    public Area2D BathroomFArea;
+    public Area2D Area;
 
     public List<InteractableSpawnpoint> Spawnpoints;
 

@@ -14,6 +14,7 @@ public class Seat : CustomerInteractable {
     public override bool ChangesCustomerSprite => true;
     public SpriteRenderer Renderer;
     private void Start() {
+        Location = Location.Bar;
         Renderer = gameObject.GetComponent<SpriteRenderer>();
     }
     private void Update() {
