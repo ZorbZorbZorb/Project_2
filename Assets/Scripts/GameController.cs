@@ -74,7 +74,7 @@ public class GameController : MonoBehaviour {
         // Save the new data
         SaveNightData();
         #warning change this in production. Creating layout static
-        string json = Resources.Load<TextAsset>(@"Configs\bathroomsDefault").text;
+        string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
         layout = Layout.FromJson(json);
     }
 
@@ -232,7 +232,7 @@ public class GameController : MonoBehaviour {
     public void LoadNightData() {
         gameData = GameData.Import(0);
         # warning change this in production. Should be handled by GameData.Import(0);
-        string json = Resources.Load<TextAsset>(@"Configs\bathrooms").text;
+        string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
         layout = Layout.FromJson(json);
     }
     /// <summary>

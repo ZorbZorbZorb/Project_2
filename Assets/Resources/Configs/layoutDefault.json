@@ -61,7 +61,48 @@
   },
   "Womens": {
     "Options": [
-	
+		{
+			"X":0,
+			"Y":4,
+			"Options":["Sink" ],
+			"Current":"Sink",
+			"Facing":"South"
+		},
+		{
+			"X":1,
+			"Y":4,
+			"Options":["Toilet", "Sink"],
+			"Current":null,
+			"Facing":"South"
+		},
+		{
+			"X":2,
+			"Y":4,
+			"Options":["Toilet", "Sink"],
+			"Current":null,
+			"Facing":"South"
+		},		
+		{
+			"X":3,
+			"Y":4,
+			"Options":["Toilet"],
+			"Current":null,
+			"Facing":"South"
+		},
+		{
+			"X":4,
+			"Y":4,
+			"Options":["Toilet"],
+			"Current":null,
+			"Facing":"South"
+		},
+		{
+			"X":5,
+			"Y":4,
+			"Options":["Toilet"],
+			"Current":"Toilet",
+			"Facing":"South"
+		}
 	]
   }
 }
