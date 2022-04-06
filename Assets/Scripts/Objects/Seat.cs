@@ -7,25 +7,15 @@ public class Seat : CustomerInteractable {
     public override string DisplayName => "seat";
     public override Vector3 CustomerPositionF => transform.position + new Vector3(0, 0, -1);
     public override Vector3 CustomerPositionM => transform.position + new Vector3(0, 0, -1);
-
-    public override Location Location => Location.Bar;
-
     public override bool HidesCustomer => true;
-
     public override bool CanWetHere => true;
-
     public override ReliefType RType => ReliefType.None;
-
     public override bool CanBeSoiled => true;
-
     public override bool ChangesCustomerSprite => true;
-
     public SpriteRenderer Renderer;
-
     private void Start() {
         Renderer = gameObject.GetComponent<SpriteRenderer>();
     }
-
     private void Update() {
         if ( OccupiedBy != null && OccupiedBy.AtDestination ) {
             Renderer.enabled = false;
@@ -42,7 +32,6 @@ public class Seat : CustomerInteractable {
             Renderer.sprite = Collections.SpriteStoolNormal;
         }
     }
-
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
         if ( customer.Location != Location.Bar ) {
