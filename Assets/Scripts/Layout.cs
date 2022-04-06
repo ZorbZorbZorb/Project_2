@@ -33,7 +33,6 @@ namespace Assets.Scripts {
             // Add waiting spots
             AddSpot((5d, 1d), bathroom, bathroom.BathroomMArea, false);
             AddSpot((4d, 1d), bathroom, bathroom.BathroomMArea, false);
-
             // Add line spots
             AddSpot((2d, -0.5d), bathroom, bathroom.BathroomMArea, true);
             AddSpot((1d, -0.5d), bathroom, bathroom.BathroomMArea, true);
@@ -43,7 +42,13 @@ namespace Assets.Scripts {
             bathroom = Bathroom.BathroomF;
             instances = ApplyToArea(Bathroom.BathroomF.BathroomFArea, Womens.Options);
             instances.ForEach(x => bathroom.AddInteractable(x));
-            // Add waiting spots and line spots
+            // Add waiting spots
+            AddSpot((5d, 1d), bathroom, bathroom.BathroomFArea, false);
+            AddSpot((4d, 1d), bathroom, bathroom.BathroomFArea, false);
+            // Add line spots
+            AddSpot((2d, -0.5d), bathroom, bathroom.BathroomFArea, true);
+            AddSpot((1d, -0.5d), bathroom, bathroom.BathroomFArea, true);
+            AddSpot((0d, -0.5d), bathroom, bathroom.BathroomFArea, true);
 
             void AddSpot((double, double) position, Bathroom bathroom, Area2D area, bool isLine) {
                 Vector2 vector = area.GetGridPosition(position);
