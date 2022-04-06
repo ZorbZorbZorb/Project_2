@@ -8,5 +8,7 @@ namespace Assets.Scripts.MetaObjects {
         public Transform Transform;
         [SerializeField]
         public Location Location;
+        public static implicit operator Location(NavigationPoint point) => point.Location;
+        public static implicit operator Vector3(NavigationPoint point) => point.Transform.position;
     }
 }

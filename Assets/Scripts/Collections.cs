@@ -103,12 +103,6 @@ public partial class Collections : MonoBehaviour {
     public static CustomerActionState[] ValidBubbleActionStatesF;
     public static CustomerActionState[] ValidBubbleActionStatesM;
 
-    static readonly public Vector3 OffScreenTop = new Vector3() {
-        x = 600,
-        y = 750,
-        z = 0
-    };
-
     public static Sprite GetBubbleSprite(Customer customer) {
         CustomerActionState[] ValidBubbleActionStates = customer.Gender == 'm' ? ValidBubbleActionStatesM : ValidBubbleActionStatesF;
         if (! ValidBubbleActionStates.Contains(customer.ActionState) ) {

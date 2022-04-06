@@ -17,8 +17,8 @@ namespace Assets.Scripts.MetaObjects {
         [SerializeReference]
         public NavigationPoint Point2 = new NavigationPoint();
         public Location[] Locations => new Location[2] { Point1.Location, Point2.Location };
-        public Location GetOther(Location source) {
-            return Point1.Location == source ? Point2.Location : Point1.Location;
+        public NavigationPoint GetOther(Location source) {
+            return Point1.Location == source ? Point2 : Point1;
         }
         public void Start() {
             Navigation.Add(this);

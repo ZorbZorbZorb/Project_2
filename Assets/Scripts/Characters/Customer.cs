@@ -185,7 +185,7 @@ public class Customer : MonoBehaviour {
         }
 
         // If about to leave or has left
-        if ( Location == Location.Outside && AtDestination && transform.position == Collections.OffScreenTop ) {
+        if ( Location == Location.Outside && AtDestination && transform.position == Assets.Scripts.Navigation.CustomerSpawnpoint ) {
             GC.RemoveCustomer(this);
         }
 
