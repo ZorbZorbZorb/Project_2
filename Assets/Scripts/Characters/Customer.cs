@@ -174,7 +174,7 @@ public class Customer : MonoBehaviour {
         }
 
         // If about to leave or has left
-        if ( position == Collections.Location.Outside && AtDestination && transform.position == Collections.OffScreenTop ) {
+        if ( position == Location.Outside && AtDestination && transform.position == Collections.OffScreenTop ) {
             GC.RemoveCustomer(this);
         }
 
@@ -192,7 +192,7 @@ public class Customer : MonoBehaviour {
         }
 
         // If in bar...
-        if ( position == Collections.Location.Bar ) {
+        if ( position == Location.Bar ) {
             ThinkAboutThingsInBar();
         }
     }
@@ -510,7 +510,7 @@ public class Customer : MonoBehaviour {
 
     // Position
     public Collections.CustomerActionState ActionState = Collections.CustomerActionState.None;
-    public Collections.Location position = Collections.Location.Bar;
+    public Location position = Location.Bar;
     public CustomerInteractable Occupying;
 
     // Movement
@@ -589,13 +589,13 @@ public class Customer : MonoBehaviour {
         Emotes.ShowBladderCircle(false);
         ActionState = Collections.CustomerActionState.None;
         if ( IsWet ) {
-            if ( position != Collections.Location.Bar ) {
+            if ( position != Location.Bar ) {
                 foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
                     MoveToVector3(keyframe);
                 }
             }
             MoveToVector3(Collections.OffScreenTop);
-            position = Collections.Location.Outside;
+            position = Location.Outside;
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
@@ -648,10 +648,12 @@ public class Customer : MonoBehaviour {
         }
     }
     public void UseInteractable(CustomerInteractable thing) {
+        // Use caution when thing intended to be occupied is already occupied by customer.
         if ( Occupying != null ) {
             Occupying.OccupiedBy = null;
         }
-        if ( position == Collections.Location.Bar && thing.CustomerLocation != position ) {
+
+        if ( position == Location.Bar && thing.CustomerLocation != position ) {
             foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBarToBathroom ) {
                 MoveToVector3(keyframe);
             }
@@ -719,11 +721,11 @@ public class Customer : MonoBehaviour {
             return false;
         }
         // If in waiting room
-        if ( position == Collections.Location.WaitingRoom ) {
+        if ( position == Location.WaitingRoom ) {
             return true;
         }
         // If in doorway and first in line
-        return position == Collections.Location.Doorway && CurrentBathroom.doorwayQueue.IsNextInLine(this);
+        return position == Location.Doorway && CurrentBathroom.doorwayQueue.IsNextInLine(this);
     }
     /// <summary>
     /// Code for if relief menu can be displayed
@@ -746,7 +748,7 @@ public class Customer : MonoBehaviour {
         if ( CurrentBathroom.waitingRoom.HasOpenWaitingSpot() ) {
             WaitingSpot waitingSpot = CurrentBathroom.waitingRoom.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
-            position = Collections.Location.WaitingRoom;
+            position = Location.WaitingRoom;
             return waitingSpot;
         }
         else {
@@ -799,7 +801,7 @@ public class Customer : MonoBehaviour {
     #region CustomerPhysicalActions
     // Sends this customer to relief
     public void EnterRelief(Relief relief) {
-        position = Collections.Location.Relief;
+        position = Location.Relief;
         UseInteractable(relief);
         BeginPeeingWithThing();
     }
@@ -813,7 +815,7 @@ public class Customer : MonoBehaviour {
             bladder.ResetLossOfControlTime();
             WaitingSpot waitingSpot = CurrentBathroom.doorwayQueue.GetNextWaitingSpot();
             waitingSpot.MoveCustomerIntoSpot(this);
-            position = Collections.Location.Doorway;
+            position = Location.Doorway;
             CanReenterBathroom = false;
             return true;
         }
@@ -841,13 +843,13 @@ public class Customer : MonoBehaviour {
     // Fully leaves the area
     public void Leave() {
         StopOccupyingAll();
-        if ( position != Collections.Location.Bar ) {
+        if ( position != Location.Bar ) {
             foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
                 MoveToVector3(keyframe);
             }
         }
         MoveToVector3(Collections.OffScreenTop);
-        position = Collections.Location.Outside;
+        position = Location.Outside;
     }
     #endregion
 

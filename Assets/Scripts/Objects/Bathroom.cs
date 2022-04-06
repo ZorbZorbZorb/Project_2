@@ -25,10 +25,8 @@ public class Bathroom : MonoBehaviour {
     public DoorwayQueue doorwayQueue;
     public WaitingRoom waitingRoom;
 
-    public List<Vector3> NavigationKeyframesFromBarToBathroom;
-    public List<Vector3> NavigationKeyframesFromBathroomToBar;
-    public List<NavigationKeyframe> navigationKeyframesFromBarToBathroom;
-    public List<NavigationKeyframe> navigationKeyframesFromBathroomToBar;
+    public Transform KeyframeOutsideDoor;
+    public Transform KeyframeInsideDoor;
 
     // Several of these are checked once per tick by each customer.
     public bool HasToiletAvailable { get; private set; }
@@ -94,10 +92,6 @@ public class Bathroom : MonoBehaviour {
     }
 
     void Awake() {
-        // Get the transform position for the navigation keyframes
-        navigationKeyframesFromBarToBathroom.ForEach(x => NavigationKeyframesFromBarToBathroom.Add(x.transform.position));
-        navigationKeyframesFromBathroomToBar.ForEach(x => NavigationKeyframesFromBathroomToBar.Add(x.transform.position));
-
         // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
         doorwayQueue.Bathroom = this;
         waitingRoom.Bathroom = this;

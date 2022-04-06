@@ -436,14 +436,14 @@ public class GameController : MonoBehaviour {
 
     // Temp method that despawns customers in the bar that dont need to go or have peed themselves
     private void DespawnCustomerOutside() {
-        Customer[] targets = customers.Where(x => x.position == Collections.Location.Outside && x.AtDestination && x.Active).ToArray();
+        Customer[] targets = customers.Where(x => x.position == Location.Outside && x.AtDestination && x.Active).ToArray();
         foreach ( Customer target in targets ) {
             RemoveCustomer(target);
         }
     }
-    private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Collections.Location.Bar);
+    private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.position == Location.Bar);
     private IEnumerable<Customer> CustomersInBathroom() => customers
-        .Where(x => x.position == Collections.Location.Doorway || x.position == Collections.Location.Relief || x.position == Collections.Location.WaitingRoom);
+        .Where(x => x.position == Location.Doorway || x.position == Location.Relief || x.position == Location.WaitingRoom);
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }

@@ -59,14 +59,15 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Area2D.cs" />
     <Compile Include="Assets\Scripts\Layout.cs" />
-    <Compile Include="Assets\Scripts\MetaObjects\NavigationKeyframe.cs" />
     <Compile Include="Assets\Scripts\Characters\Bladder.cs" />
     <Compile Include="Assets\Scripts\Abstract\Line.cs" />
     <Compile Include="Assets\Scripts\Characters\CustomerSpriteController.cs" />
     <Compile Include="Assets\Scripts\Freecam.cs" />
     <Compile Include="Assets\Scripts\Characters\Emotes.cs" />
+    <Compile Include="Assets\Scripts\Location.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\BuildClickable.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaitingSpotQueue.cs" />
+    <Compile Include="Assets\Scripts\MetaObjects\Navigation.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\WaitingSpot.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\InteractableSpawnpoint.cs" />
     <Compile Include="Assets\Scripts\Objects\Seat.cs" />

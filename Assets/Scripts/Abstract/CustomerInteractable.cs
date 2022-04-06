@@ -36,7 +36,7 @@ namespace Assets.Scripts.Objects {
         public Alignment Alignment => Facing == Orientation.North || Facing == Orientation.South 
             ? Alignment.Vertical 
             : Alignment.Horizontal;
-        public abstract Collections.Location CustomerLocation { get; }
+        public abstract Location CustomerLocation { get; }
         public Customer OccupiedBy;
         public abstract bool ChangesCustomerSprite { get; }
         public abstract bool HidesCustomer { get; }

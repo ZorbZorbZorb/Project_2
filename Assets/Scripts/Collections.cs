@@ -6,7 +6,7 @@ using System.Linq;
 using static Assets.Scripts.Objects.CustomerInteractable;
 using Assets.Scripts.Characters;
 
-public class Collections : MonoBehaviour {
+public partial class Collections : MonoBehaviour {
     static public Collections collections = null;
 
     private void Awake() {
@@ -102,14 +102,6 @@ public class Collections : MonoBehaviour {
 
     public static CustomerActionState[] ValidBubbleActionStatesF;
     public static CustomerActionState[] ValidBubbleActionStatesM;
-
-    public enum Location {
-        Outside,
-        Bar,
-        Doorway,
-        WaitingRoom,
-        Relief
-    }
 
     static readonly public Vector3 OffScreenTop = new Vector3() {
         x = 600,

@@ -10,9 +10,9 @@ public class WaitingSpot : CustomerInteractable {
     public override InteractableType IType => InteractableType.WaitingSpot;
     public override ReliefType RType => ReliefType.None;
     [Obsolete("These two need to go")]
-    public override Collections.Location CustomerLocation => Collections.Location.WaitingRoom;
+    public override Location CustomerLocation => Location.WaitingRoom;
     [Obsolete("These two need to go")]
-    public Collections.Location CustomerState = Collections.Location.WaitingRoom;
+    public Location CustomerState = Location.WaitingRoom;
     public override Vector3 CustomerPositionF => transform.position;
     public override Vector3 CustomerPositionM => transform.position;
     public override bool HidesCustomer => false;
@@ -23,7 +23,7 @@ public class WaitingSpot : CustomerInteractable {
     public override bool ChangesCustomerSprite => false;
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
-        if ( customer.position == Collections.Location.Bar ) {
+        if ( customer.position == Location.Bar ) {
             foreach ( Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBarToBathroom ) {
                 customer.MoveToVector3(keyframe);
             }

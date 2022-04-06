@@ -7,7 +7,7 @@ public class Seat : CustomerInteractable {
     public override Vector3 CustomerPositionF => transform.position + new Vector3(0, 0, -1);
     public override Vector3 CustomerPositionM => transform.position + new Vector3(0, 0, -1);
 
-    public override Collections.Location CustomerLocation => Collections.Location.Bar;
+    public override Location CustomerLocation => Location.Bar;
 
     public override bool HidesCustomer => true;
 
@@ -44,7 +44,7 @@ public class Seat : CustomerInteractable {
 
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
-        if ( customer.position != Collections.Location.Bar ) {
+        if ( customer.position != Location.Bar ) {
             foreach ( Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
                 customer.MoveToVector3(keyframe);
             }
@@ -52,6 +52,6 @@ public class Seat : CustomerInteractable {
         customer.MoveToVector3(customer.Gender == 'm' ? CustomerPositionM : CustomerPositionF);
         customer.Occupying = this;
         OccupiedBy = customer;
-        customer.position = Collections.Location.Bar;
+        customer.position = Location.Bar;
     }
 }
