@@ -11,8 +11,8 @@ public enum SeatType {
 public class Seat : CustomerInteractable {
     public override InteractableType IType => InteractableType.Seat;
     public override string DisplayName => "seat";
-    public override Vector3 CustomerPositionF => transform.position + new Vector3(0, 0, -1);
-    public override Vector3 CustomerPositionM => transform.position + new Vector3(0, 0, -1);
+    public override Vector3 CustomerPositionF => transform.position + new Vector3(0, 0);
+    public override Vector3 CustomerPositionM => transform.position + new Vector3(0, 0);
     public override bool HidesCustomer => true;
     public override bool CanWetHere => true;
     public override ReliefType RType => ReliefType.None;

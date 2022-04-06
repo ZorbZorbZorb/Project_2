@@ -100,28 +100,37 @@ namespace Assets.Scripts {
             }
             return results;
         }
-        static private List<CustomerInteractable> ApplyToArea(Bar bar, List<BarOption> options) {
-            List<CustomerInteractable> results = new List<CustomerInteractable>();
+        static private void ApplyToArea(Bar bar, List<BarOption> options) {
+            // Seats handle their own setup code in Seat.Start()
             foreach ( var option in options ) {
                 Area2D area = bar.Area;
                 Vector2 vector = area.GetGridPosition((option.X, option.Y));
-                CustomerInteractable prefab;
                 if ( option.Current == null ) {
                     continue;
                 }
                 switch ( option.Current ) {
                     case InteractableType.Seat:
-                        prefab = Prefabs.PrefabSeat;
+                        if ( option.isTable ) {
+                            BarTable prefab = Prefabs.PrefabTable;
+                            BarTable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
+                            foreach ( Seat seat in instance.Seats ) {
+                                seat.Facing = option.Facing;
+                                seat.Location = Location.Bar;
+                                seat.SeatType = SeatType.Table;
+                            }
+                        }
+                        else {
+                            Seat prefab = Prefabs.PrefabSeat;
+                            Seat instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
+                            instance.Facing = option.Facing;
+                            instance.Location = Location.Bar;
+                            instance.SeatType = SeatType.Counter;
+                        }
                         break;
                     default:
                         throw new NotImplementedException();
                 }
-                CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
-                instance.Facing = option.Facing;
-                instance.Location = Location.Bar;
-                results.Add(instance);
             }
-            return results;
         }
         public override string ToString() {
 
