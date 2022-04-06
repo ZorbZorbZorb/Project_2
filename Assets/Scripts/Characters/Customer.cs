@@ -409,17 +409,42 @@ public class Customer : MonoBehaviour {
             }
         }
     }
-
-    /// <summary>Updates the customers desperation state and state machine</summary>
+    /// <summary>
+    /// Updates the customers desperation state and state machine
+    /// </summary>
     private void UpdateDesperationState() {
         DesperationState = GetDesperationState();
         DesperationStateChangeThisUpdate = DesperationState != LastDesperationState;
         LastDesperationState = DesperationState;
     }
-
+    /// <summary>
+    /// Moves the customer from where they are currently located to the target's vector3
+    ///   factoring in keyframes.
+    /// <para>
+    ///   Does not change references, only handles movement
+    /// </para>
+    /// </summary>
+    /// <param name="target">
+    /// Interactable destination to move to. Respects male / female
+    /// position properties if available
+    /// </param>
+    public void MoveToInteractable(CustomerInteractable target) {
+        
+    }
+    /// <summary>
+    /// Adds a Vector3 destination to the customer's navigation queue. They will begin to move
+    /// to this destination next MoveUpdate.
+    /// <para>
+    /// Sets AtDestination to false on call. Calling move to a location the customer is already at
+    /// will cause a frame where the customer is not where they currently are. Just don't do this.
+    /// The missile will not know where it is.
+    /// </para>
+    /// </summary>
+    /// <param name="destination"></param>
     public void MoveToVector3(Vector3 destination) {
         Navigation.Add(destination);
         Destination = destination;
+        AtDestination = false;
     }
     private void MoveUpdate() {
         AtDestination = Navigation.Count == 0;
