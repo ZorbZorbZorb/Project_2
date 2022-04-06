@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts.MetaObjects {
     public class NavigationNode : MonoBehaviour {
@@ -14,13 +16,12 @@ namespace Assets.Scripts.MetaObjects {
         [SerializeField]
         [SerializeReference]
         public NavigationPoint Point2 = new NavigationPoint();
-        /// <summary>
-        /// Should navigation including this node use both the in and out point?
-        /// </summary>
-        [SerializeField]
-        public bool UseBothPositions;
+        public Location[] Locations => new Location[2] { Point1.Location, Point2.Location };
+        public Location GetOther(Location source) {
+            return Point1.Location == source ? Point2.Location : Point1.Location;
+        }
         public void Start() {
-            Navigation.Nodes.Add(this);
+            Navigation.Add(this);
         }
     }
 }
