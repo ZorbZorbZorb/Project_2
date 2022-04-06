@@ -631,6 +631,11 @@ public class Customer : MonoBehaviour {
                 MoveToVector3(keyframe);
             }
         }
+
+        // Move the customer to the thing. Flip sprite if necessary
+        if (thing.Alignment == Alignment.Horizontal) {
+            SRenderer.flipX = thing.Facing == Orientation.West;
+        }
         MoveToVector3(Gender == 'f' ? thing.CustomerPositionF : thing.CustomerPositionM);
 
         position = thing.CustomerLocation;
