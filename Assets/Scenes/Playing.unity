@@ -1543,7 +1543,13 @@ MonoBehaviour:
     Area: {fileID: 348004278}
     GridScaleX: 140
     GridScaleY: 140
-  Seats: []
+  Seats:
+  - {fileID: 1183730568}
+  - {fileID: 1907981655}
+  - {fileID: 2110763710}
+  - {fileID: 1394213891}
+  - {fileID: 566413390}
+  - {fileID: 1739422460}
   Tables: []
 --- !u!61 &348004278
 BoxCollider2D:
@@ -3936,11 +3942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df10267e7b0b74b94665a88905f460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BathroomMArea:
-    Area: {fileID: 1013489708}
-    GridScaleX: 140
-    GridScaleY: 140
-  BathroomFArea:
+  Area:
     Area: {fileID: 1013489708}
     GridScaleX: 140
     GridScaleY: 140
@@ -4402,7 +4404,6 @@ MonoBehaviour:
     rid: 5072688306026446848
   Point2:
     rid: 5072688306026446849
-  UseBothPositions: 0
   references:
     version: 2
     RefIds:
@@ -5184,7 +5185,6 @@ MonoBehaviour:
     rid: 5072688306026446848
   Point2:
     rid: 5072688306026446849
-  UseBothPositions: 0
   references:
     version: 2
     RefIds:
@@ -5923,7 +5923,6 @@ MonoBehaviour:
     rid: 5072688306026446848
   Point2:
     rid: 5072688306026446849
-  UseBothPositions: 0
   references:
     version: 2
     RefIds:
@@ -6028,11 +6027,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df10267e7b0b74b94665a88905f460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BathroomMArea:
-    Area: {fileID: 1598575287}
-    GridScaleX: 140
-    GridScaleY: 140
-  BathroomFArea:
+  Area:
     Area: {fileID: 1598575287}
     GridScaleX: 140
     GridScaleY: 140
@@ -6116,7 +6111,6 @@ MonoBehaviour:
     rid: 5072688306026446848
   Point2:
     rid: 5072688306026446849
-  UseBothPositions: 0
   references:
     version: 2
     RefIds:

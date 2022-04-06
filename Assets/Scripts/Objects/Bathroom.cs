@@ -87,6 +87,7 @@ public class Bathroom : MonoBehaviour {
     }
 
     void Awake() {
+        Area.Area = GetComponent<BoxCollider2D>();
         // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
         doorwayQueue.Bathroom = this;
         waitingRoom.Bathroom = this;
