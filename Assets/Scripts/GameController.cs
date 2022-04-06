@@ -17,6 +17,11 @@ public class GameController : MonoBehaviour {
         GC = this;
         Customer.GC = this;
 
+        // Shut off all of the Area2d colliders
+        Bathroom.BathroomM.Area.Area.enabled = false;
+        Bathroom.BathroomF.Area.Area.enabled = false;
+        Bar.Singleton.Area.Area.enabled = false;
+
         Freecam.NoZoom = true;
         Freecam.NoPan = true;
 
@@ -39,8 +44,7 @@ public class GameController : MonoBehaviour {
             UpdateFundsDisplay();
         }
 
-        // Construct the bathroom
-        InteractableSpawnpoint.Build(gameData);
+        // Construct the play areas
         layout.Apply();
 
         // Cheat construct bathroom if toggled when starting

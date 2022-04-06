@@ -24,11 +24,16 @@ namespace Assets.Scripts {
             public Orientation Facing;
             public bool isTable;
         }
+
         public List<BathroomOption> Mens;
         public List<BathroomOption> Womens;
         public List<BarOption> bar;
 
         public void Apply() {
+            Bathroom.BathroomM.Area.Area.enabled = true;
+            Bathroom.BathroomF.Area.Area.enabled = true;
+            Bar.Singleton.Area.Area.enabled = true;
+
             List<CustomerInteractable> instances;
             Bathroom bathroom;
 
@@ -58,6 +63,10 @@ namespace Assets.Scripts {
 
             // Set up bar
             ApplyToArea(Bar.Singleton, bar);
+
+            Bathroom.BathroomM.Area.Area.enabled = false;
+            Bathroom.BathroomF.Area.Area.enabled = false;
+            Bar.Singleton.Area.Area.enabled = false;
 
             void AddSpot((double, double) position, Bathroom bathroom, bool isLine) {
                 Vector2 vector = bathroom.Area.GetGridPosition(position);

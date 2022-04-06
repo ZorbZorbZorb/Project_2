@@ -19,8 +19,8 @@ public class Toilet : Relief {
         // Open or close the stall door
         doorClosed = OccupiedBy != null && OccupiedBy.AtDestination;
         AltSRenderer.sprite = doorClosed ? Collections.spriteStallClosed : Collections.spriteStallOpened;
+        MainSRenderer.sprite = doorClosed ? Collections.spriteToiletOpen : Collections.spriteToiletClosed;
     }
-
     private void OnMouseOver() {
         if (OccupiedBy != null) {
             AltSRenderer.color = new Color(1f, 1f, 1f, 0.7f);
