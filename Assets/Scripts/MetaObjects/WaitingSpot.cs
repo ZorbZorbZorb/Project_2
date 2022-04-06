@@ -3,7 +3,7 @@ using Assets.Scripts.Objects;
 using UnityEngine;
 
 public class WaitingSpot : CustomerInteractable {
-    public Bathroom SpotBathroom;
+    public Bathroom Bathroom;
     public override InteractableType IType => InteractableType.WaitingSpot;
     public override ReliefType RType => ReliefType.None;
     public override Vector3 CustomerPositionF => transform.position;
@@ -14,13 +14,4 @@ public class WaitingSpot : CustomerInteractable {
     public bool Wet = false;
     public override bool CanBeSoiled => false;
     public override bool ChangesCustomerSprite => false;
-    public void MoveCustomerIntoSpot(Customer customer) {
-        customer.StopOccupyingAll();
-        foreach ( Vector3 vector in Navigation.Navigate(customer.Location, Location) ) {
-            customer.MoveTo(vector);
-        }
-        customer.MoveTo(CustomerPositionF);
-        customer.Occupying = this;
-        OccupiedBy = customer;
-    }
 }

@@ -407,7 +407,7 @@ public class GameController : MonoBehaviour {
 
         nightStartFunds = gameData.funds;
 
-        Customer firstCustomer = CreateCustomer();
+        Customer firstCustomer = SpawnCustomerInBar(true);
         firstCustomer.Active = true;
 
         if ( DebugSpawnOneCustomerOnly ) {
@@ -447,7 +447,6 @@ public class GameController : MonoBehaviour {
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
-
     /// <summary>
     /// Advances the night forward one time tick.
     /// <para>Adds funds for each customer in the bar</para>
@@ -465,8 +464,6 @@ public class GameController : MonoBehaviour {
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
-
-    // Thinks about what should happen next, spawning customers
     private void Think() {
         // Update max seating in bar
         maxCustomers = Bar.Singleton.Seats
@@ -508,16 +505,15 @@ public class GameController : MonoBehaviour {
             AdvanceTime();
         }
     }
-
     public Customer SpawnCustomerInBar(bool desperate) {
         Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Collections.OffScreenTop, Quaternion.identity);
-        newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
+        newCustomer.Gender = Random.Range(0, 2) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
         if ( desperate ) {
-            newCustomer.SetupCustomer(80, 100);
+            newCustomer.SetupCustomer(90, 100);
         }
         else {
-            newCustomer.SetupCustomer(30, 92);
+            newCustomer.SetupCustomer(30, 90);
         }
         Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
         newCustomer.Active = true;
@@ -527,57 +523,13 @@ public class GameController : MonoBehaviour {
             newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
             newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) ) {
 
-            enteredDoorway = newCustomer.EnterDoorway();
+            var bathroom = newCustomer.Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
+            enteredDoorway = newCustomer.GetInLine(bathroom);
         }
         // Else sit right down at the bar and wait
         if ( !enteredDoorway ) {
             Seat seat = Bar.Singleton.GetOpenSeat();
-            seat.MoveCustomerIntoSpot(newCustomer);
-        }
-
-        return newCustomer;
-    }
-
-    [Obsolete("Duplicate of GameController::SpawnCustomerInBar(bool)")]
-    public Customer CreateCustomer() {
-        Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Collections.OffScreenTop, Quaternion.identity);
-        //newCustomer.Gender = Random.Range(0, 3) == 0 ? 'm' : 'f';
-        newCustomer.Gender = 'm';
-        customers.Add(newCustomer);
-
-        newCustomer.EnteredTicksElapsed = timeTicksElapsed;
-
-        // Customer count changes range of bladder fullness for next customer to enter
-        int min = 35;
-        int max = 105;
-#warning hardcoded values bad
-        if ( customers.Count() > 8 ) {
-            min = 10;
-            max = 80;
-        }
-        if ( customers.Count() == 1 ) {
-            min = 85;
-            max = 98;
-        }
-
-        newCustomer.SetupCustomer(min, max);
-        Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
-        newCustomer.Active = true;
-
-        // If customer enters bar and needs to go badly try to enter bathroom right away
-        bool enteredDoorway = false;
-        if ( newCustomer.WantsToEnterBathroom() &&
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) {
-
-            enteredDoorway = newCustomer.EnterDoorway();
-        }
-
-        // Else sit right down at the bar and wait
-        if ( !enteredDoorway ) {
-            Seat seat = Bar.Singleton.GetOpenSeat();
-            seat.MoveCustomerIntoSpot(newCustomer);
+            newCustomer.Occupy(seat);
         }
 
         return newCustomer;

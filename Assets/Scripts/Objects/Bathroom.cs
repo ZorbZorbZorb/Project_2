@@ -46,13 +46,18 @@ public class Bathroom : MonoBehaviour {
                 Urinals.Add(interactable as Urinal);
                 break;
             case InteractableType.WaitingSpot:
-                waitingRoom.WaitingSpots.Add(interactable as WaitingSpot);
+                WaitingSpot spot = interactable as WaitingSpot;
+                spot.Bathroom = this;
+                spot.Location = Location;
+                waitingRoom.WaitingSpots.Add(spot);
                 break;
             default:
                 throw new NotImplementedException($"Type {interactable.IType} is not supported.");
         }
     }
     public void AddLineSpot(WaitingSpot spot) {
+        spot.Bathroom = this;
+        spot.Location = Location.Hallway;
         doorwayQueue.waitingSpots.Add(spot);
     }
     public Toilet GetToilet() {
@@ -67,7 +72,7 @@ public class Bathroom : MonoBehaviour {
     public void EnterSinkQueue(Customer customer) {
         if ( customer.Occupying.IType == InteractableType.Sink ) {
             Sink sink = (Sink)customer.Occupying;
-            customer.UseInteractable(sink);
+            customer.Occupy(sink);
             sink.UseForWash(customer);
             return;
         }
@@ -82,7 +87,7 @@ public class Bathroom : MonoBehaviour {
         }
         else {
             WaitingSpot spot = SinksLine.GetNextWaitingSpot();
-            customer.UseInteractable(spot);
+            customer.Occupy(spot);
         }
     }
 
@@ -91,9 +96,9 @@ public class Bathroom : MonoBehaviour {
         // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
         doorwayQueue.Bathroom = this;
         waitingRoom.Bathroom = this;
-        doorwayQueue.waitingSpots.ForEach(x => x.SpotBathroom = this);
-        waitingRoom.WaitingSpots.ForEach(x => x.SpotBathroom = this);
-        SinksLine.Items.ForEach(x => x.SpotBathroom = this);
+        doorwayQueue.waitingSpots.ForEach(x => x.Bathroom = this);
+        waitingRoom.WaitingSpots.ForEach(x => x.Bathroom = this);
+        SinksLine.Items.ForEach(x => x.Bathroom = this);
         // I've messed this up in the past, so drop an error in the console if I forget to change the list size for spawnpoints
         if (Spawnpoints.Any(x => x == null)) {
             Debug.LogError("Spawnpoint was null. Is list size too large or was spawnpoint deleted?");

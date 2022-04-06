@@ -12,7 +12,7 @@ public class Sink : Relief {
     public override bool CanBeSoiled => false;
     public override bool ChangesCustomerSprite => true;
     public void UseForWash(Customer customer) {
-        customer.UseInteractable(this);
+        customer.Occupy(this);
 
         customer.ActionState = Collections.CustomerActionState.WashingHands;
 

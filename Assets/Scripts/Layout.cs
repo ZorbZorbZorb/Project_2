@@ -55,11 +55,9 @@ namespace Assets.Scripts {
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
                 instance.Facing = Orientation.South;
                 if ( isLine ) {
-                    instance.Location = Location.Hallway;
                     bathroom.AddLineSpot(instance as WaitingSpot);
                 }
                 else {
-                    instance.Location = bathroom.Location;
                     bathroom.AddInteractable(instance);
                 }
             }

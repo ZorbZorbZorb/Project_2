@@ -59,7 +59,7 @@ public class DoorwayQueue {
                     for ( int j = i + 1; j < waitingSpots.Count(); j++ ) {
                         if ( waitingSpots[j].OccupiedBy != null ) {
                             // Move customer in spot j to spot i - 1
-                            waitingSpots[j].OccupiedBy.UseInteractable(waitingSpots[i - 1]);
+                            waitingSpots[j].OccupiedBy.Occupy(waitingSpots[i - 1]);
                             waitingSpots[j].OccupiedBy = null;
                             // And break loop j ffs
                             break;
@@ -73,7 +73,7 @@ public class DoorwayQueue {
                     }
 
                     // Move customer in spot i to spot i - 1
-                    waitingSpots[i].OccupiedBy.UseInteractable(waitingSpots[i - 1]);
+                    waitingSpots[i].OccupiedBy.Occupy(waitingSpots[i - 1]);
                     waitingSpots[i].OccupiedBy = null;
                 }
             }
