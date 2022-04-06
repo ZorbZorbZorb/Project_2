@@ -511,6 +511,7 @@ public class GameController : MonoBehaviour {
     }
     public Customer SpawnCustomerInBar(bool desperate) {
         Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Assets.Scripts.Navigation.CustomerSpawnpoint, Quaternion.identity);
+        newCustomer.Location = Location.Outside;
         newCustomer.Gender = Random.Range(0, 2) == 0 ? 'm' : 'f';
         customers.Add(newCustomer);
         if ( desperate ) {

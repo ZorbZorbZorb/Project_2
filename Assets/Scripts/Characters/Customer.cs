@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 public class Customer : MonoBehaviour {
     void Start() {
         if ( Destination == null ) {
-            Destination = transform.position;
+            Destination = Assets.Scripts.Navigation.CustomerSpawnpoint;
         }
         UID = GameController.GetUid();
 
@@ -530,7 +530,7 @@ public class Customer : MonoBehaviour {
 
     // Position
     public Collections.CustomerActionState ActionState = Collections.CustomerActionState.None;
-    public Location Location = Location.Bar;
+    public Location Location = Location.None;
     public CustomerInteractable Occupying;
 
     // Movement
@@ -539,7 +539,6 @@ public class Customer : MonoBehaviour {
     public double MoveSpeed;
 
     #region Sprites
-
     // Class that contains all of the emotes / thought bubbles / etc for the person
     [SerializeField] public RectTransform BladderCircleTransform;
     [SerializeField] public SpriteRenderer EmoteSpriteRenderer;

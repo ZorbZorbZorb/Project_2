@@ -8,8 +8,7 @@ namespace Assets.Scripts {
         static private Dictionary<Location, List<NavigationNode>> nodes = new Dictionary<Location, List<NavigationNode>>();
         static public Vector3 CustomerSpawnpoint => nodes[Location.Outside]
             .First(x => x.GetOther(Location.Outside).Location == Location.Bar)
-            .transform
-            .position;
+            .GetOther(Location.Bar);
         static private List<Location> getReachableLocations(Location location) {
             List<Location> result = new List<Location>();
             foreach ( NavigationNode node in nodes[location] ) {
