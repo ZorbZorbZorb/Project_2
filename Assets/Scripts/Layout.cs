@@ -8,19 +8,25 @@ namespace Assets.Scripts {
     [Serializable]
     public class Layout {
         [Serializable]
-        public class Section {
-            public List<Option> Options;
-        }
-        [Serializable]
-        public class Option {
+        public class BathroomOption {
             public int X;
             public int Y;
             public List<InteractableType> Options;
             public InteractableType? Current;
             public Orientation Facing;
         }
-        public Section Mens;
-        public Section Womens;
+        [Serializable]
+        public class BarOption {
+            public int X;
+            public int Y;
+            public List<InteractableType> Options;
+            public InteractableType? Current;
+            public Orientation Facing;
+            public bool isTable;
+        }
+        public List<BathroomOption> Mens;
+        public List<BathroomOption> Womens;
+        public List<BarOption> bar;
 
         public void Apply() {
             List<CustomerInteractable> instances;
@@ -28,7 +34,7 @@ namespace Assets.Scripts {
 
             // Set up BathroomM
             bathroom = Bathroom.BathroomM;
-            instances = ApplyToArea(bathroom, Mens.Options);
+            instances = ApplyToArea(bathroom, Mens);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
             AddSpot((5d, 1d), bathroom, false);
@@ -40,7 +46,7 @@ namespace Assets.Scripts {
 
             // Set up BathroomF
             bathroom = Bathroom.BathroomF;
-            instances = ApplyToArea(bathroom, Womens.Options);
+            instances = ApplyToArea(bathroom, Womens);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
             AddSpot((5d, 1d), bathroom, false);
@@ -49,6 +55,9 @@ namespace Assets.Scripts {
             AddSpot((2d, -0.5d), bathroom, true);
             AddSpot((1d, -0.5d), bathroom, true);
             AddSpot((0d, -0.5d), bathroom, true);
+
+            // Set up bar
+            ApplyToArea(Bar.Singleton, bar);
 
             void AddSpot((double, double) position, Bathroom bathroom, bool isLine) {
                 Vector2 vector = bathroom.Area.GetGridPosition(position);
@@ -62,9 +71,9 @@ namespace Assets.Scripts {
                 }
             }
         }
-        static private List<CustomerInteractable> ApplyToArea(Bathroom bathroom, List<Option> options) {
+        static private List<CustomerInteractable> ApplyToArea(Bathroom bathroom, List<BathroomOption> options) {
             List<CustomerInteractable> results = new List<CustomerInteractable>();
-            foreach ( Option option in options ) {
+            foreach ( BathroomOption option in options ) {
                 Area2D area = bathroom.Area;
                 Vector2 vector = area.GetGridPosition((option.X, option.Y));
                 CustomerInteractable prefab;
@@ -87,6 +96,29 @@ namespace Assets.Scripts {
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
                 instance.Facing = option.Facing;
                 instance.Location = bathroom.Location;
+                results.Add(instance);
+            }
+            return results;
+        }
+        static private List<CustomerInteractable> ApplyToArea(Bar bar, List<BarOption> options) {
+            List<CustomerInteractable> results = new List<CustomerInteractable>();
+            foreach ( var option in options ) {
+                Area2D area = bar.Area;
+                Vector2 vector = area.GetGridPosition((option.X, option.Y));
+                CustomerInteractable prefab;
+                if ( option.Current == null ) {
+                    continue;
+                }
+                switch ( option.Current ) {
+                    case InteractableType.Seat:
+                        prefab = Prefabs.PrefabSeat;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+                CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
+                instance.Facing = option.Facing;
+                instance.Location = Location.Bar;
                 results.Add(instance);
             }
             return results;

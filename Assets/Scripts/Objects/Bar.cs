@@ -17,7 +17,6 @@ public class Bar : MonoBehaviour {
     public static double DrinkAmount;
 
     [SerializeField] public List<Seat> Seats;
-    [SerializeField] public List<BarTable> Tables;
 
     public Seat GetOpenSeat() {
         var x = Seats.Where(x => x.OccupiedBy == null && !x.IsSoiled).ToArray();

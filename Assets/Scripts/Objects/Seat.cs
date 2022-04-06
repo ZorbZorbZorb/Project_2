@@ -1,6 +1,12 @@
-using Assets.Scripts;
 using Assets.Scripts.Objects;
+using System;
 using UnityEngine;
+
+public enum SeatType {
+    None,
+    Counter,
+    Table
+}
 
 public class Seat : CustomerInteractable {
     public override InteractableType IType => InteractableType.Seat;
@@ -13,9 +19,14 @@ public class Seat : CustomerInteractable {
     public override bool CanBeSoiled => true;
     public override bool ChangesCustomerSprite => true;
     public SpriteRenderer Renderer;
+    public SeatType SeatType;
     private void Start() {
         Location = Location.Bar;
         Renderer = gameObject.GetComponent<SpriteRenderer>();
+        if ( SeatType == SeatType.None ) {
+            throw new InvalidOperationException("Seat was not initiailized correctly");
+        }
+        Bar.Singleton.Seats.Add(this);
     }
     private void Update() {
         if ( OccupiedBy != null && OccupiedBy.AtDestination ) {
