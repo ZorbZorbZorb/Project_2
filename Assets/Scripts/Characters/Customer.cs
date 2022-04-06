@@ -418,8 +418,8 @@ public class Customer : MonoBehaviour {
         LastDesperationState = DesperationState;
     }
     /// <summary>
-    /// Moves the customer from where they are currently located to the target's vector3
-    ///   factoring in keyframes.
+    /// Moves the customer from where they are currently located to the target's vector3.
+    ///   Movement begins next MoveUpdate.
     /// <para>
     ///   Does not change references, only handles movement
     /// </para>
@@ -428,20 +428,34 @@ public class Customer : MonoBehaviour {
     /// Interactable destination to move to. Respects male / female
     /// position properties if available
     /// </param>
-    public void MoveToInteractable(CustomerInteractable target) {
-        
+    public void MoveTo(CustomerInteractable target) {
+        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(position, target.Location);
+        vectors.Add(Gender == 'm' ? target.CustomerPositionM : target.CustomerPositionF);
+        Navigation.AddRange(vectors);
+        Destination = vectors.Last();
+        AtDestination = false;
     }
     /// <summary>
-    /// Adds a Vector3 destination to the customer's navigation queue. They will begin to move
-    /// to this destination next MoveUpdate.
+    /// Moves the customer from where they are currently located to the location's point
+    ///   Movement begins next MoveUpdate.
     /// <para>
-    /// Sets AtDestination to false on call. Calling move to a location the customer is already at
-    /// will cause a frame where the customer is not where they currently are. Just don't do this.
-    /// The missile will not know where it is.
+    ///   Does not change references, only handles movement
     /// </para>
     /// </summary>
-    /// <param name="destination"></param>
-    public void MoveToVector3(Vector3 destination) {
+    /// <param name="target">
+    /// Interactable destination to move to. Respects male / female
+    /// position properties if available
+    /// </param>
+    public void MoveTo(Location location) {
+        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(position, location);
+        if ( vectors.Any() ) {
+            Navigation.AddRange(vectors);
+            Destination = vectors.Last();
+            AtDestination = false;
+        }
+    }
+    [Obsolete]
+    public void MoveTo(Vector3 destination) {
         Navigation.Add(destination);
         Destination = destination;
         AtDestination = false;
@@ -589,12 +603,7 @@ public class Customer : MonoBehaviour {
         Emotes.ShowBladderCircle(false);
         ActionState = Collections.CustomerActionState.None;
         if ( IsWet ) {
-            if ( position != Location.Bar ) {
-                foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
-                    MoveToVector3(keyframe);
-                }
-            }
-            MoveToVector3(Collections.OffScreenTop);
+            MoveTo(Location.Outside);
             position = Location.Outside;
             Occupying.OccupiedBy = null;
             Occupying = null;
@@ -652,20 +661,13 @@ public class Customer : MonoBehaviour {
         if ( Occupying != null ) {
             Occupying.OccupiedBy = null;
         }
-
-        if ( position == Location.Bar && thing.CustomerLocation != position ) {
-            foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBarToBathroom ) {
-                MoveToVector3(keyframe);
-            }
-        }
-
+        MoveTo(thing);
         // Move the customer to the thing. Flip sprite if necessary
         if (thing.Alignment == Alignment.Horizontal) {
             SRenderer.flipX = thing.Facing == Orientation.West;
         }
-        MoveToVector3(Gender == 'f' ? thing.CustomerPositionF : thing.CustomerPositionM);
 
-        position = thing.CustomerLocation;
+        position = thing.Location;
         Occupying = thing;
         thing.OccupiedBy = this;
         CanWetNow = thing.CanWetHere;
@@ -843,13 +845,10 @@ public class Customer : MonoBehaviour {
     // Fully leaves the area
     public void Leave() {
         StopOccupyingAll();
-        if ( position != Location.Bar ) {
-            foreach ( Vector3 keyframe in CurrentBathroom.NavigationKeyframesFromBathroomToBar ) {
-                MoveToVector3(keyframe);
-            }
-        }
-        MoveToVector3(Collections.OffScreenTop);
-        position = Location.Outside;
+        MoveTo(Location.Outside);
+        SetNext(0f, () => { 
+            position = Location.Outside; 
+        }, () => AtDestination );
     }
     #endregion
 

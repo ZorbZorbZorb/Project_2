@@ -67,7 +67,9 @@
     <Compile Include="Assets\Scripts\Location.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\BuildClickable.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IWaitingSpotQueue.cs" />
-    <Compile Include="Assets\Scripts\MetaObjects\Navigation.cs" />
+    <Compile Include="Assets\Scripts\Navigation.cs" />
+    <Compile Include="Assets\Scripts\MetaObjects\NavigationNode.cs" />
+    <Compile Include="Assets\Scripts\MetaObjects\NavigationPoint.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\WaitingSpot.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\InteractableSpawnpoint.cs" />
     <Compile Include="Assets\Scripts\Objects\Seat.cs" />

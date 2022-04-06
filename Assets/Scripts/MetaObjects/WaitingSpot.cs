@@ -1,17 +1,12 @@
-using Assets.Scripts.Interfaces;
+using Assets.Scripts;
 using Assets.Scripts.Objects;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WaitingSpot : CustomerInteractable {
     public Bathroom SpotBathroom;
     public override InteractableType IType => InteractableType.WaitingSpot;
     public override ReliefType RType => ReliefType.None;
-    [Obsolete("These two need to go")]
-    public override Location CustomerLocation => Location.WaitingRoom;
-    [Obsolete("These two need to go")]
+    public override Location Location => Location.WaitingRoom;
     public Location CustomerState = Location.WaitingRoom;
     public override Vector3 CustomerPositionF => transform.position;
     public override Vector3 CustomerPositionM => transform.position;
@@ -23,12 +18,10 @@ public class WaitingSpot : CustomerInteractable {
     public override bool ChangesCustomerSprite => false;
     public void MoveCustomerIntoSpot(Customer customer) {
         customer.StopOccupyingAll();
-        if ( customer.position == Location.Bar ) {
-            foreach ( Vector3 keyframe in customer.CurrentBathroom.NavigationKeyframesFromBarToBathroom ) {
-                customer.MoveToVector3(keyframe);
-            }
+        foreach ( Vector3 vector in Navigation.Navigate(customer.position, Location) ) {
+            customer.MoveTo(vector);
         }
-        customer.MoveToVector3(CustomerPositionF);
+        customer.MoveTo(CustomerPositionF);
         customer.Occupying = this;
         OccupiedBy = customer;
     }

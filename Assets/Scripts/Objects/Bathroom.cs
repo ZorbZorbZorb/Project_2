@@ -25,8 +25,7 @@ public class Bathroom : MonoBehaviour {
     public DoorwayQueue doorwayQueue;
     public WaitingRoom waitingRoom;
 
-    public Transform KeyframeOutsideDoor;
-    public Transform KeyframeInsideDoor;
+    public Location Location { get; }
 
     // Several of these are checked once per tick by each customer.
     public bool HasToiletAvailable { get; private set; }
