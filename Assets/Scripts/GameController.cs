@@ -1,6 +1,4 @@
 using Assets.Scripts;
-using Assets.Scripts.Extensions;
-using Assets.Scripts.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class GameController : MonoBehaviour {
+public partial class GameController : MonoBehaviour {
     void Start() {
         if ( GC != null ) {
             Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
@@ -22,15 +20,12 @@ public class GameController : MonoBehaviour {
         Bathroom.BathroomF.Area.Area.enabled = false;
         Bar.Singleton.Area.Area.enabled = false;
 
+        // Lock up the camera
         Freecam.NoZoom = true;
         Freecam.NoPan = true;
 
         // Clear the menu system's caches.
         Menu.ClearForSceneReload();
-
-        // Set the callbacks for the pause menu buttons. (restart and main menu)
-        PauseMenu.SetUpButtons();
-        BuildMenu.SetUpButtons();
 
         // Load the prefabs
         Prefabs.Load();
@@ -53,8 +48,7 @@ public class GameController : MonoBehaviour {
             DebugBuildAll = false;
         }
 
-        // Set max customers and initialize bar time
-        maxCustomers = Bar.Singleton.Seats.Count;
+        // initialize bar time
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 21, 0, 0);
 
         // Start build mode if not first night
@@ -131,7 +125,6 @@ public class GameController : MonoBehaviour {
         timeAcc += Time.deltaTime;
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
-            DespawnCustomerOutside();
             Think();
 
             // Update time and funds display once per second.
@@ -154,12 +147,15 @@ public class GameController : MonoBehaviour {
     public bool SpawningEnabled = true;
     public bool CanPause = true;
     public static bool CreateNewSaveData = true;  // Hey, turn this off on build
+    public bool DisplayedNightStartSplashScreen = false;
     
+    // Managers
+    public CustomerManager CustomersManager = new CustomerManager();
+
     // Save data
     public GameData gameData;
     public Layout layout;
 
-    public bool DisplayedNightStartSplashScreen = false;
 
     // Unique Id System
     private static int uid = 0;
@@ -173,7 +169,6 @@ public class GameController : MonoBehaviour {
     public int AdvanceBarTimeEveryXSeconds;
     public int AdvanceBarTimeByXMinutes;
 
-    public static List<Customer> customers = new List<Customer>();
     public int ticksSinceLastSpawn = 0;
     public int maxCustomers = 14;
     public double nightStartFunds;
@@ -187,13 +182,6 @@ public class GameController : MonoBehaviour {
     public Canvas NightStartCanvas;
     public Text NightStartText;
     public SpriteRenderer NightStartOverlay;
-
-    public void SetMaxCustomers(int max) {
-        maxCustomers = max;
-    }
-
-    public WaitingRoom waitingRoom;
-    public DoorwayQueue doorwayQueue;
 
     /// <summary>
     /// References the currently active GameController singleton
@@ -246,7 +234,6 @@ public class GameController : MonoBehaviour {
         uid = 0;
         GamePaused = false;
         gamePaused = false;
-        customers = new List<Customer>();
         InteractableSpawnpoint.Spawnpoints = new List<InteractableSpawnpoint>();
     }
 
@@ -267,7 +254,7 @@ public class GameController : MonoBehaviour {
         maxCustomers = Bar.Singleton.Seats.Count;
     }
     #endregion
-
+    
     #region PauseMenu
     public PauseMenu PauseMenu;
     private static bool gamePaused = false;
@@ -411,7 +398,7 @@ public class GameController : MonoBehaviour {
 
         nightStartFunds = gameData.funds;
 
-        Customer firstCustomer = SpawnCustomerInBar(true);
+        Customer firstCustomer = CustomersManager.CreateCustomer(true);
         firstCustomer.Active = true;
 
         if ( DebugSpawnOneCustomerOnly ) {
@@ -437,17 +424,6 @@ public class GameController : MonoBehaviour {
             }
         }
     }
-
-    // Temp method that despawns customers in the bar that dont need to go or have peed themselves
-    private void DespawnCustomerOutside() {
-        Customer[] targets = customers.Where(x => x.Location == Location.Outside && x.AtDestination && x.Active).ToArray();
-        foreach ( Customer target in targets ) {
-            RemoveCustomer(target);
-        }
-    }
-    private IEnumerable<Customer> CustomersInBar() => customers.Where(x => x.Location == Location.Bar);
-    private IEnumerable<Customer> CustomersInBathroom() => customers
-        .Where(x => x.Location == Location.BathroomM || x.Location == Location.BathroomF);
     public void UpdateFundsDisplay() {
         fundsDisplay.text = "$" + Math.Round(gameData.funds, 0).ToString();
     }
@@ -458,9 +434,8 @@ public class GameController : MonoBehaviour {
     /// </summary>
     private void AdvanceTime() {
         // Generate funds for customers in bar
-        int customersInBar = CustomersInBar().Count();
-        int customersInBathroom = CustomersInBathroom().Count();
-        AddFunds(( customersInBar * 3d ) + ( customersInBathroom * 1d ));
+        double amount = ( CustomersManager.CustomersInBar.Count() * 3d ) + ( CustomersManager.CustomersInBathroom.Count() * 1d );
+        AddFunds(amount);
         // TODO: Have a little money emote display above each customer in the bar who generated funds.
         // Advance time
         timeTicksElapsed++;
@@ -488,19 +463,19 @@ public class GameController : MonoBehaviour {
             SpawningEnabled = false;
 
             // End game at end time or everyone has left
-            if ( customers.Count() < 1 || timeTicksElapsed >= nightMaxTime ) {
+            if ( !CustomersManager.Customers.Any() || timeTicksElapsed >= nightMaxTime ) {
                 GameEnd = true;
                 return;
             }
         }
 
         // Customer spawning
-        if ( SpawningEnabled && customers.Count < maxCustomers ) {
+        if ( SpawningEnabled && !CustomersManager.AtCapacity ) {
             ticksSinceLastSpawn++;
             bool spawnNow = Random.Range(0, 6) == 0;
             if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
                 ticksSinceLastSpawn = 0;
-                Customer customer = SpawnCustomerInBar(desperate: false);
+                Customer customer = CustomersManager.CreateCustomer(desperate: false);
             }
         }
 
@@ -509,41 +484,4 @@ public class GameController : MonoBehaviour {
             AdvanceTime();
         }
     }
-    public Customer SpawnCustomerInBar(bool desperate) {
-        Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Assets.Scripts.Navigation.CustomerSpawnpoint, Quaternion.identity);
-        newCustomer.Location = Location.Outside;
-        newCustomer.Gender = Random.Range(0, 2) == 0 ? 'm' : 'f';
-        customers.Add(newCustomer);
-        if ( desperate ) {
-            newCustomer.SetupCustomer(90, 100);
-        }
-        else {
-            newCustomer.SetupCustomer(30, 90);
-        }
-        Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
-        newCustomer.Active = true;
-        bool enteredDoorway = false;
-        if ( newCustomer.WantsToEnterBathroom() &&
-            ( newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
-            newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) ) {
-
-            var bathroom = newCustomer.Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
-            enteredDoorway = newCustomer.GetInLine(bathroom);
-        }
-        // Else sit right down at the bar and wait
-        if ( !enteredDoorway ) {
-            Seat seat = Bar.Singleton.GetOpenSeat();
-            newCustomer.Occupy(seat);
-        }
-
-        return newCustomer;
-    }
-    public void RemoveCustomer(Customer customer) {
-        Debug.LogWarning($"Deleted customer {customer.UID}");
-        customer.StopOccupyingAll();
-        customers.Remove(customer);
-        Destroy(customer.gameObject);
-    }
-
 }

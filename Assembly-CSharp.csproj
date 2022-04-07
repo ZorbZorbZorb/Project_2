@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Area2D.cs" />
+    <Compile Include="Assets\Scripts\CustomerManager.cs" />
     <Compile Include="Assets\Scripts\Layout.cs" />
     <Compile Include="Assets\Scripts\Characters\Bladder.cs" />
     <Compile Include="Assets\Scripts\Abstract\Line.cs" />

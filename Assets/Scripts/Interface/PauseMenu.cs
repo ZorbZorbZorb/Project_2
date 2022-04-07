@@ -96,6 +96,7 @@ namespace Assets.Scripts {
         }
 
         public PauseMenu() {
+            SetUpButtons();
         }
     }
 }

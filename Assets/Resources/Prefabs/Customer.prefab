@@ -1179,8 +1179,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HasNext: 0
   NextDelay: 0
-  CurrentBathroom: {fileID: 0}
-  OtherBathroom: {fileID: 0}
   Funds: 0
   LastDrinkAt: -20
   DrinkInterval: 30
@@ -1205,7 +1203,7 @@ MonoBehaviour:
   DesperationStateChangeThisUpdate: 0
   CustomerState: 0
   bladder:
-    AverageMax: 800
+    AverageMax: 600
     customer: {fileID: 0}
     Stomach: 0
     Amount: 0
@@ -1238,7 +1236,7 @@ MonoBehaviour:
   MinTimeBetweenChecks: 8
   MinTimeBetweenChecksNow: 0
   ActionState: 0
-  position: 1
+  Location: 0
   Occupying: {fileID: 0}
   Destination: {x: 0, y: 0, z: 0}
   Navigation: []
