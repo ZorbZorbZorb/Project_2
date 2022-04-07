@@ -1,0 +1,2 @@
+For movement, only slow the character down when approaching the final movement node, otherwise normal speed,
+the character movement can be made smooth by counting an intermediate node as approached after the character is within 2f of it, and starting to move to the next one right away, or both at once
