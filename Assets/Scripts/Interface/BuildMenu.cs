@@ -111,7 +111,6 @@ namespace Assets.Scripts {
         }
 
         public BuildMenu() {
-            SetUpButtons();
         }
     }
 }

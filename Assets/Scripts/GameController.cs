@@ -27,6 +27,10 @@ public partial class GameController : MonoBehaviour {
         // Clear the menu system's caches.
         Menu.ClearForSceneReload();
 
+        // Set up menu buttons
+        BuildMenu.SetUpButtons();
+        PauseMenu.SetUpButtons();
+
         // Load the prefabs
         Prefabs.Load();
 
