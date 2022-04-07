@@ -106,7 +106,7 @@
 		"X":1,
 		"Y":1,
 		"Options":["Seat"],
-		"Current":"Seat",
+		"Current":null,
 		"Facing":"South",
 		"IsTable":false
 		},
@@ -162,7 +162,7 @@
 		"X":8,
 		"Y":1,
 		"Options":["Seat"],
-		"Current":"Seat",
+		"Current":null,
 		"Facing":"South",
 		"IsTable":false
 		},
@@ -170,7 +170,7 @@
 		"X":9,
 		"Y":1,
 		"Options":["Seat"],
-		"Current":"Seat",
+		"Current":null,
 		"Facing":"South",
 		"IsTable":false
 		}

@@ -165,6 +165,14 @@
 		"Current":"Seat",
 		"Facing":"South",
 		"IsTable":false
+		},
+		{
+		"X":9,
+		"Y":1,
+		"Options":["Seat"],
+		"Current":"Seat",
+		"Facing":"South",
+		"IsTable":false
 		}
 	]
 }
