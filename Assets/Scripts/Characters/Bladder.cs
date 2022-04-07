@@ -7,8 +7,7 @@ using Random = UnityEngine.Random;
 // Pee is stored in the balls
 [Serializable]
 public class Bladder {
-    [SerializeField]
-    public double AverageMax = 800;
+    public double AverageMax = 700;
     [SerializeField]
     public Customer customer;
     public double Stomach;  // The stomach is stored in the bladder
@@ -193,7 +192,7 @@ public class Bladder {
         }
 
         // Randomly give maximum bladder size from 550 to 1500
-        Max = Random.Range(550, 1500);
+        Max = Random.Range(400, 1000);
         // Randomly give fullness of min% to max%
         double fullness = 0.01d * Random.Range(min, max);
         Amount = fullness * Max;
