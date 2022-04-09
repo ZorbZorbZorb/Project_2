@@ -7,12 +7,14 @@ public class Freecam : MonoBehaviour {
     public static float MaxZoom = 200f;
     public static float MinZoom = 600f;
 
+    // Change to mouse pan and mouse zoom for clarity.
     public static bool NoPan = false;
     public static bool NoZoom = false;
 
     public Camera Camera { get; private set; }
-    /// <summary>Is camera panning this update?</summary>
+    private bool mousePanning = false;
     private bool panning = false;
+    private Vector3 panIntent;
     /// <summary>Camera pan speed</summary>
     public float FreeLookSensitivity;
     /// <summary>Amount to zoom the camera when scrolling</summary>
@@ -35,13 +37,15 @@ public class Freecam : MonoBehaviour {
     private float cameraDown;
 
     private void Awake() {
-        this.Camera = GetComponent<Camera>();
-
-        zoomCurrent = this.Camera.orthographicSize;
-        zoomIntent = this.Camera.orthographicSize;
-        zooming = false;
+        Camera = GetComponent<Camera>();
 
         Center = transform.position;
+
+        zoomCurrent = Camera.orthographicSize;
+        zoomIntent = Camera.orthographicSize;
+        zooming = false;
+
+        panIntent = Center;
 
         // Recalculate camera size and overages
         CalculateCameraSize();
@@ -62,46 +66,57 @@ public class Freecam : MonoBehaviour {
             Destroy(CameraBounds.gameObject);
         }
     }
-
     void Update() {
-        if ( NoPan ) {
-            if ( panning ) {
-                StopPanning();
+        // If Auto-panning
+        if ( panning ) {
+            NoPan = true;
+            if ( mousePanning ) {
+                StopMousePanning();
             }
+            PanCamera();
         }
+        // If mouse panning
         else {
-            // Are we free-looking?
-            if ( Input.GetKeyDown(KeyCode.Mouse1) ) {
-                StartPanning();
+            if ( NoPan ) {
+                if ( mousePanning ) {
+                    StopMousePanning();
+                }
             }
-            else if ( Input.GetKeyUp(KeyCode.Mouse1) ) {
-                StopPanning();
-            }
+            else {
+                // Are we free-looking?
+                if ( Input.GetKeyDown(KeyCode.Mouse1) ) {
+                    StartMousePanning();
+                }
+                else if ( Input.GetKeyUp(KeyCode.Mouse1) ) {
+                    StopMousePanning();
+                }
 
-            // Pan the camera
-            if ( panning ) {
-                PanCamera();
+                // Pan the camera
+                if ( mousePanning ) {
+                    MousePanCamera();
+                }
             }
         }
 
-        // Zoom the camera
+        // Capture mouse scrollwheel for zoom
         if ( !NoZoom ) {
             float axis = Input.GetAxis("Mouse ScrollWheel");
             if ( axis != 0 ) {
                 ZoomCamera(axis);
             }
-            else if ( zooming ) {
-                ApproachZoom();
-            }
         }
-        // If not allowed to zoom camera, stop zooming now.
-        else {
-            zoomIntent = zoomCurrent;
-            zooming = false;
+        // Zoom the camera
+        if ( zooming ) {
+            ApproachZoom();
+        }
+    }
+    void OnDisable() {
+        if ( mousePanning ) {
+            StopMousePanning();
         }
     }
 
-    private void PanCamera() {
+    private void MousePanCamera() {
         // How much to pan?
         var multiplier = FreeLookSensitivity * Time.fixedDeltaTime;
         // The clamp will prevent the camera from 'snapping' when alt-tabbing and disorienting the player
@@ -115,8 +130,18 @@ public class Freecam : MonoBehaviour {
         // Move the camera
         UpdateCameraPosition(newX, newY);
     }
+    private void PanCamera() {
+        float distance = Vector3.Distance(transform.position, panIntent);
+        if ( distance < 0.1f ) {
+            panning = false;
+        }
+        else {
+            float amount = 20f + ( distance * 2f );
+            transform.position = Vector3.MoveTowards(transform.position, panIntent, amount * Time.deltaTime);
+        }
+    }
     private void ZoomCamera(float axis) {
-        zoomIntent = Mathf.Clamp(zoomIntent + (-axis * ZoomSens), MaxZoom, MinZoom);
+        zoomIntent = Mathf.Clamp(zoomIntent + ( -axis * ZoomSens ), MaxZoom, MinZoom);
         if ( zoomIntent != zoomCurrent ) {
             zooming = true;
             ApproachZoom();
@@ -125,12 +150,12 @@ public class Freecam : MonoBehaviour {
     private void ApproachZoom() {
         // Approach the intended zoom amount
         float difference = ( zoomIntent - zoomCurrent );
-        float zoomAmount = (difference * Time.fixedDeltaTime) + 0.1f * Mathf.Sign(difference);
+        float zoomAmount = ( difference * Time.fixedDeltaTime ) + 0.1f * Mathf.Sign(difference);
         zoomCurrent = Mathf.Clamp(Camera.main.orthographicSize + zoomAmount, MaxZoom, MinZoom);
         Camera.main.orthographicSize = zoomCurrent;
 
         // Stop zooming if finished approaching
-        if ( Mathf.Abs( zoomCurrent - zoomIntent ) < 0.2f ) {
+        if ( Mathf.Abs(zoomCurrent - zoomIntent) < 0.2f ) {
             zooming = false;
             zoomIntent = zoomCurrent;
         }
@@ -167,69 +192,72 @@ public class Freecam : MonoBehaviour {
         cameraDown = transform.position.y - halfCamHeight;
         cameraUp = transform.position.y + halfCamHeight;
     }
-    void OnDisable() {
-        StopPanning();
-    }
-    private void StartPanning() {
-        panning = true;
+    private void StartMousePanning() {
+        mousePanning = true;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
-    private void StopPanning() {
-        panning = false;
+    private void StopMousePanning() {
+        mousePanning = false;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
-    /// <summary>
-    /// Unpans the camera, returning it to the position it was when the freecam component was created.
-    /// <para>Uses the current main camera</para>
-    /// </summary>
-    public static void UnpanCamera() {
-        Camera.main.transform.position = Center;
+    public void UnpanCamera() {
+        Camera.transform.position = Center;
     }
     /// <summary>
-    /// Unpans the camera, returning it to the position it was when the freecam component was created.
+    /// Auto-Pans the camera to a vector3.
+    /// <para>Disables mouse panning</para>
     /// </summary>
-    public static void UnpanCamera(Camera camera) {
-        camera.transform.position = Center;
+    /// <param name="pan"></param>
+    /// <param name="instant"></param>
+    public void PanTo(Vector3 pan, bool instant = false) {
+        pan.z = transform.position.z;
+
+        if (mousePanning) {
+            StopMousePanning();
+        }
+
+        if ( instant ) {
+            panning = false;
+            transform.position = pan;
+        }
+        else {
+            NoPan = true;
+            if ( mousePanning ) {
+                StopMousePanning();
+            }
+            panning = true;
+            panIntent = pan;
+        }
     }
     /// <summary>
-    /// Unpans the camera, returning it to the position it was when the freecam component was created.
+    /// Auto-Zooms the camera to a zoom level.
     /// </summary>
-    public static void UnpanCamera(Freecam freecam) {
-        freecam.Camera.transform.position = Center;
+    /// <param name="zoom"></param>
+    /// <param name="instant"></param>
+    public void ZoomTo(float zoom, bool instant = false) {
+        if ( instant ) {
+            Camera.orthographicSize = MinZoom;
+            zoomIntent = MinZoom;
+            zooming = false;
+            zoomCurrent = MinZoom;
+        }
+        else {
+            zoomIntent = zoom;
+            zooming = true;
+        }
     }
-    /// <summary>
-    /// Unzooms the camera to MinZoom
-    /// <para>Uses the current main camera. Must to call GetComponent. Please consider keeping a reference to your 
-    /// freecamera and using <see cref="UnZoomCamera(Freecam)"/> instead.</para>
-    /// </summary>
-    public static void UnzoomCamera() {
-        Camera camera = Camera.main;
-        camera.orthographicSize = MinZoom;
-        // There's little way around this one, sorry.
-        StopZoom(camera.GetComponent<Freecam>());
+    public void LockCamera() {
+        NoZoom = true;
+        NoPan = true;
+        if ( zooming ) {
+            zoomIntent = zoomCurrent;
+            zooming = false;
+        }
     }
-    /// <summary>
-    /// Unzooms the camera to MinZoom
-    /// <para>Must to call GetComponent. Please consider keeping a reference to your 
-    /// freecamera and using <see cref="UnZoomCamera(Freecam)"/> instead.</para>
-    /// </summary>
-    public static void UnzoomCamera(Camera camera) {
-        camera.orthographicSize = MinZoom;
-        // There's little way around this one, sorry.
-        StopZoom(camera.GetComponent<Freecam>());
-    }
-    /// <summary>
-    /// Unzooms the camera to MinZoom
-    /// </summary>
-    public static void UnZoomCamera(Freecam camera) {
-        camera.Camera.orthographicSize = MinZoom;
-        StopZoom(camera);
-    }
-    private static void StopZoom(Freecam freecam) {
-        freecam.zoomIntent = MinZoom;
-        freecam.zooming = false;
-        freecam.zoomCurrent = MinZoom;
+    public void UnlockCamera() {
+        NoZoom = false;
+        NoPan = false;
     }
 }

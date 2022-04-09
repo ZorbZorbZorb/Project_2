@@ -75,8 +75,8 @@ public partial class GameController : MonoBehaviour {
 
     /// <summary><see cref="GameController"/> singleton</summary>
     public static GameController GC = null;
-    /// <summary><see cref="Freecam"/> singleton</summary>
-    public static Freecam Freecam = null;
+    /// <summary><see cref="Cam"/> singleton</summary>
+    public static Freecam Cam = null;
 
     void Start() {
         if ( GC != null ) {
@@ -84,6 +84,9 @@ public partial class GameController : MonoBehaviour {
         }
         GC = this;
         Customer.GC = this;
+
+        // Freecam should always be attached to the main camera
+        Cam = Camera.main.GetComponent<Freecam>();
 
         // Shut off all of the Area2d colliders
         Bathroom.BathroomM.Area.Area.enabled = false;
@@ -196,6 +199,24 @@ public partial class GameController : MonoBehaviour {
                         PauseGame();
                     }
                 }
+            }
+            if (Input.GetKeyDown(KeyCode.D)) {
+                Cam.LockCamera();
+                Cam.PanTo(Bathroom.BathroomF.transform.position);
+                Cam.ZoomTo(450);
+            }
+            if ( Input.GetKeyDown(KeyCode.A) ) {
+                Cam.LockCamera();
+                Cam.PanTo(Bathroom.BathroomM.transform.position);
+                Cam.ZoomTo(450);
+            }
+            if ( Input.GetKeyDown(KeyCode.S) ) {
+                Cam.LockCamera();
+                Cam.PanTo(Freecam.Center);
+                Cam.ZoomTo(600);
+            }
+            if (Input.GetKeyDown(KeyCode.W)) {
+                Cam.UnlockCamera();
             }
         }
     }
@@ -351,8 +372,8 @@ public partial class GameController : MonoBehaviour {
         Freecam.NoZoom = true;
         Freecam.NoPan = true;
         // These two shouldnt be done in production, its just a bandaid. Add a cached last pan last zoom to return to ???
-        Freecam.UnzoomCamera();
-        Freecam.UnpanCamera();
+        Cam.ZoomTo(Freecam.MinZoom, instant: true);
+        Cam.UnpanCamera();
         // Close all open menus.
         Menu.CloseAllOpenMenus();
         PauseMenu.Open();
