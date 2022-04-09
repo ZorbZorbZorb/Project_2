@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Assets.Scripts {
@@ -28,6 +29,9 @@ namespace Assets.Scripts {
         public List<BathroomOption> Mens;
         public List<BathroomOption> Womens;
         public List<BarOption> bar;
+
+        public int Night;
+        public int Funds;
 
         public void Apply() {
             Bathroom.BathroomM.Area.Area.enabled = true;
@@ -158,6 +162,65 @@ namespace Assets.Scripts {
         }
         static public Layout FromJson(string json) {
             return JsonConvert.DeserializeObject<Layout>(json);
+        }
+        private static string GetSavePath(int slotNumber) => Path.Combine( Application.persistentDataPath, $"/{slotNumber}.json");
+        public static Layout ImportDefault() {
+            string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
+            return FromJson(json);
+        }
+        public static Layout Import(int slotNumber) {
+            string path = GetSavePath(slotNumber);
+            FileStream fs = null;
+            StreamReader reader = null;
+            string json;
+            try {
+                using (fs = new FileStream(path, FileMode.OpenOrCreate)) {
+                    using ( reader = new StreamReader(fs) ) {
+                        json = reader.ReadToEnd();
+                    }
+                }
+            }
+            catch (IOException e) {
+                Debug.LogError($"Save import failed for path '{path}'");
+                throw e;
+            }
+            finally {
+                reader?.Close();
+                fs?.Close();
+            }
+
+            try {
+                Layout layout = FromJson(json);
+                Debug.Log($"Save imported from slot {slotNumber}");
+                return layout;
+            }
+            catch (Exception e) {
+                Debug.LogError($"Save import failed for slot {slotNumber}.\r\nSave json may be corrupt.\r\nError: {e.Message}");
+                throw e;
+            }
+        }
+        public void Export(int slotNumber) {
+            string path = GetSavePath(slotNumber);
+            FileStream fs = null;
+            StreamWriter writer = null;
+            string json = ToString();
+            try {
+                File.WriteAllText(path, json);
+                using ( fs = new FileStream(path, FileMode.Create) ) {
+                    using ( writer = new StreamWriter(fs) ) {
+                        writer.Write(json);
+                    }
+                }
+                Debug.Log($"Save exported to slot {slotNumber}");
+            }
+            catch ( IOException e ) {
+                Debug.LogError($"Save export failed for path '{path}'");
+                throw e;
+            }
+            finally {
+                writer?.Close();
+                fs?.Close();
+            }
         }
     }
 }
