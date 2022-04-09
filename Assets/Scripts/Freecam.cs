@@ -7,9 +7,7 @@ public class Freecam : MonoBehaviour {
     public static float MaxZoom = 200f;
     public static float MinZoom = 600f;
 
-    // Change to mouse pan and mouse zoom for clarity.
-    public static bool NoPan = false;
-    public static bool NoZoom = false;
+    public bool Locked = false;
 
     public Camera Camera { get; private set; }
     private bool mousePanning = false;
@@ -67,41 +65,38 @@ public class Freecam : MonoBehaviour {
         }
     }
     void Update() {
-        // If Auto-panning
-        if ( panning ) {
-            NoPan = true;
+        if ( Locked ) {
             if ( mousePanning ) {
                 StopMousePanning();
             }
-            PanCamera();
         }
-        // If mouse panning
         else {
-            if ( NoPan ) {
-                if ( mousePanning ) {
-                    StopMousePanning();
-                }
+            // Are we free-looking?
+            if ( Input.GetKeyDown(KeyCode.Mouse1) ) {
+                // Stop auto-panning
+                panning = false;  
+                StartMousePanning();
             }
-            else {
-                // Are we free-looking?
-                if ( Input.GetKeyDown(KeyCode.Mouse1) ) {
-                    StartMousePanning();
-                }
-                else if ( Input.GetKeyUp(KeyCode.Mouse1) ) {
-                    StopMousePanning();
-                }
+            else if ( Input.GetKeyUp(KeyCode.Mouse1) ) {
+                StopMousePanning();
+            }
 
-                // Pan the camera
-                if ( mousePanning ) {
-                    MousePanCamera();
-                }
+            // Pan the camera
+            if ( mousePanning ) {
+                MousePanCamera();
             }
+        }
+
+        // If Auto-panning
+        if ( panning ) {
+            PanCamera();
         }
 
         // Capture mouse scrollwheel for zoom
-        if ( !NoZoom ) {
+        if ( !Locked ) {
             float axis = Input.GetAxis("Mouse ScrollWheel");
             if ( axis != 0 ) {
+                panning = false;
                 ZoomCamera(axis);
             }
         }
@@ -223,10 +218,6 @@ public class Freecam : MonoBehaviour {
             transform.position = pan;
         }
         else {
-            NoPan = true;
-            if ( mousePanning ) {
-                StopMousePanning();
-            }
             panning = true;
             panIntent = pan;
         }
@@ -247,17 +238,5 @@ public class Freecam : MonoBehaviour {
             zoomIntent = zoom;
             zooming = true;
         }
-    }
-    public void LockCamera() {
-        NoZoom = true;
-        NoPan = true;
-        if ( zooming ) {
-            zoomIntent = zoomCurrent;
-            zooming = false;
-        }
-    }
-    public void UnlockCamera() {
-        NoZoom = false;
-        NoPan = false;
     }
 }

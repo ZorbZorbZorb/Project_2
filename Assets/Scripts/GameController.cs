@@ -94,8 +94,7 @@ public partial class GameController : MonoBehaviour {
         Bar.Singleton.Area.Area.enabled = false;
 
         // Lock up the camera
-        Freecam.NoZoom = true;
-        Freecam.NoPan = true;
+        Cam.Locked = true;
 
         // Clear the menu system's caches.
         Menu.ClearForSceneReload();
@@ -200,23 +199,22 @@ public partial class GameController : MonoBehaviour {
                     }
                 }
             }
+            // Camera movement hotkeys
             if (Input.GetKeyDown(KeyCode.D)) {
-                Cam.LockCamera();
                 Cam.PanTo(Bathroom.BathroomF.transform.position);
                 Cam.ZoomTo(450);
             }
             if ( Input.GetKeyDown(KeyCode.A) ) {
-                Cam.LockCamera();
                 Cam.PanTo(Bathroom.BathroomM.transform.position);
                 Cam.ZoomTo(450);
             }
             if ( Input.GetKeyDown(KeyCode.S) ) {
-                Cam.LockCamera();
                 Cam.PanTo(Freecam.Center);
                 Cam.ZoomTo(600);
             }
             if (Input.GetKeyDown(KeyCode.W)) {
-                Cam.UnlockCamera();
+                Cam.PanTo(Freecam.Center);
+                Cam.ZoomTo(600);
             }
         }
     }
@@ -369,8 +367,7 @@ public partial class GameController : MonoBehaviour {
     void PauseGame() {
         Time.timeScale = 0;
         GamePaused = true;
-        Freecam.NoZoom = true;
-        Freecam.NoPan = true;
+        Cam.Locked = true;
         // These two shouldnt be done in production, its just a bandaid. Add a cached last pan last zoom to return to ???
         Cam.ZoomTo(Freecam.MinZoom, instant: true);
         Cam.UnpanCamera();
@@ -389,8 +386,7 @@ public partial class GameController : MonoBehaviour {
         }
         Time.timeScale = 1;
         GamePaused = false;
-        Freecam.NoZoom = false;
-        Freecam.NoPan = false;
+        Cam.Locked = false;
         PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
