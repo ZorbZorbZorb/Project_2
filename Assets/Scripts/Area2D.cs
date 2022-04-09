@@ -22,22 +22,12 @@ namespace Assets.Scripts {
             vector.y = Mathf.Clamp(vector.y, Area.bounds.min.y, Area.bounds.max.y);
             return vector;
         }
-        public Vector2 GetGridPosition((int, int) position) {
-            var x = Area.bounds.min.x + ( position.Item1 * (float)GridScaleX ) + ( GridScaleX / 2f );
-            var y = Area.bounds.min.y + ( position.Item2 * (float)GridScaleY ) + ( GridScaleY / 2f );
-            return new Vector2((float)x, (float)y);
-        }
         public Vector2 GetGridPosition((double, double) position) {
             var x = Area.bounds.min.x + ( position.Item1 * (float)GridScaleX ) + ( GridScaleX / 2f );
             var y = Area.bounds.min.y + ( position.Item2 * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);
         }
-        public Vector2 GetGridPosition(GameSaveData.BarOption option) {
-            var x = Area.bounds.min.x + ( option.X * (float)GridScaleX ) + ( GridScaleX / 2f );
-            var y = Area.bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
-            return new Vector2((float)x, (float)y);
-        }
-        public Vector2 GetGridPosition(GameSaveData.BathroomOption option) {
+        public Vector2 GetGridPosition(GameSaveData.Option option) {
             var x = Area.bounds.min.x + ( option.X * (float)GridScaleX ) + ( GridScaleX / 2f );
             var y = Area.bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);

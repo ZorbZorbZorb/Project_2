@@ -9,25 +9,21 @@ namespace Assets.Scripts {
     [Serializable]
     public class GameSaveData {
         [Serializable]
-        public class BathroomOption {
+        public class Option {
             public int X;
             public int Y;
             public List<InteractableType> Options;
             public InteractableType? Current;
             public Orientation Facing;
+            public int Cost;
         }
         [Serializable]
-        public class BarOption {
-            public int X;
-            public int Y;
-            public List<InteractableType> Options;
-            public InteractableType? Current;
-            public Orientation Facing;
+        public class BarOption : Option {
             public bool isTable;
         }
 
-        public List<BathroomOption> Mens;
-        public List<BathroomOption> Womens;
+        public List<Option> Mens;
+        public List<Option> Womens;
         public List<BarOption> bar;
 
         public int Night;
@@ -53,7 +49,7 @@ namespace Assets.Scripts {
             AddSpot((1d, -0.5d), bathroom, WaitingSpotType.Line);
             AddSpot((0d, -0.5d), bathroom, WaitingSpotType.Line);
             // Add sink spot
-            AddSpot((1d, 3d), bathroom, WaitingSpotType.Sink);
+            AddSpot((1d, 2.5d), bathroom, WaitingSpotType.Sink);
 
             // Set up BathroomF
             bathroom = Bathroom.BathroomF;
@@ -67,7 +63,7 @@ namespace Assets.Scripts {
             AddSpot((1d, -0.5d), bathroom, WaitingSpotType.Line);
             AddSpot((0d, -0.5d), bathroom, WaitingSpotType.Line);
             // Add sink spot
-            AddSpot((1d, 3d), bathroom, WaitingSpotType.Sink);
+            AddSpot((1d, 2.5d), bathroom, WaitingSpotType.Sink);
 
             // Set up bar
             ApplyToArea(Bar.Singleton, bar);
@@ -80,7 +76,7 @@ namespace Assets.Scripts {
                 Vector2 vector = bathroom.Area.GetGridPosition(position);
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
                 instance.Facing = Orientation.South;
-                switch (type) {
+                switch ( type ) {
                     case WaitingSpotType.Line:
                         bathroom.AddLineSpot(instance as WaitingSpot);
                         break;
@@ -95,11 +91,14 @@ namespace Assets.Scripts {
                 }
             }
         }
-        static private List<CustomerInteractable> ApplyToArea(Bathroom bathroom, List<BathroomOption> options) {
+        static public GameSaveData FromJson(string json) {
+            return JsonConvert.DeserializeObject<GameSaveData>(json);
+        }
+        static private List<CustomerInteractable> ApplyToArea(Bathroom bathroom, List<Option> options) {
             List<CustomerInteractable> results = new List<CustomerInteractable>();
-            foreach ( BathroomOption option in options ) {
+            foreach ( Option option in options ) {
                 Area2D area = bathroom.Area;
-                Vector2 vector = area.GetGridPosition((option.X, option.Y));
+                Vector2 vector = area.GetGridPosition(option);
                 CustomerInteractable prefab;
                 if ( option.Current == null ) {
                     continue;
@@ -128,7 +127,7 @@ namespace Assets.Scripts {
             // Seats handle their own setup code in Seat.Start()
             foreach ( var option in options ) {
                 Area2D area = bar.Area;
-                Vector2 vector = area.GetGridPosition((option.X, option.Y));
+                Vector2 vector = area.GetGridPosition(option);
                 if ( option.Current == null ) {
                     continue;
                 }
@@ -160,10 +159,7 @@ namespace Assets.Scripts {
 
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-        static public GameSaveData FromJson(string json) {
-            return JsonConvert.DeserializeObject<GameSaveData>(json);
-        }
-        private static string GetSavePath(int slotNumber) => Path.Combine( Application.persistentDataPath, $"/{slotNumber}.json");
+        private static string GetSavePath(int slotNumber) => Path.Combine(Application.persistentDataPath, $"/{slotNumber}.json");
         public static bool Exists(int slotNumber) => File.Exists(GetSavePath(slotNumber));
         public static GameSaveData ImportDefault() {
             string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
@@ -175,13 +171,13 @@ namespace Assets.Scripts {
             StreamReader reader = null;
             string json;
             try {
-                using (fs = new FileStream(path, FileMode.OpenOrCreate)) {
+                using ( fs = new FileStream(path, FileMode.OpenOrCreate) ) {
                     using ( reader = new StreamReader(fs) ) {
                         json = reader.ReadToEnd();
                     }
                 }
             }
-            catch (IOException e) {
+            catch ( IOException e ) {
                 Debug.LogError($"Save import failed for path '{path}'");
                 throw e;
             }
@@ -195,7 +191,7 @@ namespace Assets.Scripts {
                 Debug.Log($"Save imported from slot {slotNumber}");
                 return layout;
             }
-            catch (Exception e) {
+            catch ( Exception e ) {
                 Debug.LogError($"Save import failed for slot {slotNumber}.\r\nSave json may be corrupt.\r\nError: {e.Message}");
                 throw e;
             }

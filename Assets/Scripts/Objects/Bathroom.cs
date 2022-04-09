@@ -82,14 +82,6 @@ public class Bathroom : MonoBehaviour {
         doorwayQueue.waitingSpots.ForEach(x => x.Bathroom = this);
         waitingRoom.WaitingSpots.ForEach(x => x.Bathroom = this);
         SinksLine.Items.ForEach(x => x.Bathroom = this);
-        // I've messed this up in the past, so drop an error in the console if I forget to change the list size for spawnpoints
-        if (Spawnpoints.Any(x => x == null)) {
-            Debug.LogError("Spawnpoint was null. Is list size too large or was spawnpoint deleted?");
-        }
-        Spawnpoints.Where(x => x != null)
-            .ToList()
-            .ForEach(x => x.Bathroom = this);
-
         switch (Location) {
             case Location.BathroomM:
                 if (BathroomM != null) {
