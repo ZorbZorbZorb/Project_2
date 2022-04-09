@@ -42,24 +42,28 @@ namespace Assets.Scripts {
             instances = ApplyToArea(bathroom, Mens);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
-            AddSpot((5d, 1d), bathroom, false);
-            AddSpot((4d, 1d), bathroom, false);
+            AddSpot((5d, 1d), bathroom, WaitingSpotType.Bathroom);
+            AddSpot((4d, 1d), bathroom, WaitingSpotType.Bathroom);
             // Add line spots
-            AddSpot((2d, -0.5d), bathroom, true);
-            AddSpot((1d, -0.5d), bathroom, true);
-            AddSpot((0d, -0.5d), bathroom, true);
+            AddSpot((2d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((1d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((0d, -0.5d), bathroom, WaitingSpotType.Line);
+            // Add sink spot
+            AddSpot((1d, 3d), bathroom, WaitingSpotType.Sink);
 
             // Set up BathroomF
             bathroom = Bathroom.BathroomF;
             instances = ApplyToArea(bathroom, Womens);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
-            AddSpot((5d, 1d), bathroom, false);
-            AddSpot((4d, 1d), bathroom, false);
+            AddSpot((5d, 1d), bathroom, WaitingSpotType.Bathroom);
+            AddSpot((4d, 1d), bathroom, WaitingSpotType.Bathroom);
             // Add line spots
-            AddSpot((2d, -0.5d), bathroom, true);
-            AddSpot((1d, -0.5d), bathroom, true);
-            AddSpot((0d, -0.5d), bathroom, true);
+            AddSpot((2d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((1d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((0d, -0.5d), bathroom, WaitingSpotType.Line);
+            // Add sink spot
+            AddSpot((1d, 3d), bathroom, WaitingSpotType.Sink);
 
             // Set up bar
             ApplyToArea(Bar.Singleton, bar);
@@ -68,15 +72,22 @@ namespace Assets.Scripts {
             Bathroom.BathroomF.Area.Area.enabled = false;
             Bar.Singleton.Area.Area.enabled = false;
 
-            void AddSpot((double, double) position, Bathroom bathroom, bool isLine) {
+            void AddSpot((double, double) position, Bathroom bathroom, WaitingSpotType type) {
                 Vector2 vector = bathroom.Area.GetGridPosition(position);
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
                 instance.Facing = Orientation.South;
-                if ( isLine ) {
-                    bathroom.AddLineSpot(instance as WaitingSpot);
-                }
-                else {
-                    bathroom.AddInteractable(instance);
+                switch (type) {
+                    case WaitingSpotType.Line:
+                        bathroom.AddLineSpot(instance as WaitingSpot);
+                        break;
+                    case WaitingSpotType.Bathroom:
+                        bathroom.AddInteractable(instance);
+                        break;
+                    case WaitingSpotType.Sink:
+                        bathroom.AddSinkLineSpot(instance as WaitingSpot);
+                        break;
+                    default:
+                        throw new NotImplementedException("Waiting spot not initialized correctly");
                 }
             }
         }

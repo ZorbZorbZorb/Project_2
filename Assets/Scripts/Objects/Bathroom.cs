@@ -16,6 +16,7 @@ public class Bathroom : MonoBehaviour {
     public List<Urinal> Urinals;
     public List<Sink> Sinks;
 
+    // Change to single waiting spot, shared among all sinks
     public Line SinksLine;
 
     public DoorwayQueue doorwayQueue;
@@ -60,6 +61,11 @@ public class Bathroom : MonoBehaviour {
         spot.Location = Location.Hallway;
         doorwayQueue.waitingSpots.Add(spot);
     }
+    public void AddSinkLineSpot(WaitingSpot spot) {
+        spot.Bathroom = this;
+        spot.Location = Location;
+        SinksLine.Items.Add(spot);
+    }
     public Toilet GetToilet() {
         return Toilets.First(x => x.OccupiedBy == null);
     }
@@ -68,27 +74,6 @@ public class Bathroom : MonoBehaviour {
     }
     public Sink GetSink() {
         return Sinks.First(x => x.OccupiedBy == null);
-    }
-    public void EnterSinkQueue(Customer customer) {
-        if ( customer.Occupying.IType == InteractableType.Sink ) {
-            Sink sink = (Sink)customer.Occupying;
-            customer.Occupy(sink);
-            sink.UseForWash(customer);
-            return;
-        }
-        else {
-            customer.Occupying.OccupiedBy = null;
-            customer.Occupying = null;
-        }
-
-        if ( !SinksLine.HasAnyoneInLine() && HasSinkForAny ) {
-            Sink sink = GetSink();
-            sink.UseForWash(customer);
-        }
-        else {
-            WaitingSpot spot = SinksLine.GetNextWaitingSpot();
-            customer.Occupy(spot);
-        }
     }
 
     void Awake() {
@@ -134,8 +119,7 @@ public class Bathroom : MonoBehaviour {
             SinksLine.Update();
             Sink sink = Sinks.FirstOrDefault(x => x.Unoccupied);
             if ( sink != null) {
-                Customer customer = SinksLine.GetNextInLine();
-                sink.UseForWash(customer);
+                sink.UseForWash(SinksLine.GetNextInLine());
             }
         }
 

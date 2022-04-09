@@ -122,13 +122,13 @@ public class Customer : MonoBehaviour {
     #endregion
 
     public Bathroom GetCurrentBathroom() {
-        switch (Location) {
+        switch ( Location ) {
             case Location.BathroomF:
                 return Bathroom.BathroomF;
             case Location.BathroomM:
                 return Bathroom.BathroomM;
             default:
-                if (Occupying is WaitingSpot spot) {
+                if ( Occupying is WaitingSpot spot ) {
                     return spot.Bathroom;
                 }
                 return null;
@@ -182,11 +182,6 @@ public class Customer : MonoBehaviour {
             else {
                 return;
             }
-        }
-
-        // If about to leave or has left
-        if ( Location == Location.Outside && AtDestination && transform.position == Assets.Scripts.Navigation.CustomerSpawnpoint ) {
-            GC.RemoveCustomer(this);
         }
 
         // If wet self and finished wetting self
@@ -613,8 +608,8 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
-        else if ( GetCurrentBathroom().SinksLine.HasOpenWaitingSpot() ) {
-            GetCurrentBathroom().EnterSinkQueue(this);
+        else if (UseSink(GetCurrentBathroom()) ) {
+            // Handled in UseSink(Bathroom)
         }
         else {
             ActionState = Collections.CustomerActionState.None;
@@ -662,11 +657,8 @@ public class Customer : MonoBehaviour {
         }
     }
     public void Occupy(CustomerInteractable thing) {
-        if (Occupying != thing) {
-            // Clear previous occupation reference to this customer
-            if ( Occupying != null ) {
-                Occupying.OccupiedBy = null;
-            }
+        if ( Occupying != thing ) {
+            Unoccupy();
             MoveTo(thing);
             Location = thing.Location;
             // Move the customer to the thing. Flip sprite if necessary
@@ -681,6 +673,17 @@ public class Customer : MonoBehaviour {
         }
         else {
             Debug.LogWarning("Customer tried to occupy a thing they were already occupying");
+        }
+    }
+    /// <summary>
+    /// Tells any <see cref="CustomerInteractable" that it is no longer occupied by this customer, and
+    ///   also />
+    /// </summary>
+    public void Unoccupy() {
+        if (Occupying != null) {
+            Occupying.OccupiedBy = null;
+            Occupying = null;
+
         }
     }
     #endregion
@@ -760,21 +763,24 @@ public class Customer : MonoBehaviour {
     // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
         if ( GetCurrentBathroom().HasToiletAvailable ) {
-            EnterRelief(GetCurrentBathroom().GetToilet());
+            Occupy(GetCurrentBathroom().GetToilet());
+            BeginPeeingWithThing();
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoUrinal() {
         if ( GetCurrentBathroom().HasUrinalAvailable ) {
-            EnterRelief(GetCurrentBathroom().GetUrinal());
+            Occupy(GetCurrentBathroom().GetUrinal());
+            BeginPeeingWithThing();
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoSink() {
         if ( GetCurrentBathroom().HasSinkForRelief ) {
-            EnterRelief(GetCurrentBathroom().GetSink());
+            Occupy(GetCurrentBathroom().GetSink()); 
+            BeginPeeingWithThing();
             return true;
         }
         return false;
@@ -800,17 +806,12 @@ public class Customer : MonoBehaviour {
     #endregion
 
     #region CustomerPhysicalActions
-    // Sends this customer to relief
-    public void EnterRelief(Relief relief) {
-        Occupy(relief);
-        BeginPeeingWithThing();
-    }
     // Goes to the doorway queue
-    public bool GetInLine(Bathroom CurrentBathroom) {
-        if ( CurrentBathroom.doorwayQueue.HasOpenWaitingSpot() ) {
+    public bool GetInLine(Bathroom bathroom) {
+        if ( bathroom.doorwayQueue.HasOpenWaitingSpot() ) {
             // Makes customer hold on for a while longer when entering doorway.
             bladder.ResetLossOfControlTime();
-            WaitingSpot waitingSpot = CurrentBathroom.doorwayQueue.GetNextWaitingSpot();
+            WaitingSpot waitingSpot = bathroom.doorwayQueue.GetNextWaitingSpot();
             Occupy(waitingSpot);
             Location = Location.Hallway;
             CanReenterBathroom = false;
@@ -819,6 +820,38 @@ public class Customer : MonoBehaviour {
         else {
             CanReenterBathroom = false;
             return false;
+        }
+    }
+    /// <summary>
+    /// Makes a customer either use a sink, or get in line to use a sink. If a sink
+    ///   isnt available, the customer will not get in line.
+    /// </summary>
+    /// <returns>True if customer can use sink or get in line, false if they cannot</returns>
+    public bool UseSink(Bathroom bathroom) {
+        // If the customer was already occupying a sink don't use a sink
+        if (Occupying != null && Occupying.IType == InteractableType.Sink) {
+            Debug.LogError("UseSink called but customer just relieved using sink. This was disabled as of commit #247");
+            return false;
+        }
+        else {
+            Occupying.OccupiedBy = null;
+            Occupying = null;
+        }
+
+        Sink sink = bathroom.GetSink();
+        if (sink != null) {
+            sink.UseForWash(this);
+            return true;
+        }
+        else {
+            WaitingSpot spot = bathroom.SinksLine.GetNextWaitingSpot();
+            if (spot != null) {
+                Occupy(spot);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
     // Goes back to the bar
@@ -835,13 +868,16 @@ public class Customer : MonoBehaviour {
         Occupy(seat);
         HasNext = false;
     }
-    // Fully leaves the area
+    /// <summary>
+    /// Leaves the bar, then calls <see cref="GameController.CustomerManager.RemoveCustomer(Customer)"/> on this customer.
+    /// </summary>
     public void Leave() {
         StopOccupyingAll();
         MoveTo(Location.Outside);
-        SetNext(0f, () => { 
-            Location = Location.Outside; 
-        }, () => AtDestination );
+        Location = Location.Outside;
+        SetNext(0f, () => {
+            GameController.GC.CustomersManager.RemoveCustomer(this);
+        }, () => AtDestination);
     }
     #endregion
 
