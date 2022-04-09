@@ -227,7 +227,6 @@ public class Freecam : MonoBehaviour {
         camera.Camera.orthographicSize = MinZoom;
         StopZoom(camera);
     }
-
     private static void StopZoom(Freecam freecam) {
         freecam.zoomIntent = MinZoom;
         freecam.zooming = false;
