@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Scripts {
     [Serializable]
-    public class Layout {
+    public class GameSaveData {
         [Serializable]
         public class BathroomOption {
             public int X;
@@ -160,15 +160,15 @@ namespace Assets.Scripts {
 
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-        static public Layout FromJson(string json) {
-            return JsonConvert.DeserializeObject<Layout>(json);
+        static public GameSaveData FromJson(string json) {
+            return JsonConvert.DeserializeObject<GameSaveData>(json);
         }
         private static string GetSavePath(int slotNumber) => Path.Combine( Application.persistentDataPath, $"/{slotNumber}.json");
-        public static Layout ImportDefault() {
+        public static GameSaveData ImportDefault() {
             string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
             return FromJson(json);
         }
-        public static Layout Import(int slotNumber) {
+        public static GameSaveData Import(int slotNumber) {
             string path = GetSavePath(slotNumber);
             FileStream fs = null;
             StreamReader reader = null;
@@ -190,7 +190,7 @@ namespace Assets.Scripts {
             }
 
             try {
-                Layout layout = FromJson(json);
+                GameSaveData layout = FromJson(json);
                 Debug.Log($"Save imported from slot {slotNumber}");
                 return layout;
             }

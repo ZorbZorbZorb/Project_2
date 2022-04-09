@@ -32,7 +32,7 @@ public class InteractableSpawnpoint : MonoBehaviour {
             SpawnInteractablePrefab(spawnpoint);
         }
     }
-    public static void Build(GameData gameData) {
+    public static void Build(GameSaveData gameData) {
         foreach ( int id in gameData.UnlockedPoints ) {
             // Lookup the point
             var spawnpoint = InteractableSpawnpoint.Spawnpoints.Where(x => x.Id == id).FirstOrDefault();

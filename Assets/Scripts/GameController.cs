@@ -36,15 +36,15 @@ public partial class GameController : MonoBehaviour {
 
         // Load or create game data
         if ( CreateNewSaveData ) {
-            layout = Layout.ImportDefault();
+            game = GameSaveData.ImportDefault();
         }
         else {
-            layout = Layout.Import(0);
+            game = GameSaveData.Import(0);
         }
         UpdateFundsDisplay();
 
         // Construct the play areas
-        layout.Apply();
+        game.Apply();
 
         // Cheat construct bathroom if toggled when starting
         if ( DebugBuildAll ) {
@@ -56,7 +56,7 @@ public partial class GameController : MonoBehaviour {
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 0, 0);
 
         // Start build mode if not first night
-        if ( DebugDisplayBuildMenuOnFirstNight || gameData.night > 1 ) {
+        if ( DebugDisplayBuildMenuOnFirstNight || game.Night > 1 ) {
             StartBuildMode();
         }
         else {
@@ -201,7 +201,7 @@ public partial class GameController : MonoBehaviour {
     public CustomerManager CustomersManager = new CustomerManager();
 
     // Save data
-    public Layout layout;
+    public GameSaveData game;
 
     // Unique Id System
     private static int uid = 0;

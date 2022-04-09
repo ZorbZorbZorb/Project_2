@@ -15,8 +15,8 @@ public class MainMenuController : MonoBehaviour {
     [SerializeField] public Text TextContinue;
 
     void Start() {
-        if (GameData.Exists(0)) {
-            GameData data = GameData.Import(0);
+        if (GameSaveData.Exists(0)) {
+            GameSaveData data = GameSaveData.Import(0);
             TextContinue.text = $"Continue (Night {data.night})";
             ButtonContinue.interactable = true;
         }
