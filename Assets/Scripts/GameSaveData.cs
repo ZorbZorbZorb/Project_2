@@ -31,7 +31,7 @@ namespace Assets.Scripts {
         public List<BarOption> bar;
 
         public int Night;
-        public int Funds;
+        public double Funds;
 
         public void Apply() {
             Bathroom.BathroomM.Area.Area.enabled = true;
@@ -164,6 +164,7 @@ namespace Assets.Scripts {
             return JsonConvert.DeserializeObject<GameSaveData>(json);
         }
         private static string GetSavePath(int slotNumber) => Path.Combine( Application.persistentDataPath, $"/{slotNumber}.json");
+        public static bool Exists(int slotNumber) => File.Exists(GetSavePath(slotNumber));
         public static GameSaveData ImportDefault() {
             string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
             return FromJson(json);

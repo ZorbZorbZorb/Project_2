@@ -10,8 +10,6 @@ public class Bathroom : MonoBehaviour {
     public static Bathroom BathroomF;
     public Area2D Area;
 
-    public List<InteractableSpawnpoint> Spawnpoints;
-
     public List<Toilet> Toilets;
     public List<Urinal> Urinals;
     public List<Sink> Sinks;

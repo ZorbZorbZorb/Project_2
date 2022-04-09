@@ -622,7 +622,6 @@ public class Customer : MonoBehaviour {
         }
     }
     public void BeginPeeingSelf() {
-        GameController.AddWetting();
         bladder.Emptying = true;
         Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
         if ( emote == null ) {

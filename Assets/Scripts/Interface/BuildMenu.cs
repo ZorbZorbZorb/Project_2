@@ -92,11 +92,11 @@ namespace Assets.Scripts {
 
                 // Set up the click action
                 clickable.GetComponent<BuildClickable>().OnClick = () => {
-                    if (GameController.GC.DebugInfiniteMoney || GameController.GC.gameData.funds >= point.Price ) {
-                        GameController.GC.gameData.funds -= point.Price;
+                    if (GameController.GC.DebugInfiniteMoney || GameController.GC.Game.Funds >= point.Price ) {
+                        GameController.GC.Game.Funds -= point.Price;
                         GameController.GC.UpdateFundsDisplay();
                         InteractableSpawnpoint.SpawnInteractablePrefab(point);
-                        GameController.GC.gameData.UnlockedPoints.Add(point.Id);
+                        GameController.GC.Game.UnlockedPoints.Add(point.Id);
                         RebuildClickables();
                     }
                 };

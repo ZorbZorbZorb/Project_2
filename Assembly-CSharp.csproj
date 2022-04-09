@@ -72,7 +72,6 @@
     <Compile Include="Assets\Scripts\MetaObjects\NavigationNode.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\NavigationPoint.cs" />
     <Compile Include="Assets\Scripts\MetaObjects\WaitingSpot.cs" />
-    <Compile Include="Assets\Scripts\MetaObjects\InteractableSpawnpoint.cs" />
     <Compile Include="Assets\Scripts\Objects\Seat.cs" />
     <Compile Include="Assets\Scripts\Interface\MainMenuController.cs" />
     <Compile Include="Assets\Scripts\Abstract\Relief.cs" />
