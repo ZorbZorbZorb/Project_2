@@ -32,6 +32,16 @@ namespace Assets.Scripts {
             var y = Area.bounds.min.y + ( position.Item2 * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);
         }
+        public Vector2 GetGridPosition(GameSaveData.BarOption option) {
+            var x = Area.bounds.min.x + ( option.X * (float)GridScaleX ) + ( GridScaleX / 2f );
+            var y = Area.bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
+            return new Vector2((float)x, (float)y);
+        }
+        public Vector2 GetGridPosition(GameSaveData.BathroomOption option) {
+            var x = Area.bounds.min.x + ( option.X * (float)GridScaleX ) + ( GridScaleX / 2f );
+            var y = Area.bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
+            return new Vector2((float)x, (float)y);
+        }
         public Area2D(BoxCollider2D area) {
             Area = area;
             GridScaleX = 1;
