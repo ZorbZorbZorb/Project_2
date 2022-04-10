@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 using static Assets.Scripts.Objects.CustomerInteractable;
-using Assets.Scripts.Characters;
+using Assets.Scripts.Customers;
 
 public partial class Collections : MonoBehaviour {
     static public Collections collections = null;

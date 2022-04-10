@@ -1,9 +1,8 @@
-﻿using Assets.Scripts.MetaObjects;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.Scripts {
+namespace Assets.Scripts.Customers {
     static public class Navigation {
         static private Dictionary<Location, List<NavigationNode>> nodes = new Dictionary<Location, List<NavigationNode>>();
         static public Vector3 CustomerSpawnpoint => nodes[Location.Outside]
@@ -65,28 +64,38 @@ namespace Assets.Scripts {
             // Return the path
             current = source;
             List<Vector2> results = new List<Vector2>();
-            foreach ( NavigationNode node in path ) {
-                if (node.Point1.Location == current) {
-                    if (node.UseBothPoints) {
-                        results.Add(node.Point1.Transform.position);
-                        results.Add(node.Point2.Transform.position);
-                    }
-                    else {
-                        results.Add(node.Point2.Transform.position);
-                    }
+            for ( int i = 0; i < path.Count(); i++ ) {
+                NavigationNode node = path[i];
+                bool isFinal = i == path.Count() - 1;
+                // Always use both points if this is the final node and path length is too short
+                if (node.UseBothPoints || (isFinal && results.Count() < 2 )) {
+                    AddPoints(node);
                 }
                 else {
-                    if ( node.UseBothPoints ) {
-                        results.Add(node.Point2.Transform.position);
-                        results.Add(node.Point1.Transform.position);
-                    }
-                    else {
-                        results.Add(node.Point1.Transform.position);
-                    }
+                    AddPoint(node);
                 }
                 current = node.GetOther(current);
             }
             return results;
+
+            void AddPoints(NavigationNode node) {
+                if ( node.Point1.Location == current ) {
+                    results.Add(node.Point1.Transform.position);
+                    results.Add(node.Point2.Transform.position);
+                }
+                else {
+                    results.Add(node.Point2.Transform.position);
+                    results.Add(node.Point1.Transform.position);
+                }
+            }
+            void AddPoint(NavigationNode node) {
+                if ( node.Point1.Location == current ) {
+                    results.Add(node.Point2.Transform.position);
+                }
+                else {
+                    results.Add(node.Point1.Transform.position);
+                }
+            }
         }
         static public void Add(NavigationNode node) {
             if ( nodes.ContainsKey(node.Point1.Location) ) {

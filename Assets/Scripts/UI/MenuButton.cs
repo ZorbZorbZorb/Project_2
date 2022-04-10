@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine;
+using Assets.Scripts.Customers;
 
 namespace Assets.Scripts {
     [Serializable]

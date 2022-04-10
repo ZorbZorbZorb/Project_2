@@ -1,10 +1,14 @@
 using Assets.Scripts;
+using Assets.Scripts.Areas;
+using Assets.Scripts.Customers;
+using Assets.Scripts.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 using Random = UnityEngine.Random;
 
 public partial class GameController : MonoBehaviour {
@@ -43,7 +47,7 @@ public partial class GameController : MonoBehaviour {
     public bool DisplayedNightStartSplashScreen = false;
     
     // Managers
-    public CustomerManager CustomersManager = new CustomerManager();
+    public CustomerManager CustomersManager;
 
     // Save data
     public GameSaveData Game;
@@ -70,7 +74,7 @@ public partial class GameController : MonoBehaviour {
     public float nightStartDelay = 2f;
     public Canvas NightStartCanvas;
     public Text NightStartText;
-    public SpriteRenderer NightStartOverlay;
+    public Image NightStartOverlay;
 
     /// <summary><see cref="GameController"/> singleton</summary>
     public static GameController GC = null;
@@ -86,6 +90,10 @@ public partial class GameController : MonoBehaviour {
 
         // Freecam should always be attached to the main camera
         Cam = Camera.main.GetComponent<Freecam>();
+
+        CustomersManager = new CustomerManager() {
+            CustomersHolder = GameObject.FindGameObjectWithTag("CustomersHolder")
+        };
 
         // Set the customer's static variables
         Customer.BathroomStartX =
@@ -185,6 +193,7 @@ public partial class GameController : MonoBehaviour {
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             Think();
+            StupidDebugThink();
 
             // Update time and funds display once per second.
             barTimeDisplay.text = barTime.ToString("hh:mm tt");
@@ -219,6 +228,23 @@ public partial class GameController : MonoBehaviour {
                 Cam.PanTo(Freecam.Center);
                 Cam.ZoomTo(600);
             }
+        }
+    }
+    private void StupidDebugThink() {
+        foreach(Customer customer in CustomersManager.Customers) {
+            if ( customer.AtDestination ) {
+                if ( customer.Location == Location.Bar ) {
+                    customer.Leave();
+                }
+                else if (customer.Location == Location.Hallway) {
+                    if ( customer.GetCurrentBathroom().Line.IsNextInLine(customer) ) {
+                        customer.MenuOptionGotoToilet();
+                    }
+                }
+            }
+        }
+        if (CustomersManager.Customers.Count < CustomersManager.MaxCustomers) {
+            var c = CustomersManager.CreateCustomer(desperate: true);
         }
     }
     private void Think() {

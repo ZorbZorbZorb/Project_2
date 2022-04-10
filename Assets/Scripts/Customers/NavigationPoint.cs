@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Assets.Scripts.MetaObjects {
+namespace Assets.Scripts.Customers {
     [Serializable]
     public class NavigationPoint {
         [SerializeField]

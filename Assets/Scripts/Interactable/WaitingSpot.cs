@@ -1,4 +1,4 @@
-using Assets.Scripts;
+using Assets.Scripts.Areas;
 using Assets.Scripts.Objects;
 using UnityEngine;
 

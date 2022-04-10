@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Objects;
+﻿using Assets.Scripts.Customers;
+using Assets.Scripts.Objects;
 using UnityEngine;
 
 namespace Assets.Scripts {

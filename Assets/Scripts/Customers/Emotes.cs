@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Scripts.Characters {
+namespace Assets.Scripts.Customers {
     [Serializable]
     public class Emotes {
         // https://i.imgur.com/Zul9DoY_d.webp?maxwidth=760&fidelity=grand

@@ -1,6 +1,7 @@
 using Assets.Scripts.Objects;
 using System;
 using UnityEngine;
+using Assets.Scripts;
 
 public enum SeatType {
     None,

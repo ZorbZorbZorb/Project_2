@@ -1,11 +1,11 @@
-﻿using Assets.Scripts;
+﻿using Assets.Scripts.Areas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public partial class GameController : MonoBehaviour {
+namespace Assets.Scripts.Customers {
     [Serializable]
     public class CustomerManager {
         public int MaxCustomers;
@@ -15,8 +15,10 @@ public partial class GameController : MonoBehaviour {
         public IEnumerable<Customer> CustomersInBar => Customers
             .Where(x => x.Location == Location.Bar || x.Location == Location.Hallway);
         public bool AtCapacity => Customers.Count >= MaxCustomers;
+        public GameObject CustomersHolder;
         public Customer CreateCustomer(bool desperate) {
-            Customer newCustomer = Instantiate(Prefabs.PrefabCustomer, Assets.Scripts.Navigation.CustomerSpawnpoint, Quaternion.identity);
+            Customer newCustomer = UnityEngine.Object.Instantiate(Prefabs.PrefabCustomer, Navigation.CustomerSpawnpoint, Quaternion.identity);
+            newCustomer.transform.SetParent(CustomersHolder.transform, true);
             newCustomer.Location = Location.Outside;
             newCustomer.Gender = Random.Range(0, 2) == 0 ? 'm' : 'f';
             Customers.Add(newCustomer);
@@ -26,7 +28,7 @@ public partial class GameController : MonoBehaviour {
             else {
                 newCustomer.SetupCustomer(30, 90);
             }
-            Debug.Log($"Customer {newCustomer.UID} created. state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}");
+            //Debug.Log($"Created | state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}", newCustomer);
             newCustomer.Active = true;
             bool enteredDoorway = false;
             if ( newCustomer.WantsToEnterBathroom() &&
@@ -46,10 +48,9 @@ public partial class GameController : MonoBehaviour {
             return newCustomer;
         }
         public void RemoveCustomer(Customer customer) {
-            Debug.Log($"Deleted customer {customer.UID}");
             customer.StopOccupyingAll();
             Customers.Remove(customer);
-            Destroy(customer.gameObject);
+            UnityEngine.Object.Destroy(customer.gameObject);
         }
     }
 }

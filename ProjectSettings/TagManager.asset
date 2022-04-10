@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Prefab
+  - CustomersHolder
   layers:
   - Default
   - TransparentFX
@@ -53,4 +54,7 @@ TagManager:
     locked: 0
   - name: AboveBlockSight
     uniqueID: 401320327
+    locked: 0
+  - name: UI
+    uniqueID: 3289484463
     locked: 0

@@ -1183,6 +1183,9 @@ MonoBehaviour:
   LastDrinkAt: -20
   DrinkInterval: 30
   EnteredTicksElapsed: 0
+  PathProgress: 0
+  ApproximatePathLength: 0
+  PathLength: 0
   SRenderer: {fileID: 1102209946547850408}
   animator: {fileID: 1102209946547850411}
   animatorStateName: 
@@ -1238,9 +1241,7 @@ MonoBehaviour:
   ActionState: 0
   Location: 0
   Occupying: {fileID: 0}
-  Destination: {x: 0, y: 0, z: 0}
-  Navigation: []
-  MoveSpeed: 400
+  MoveSpeed: 600
   BladderCircleTransform: {fileID: 1102209947407415471}
   EmoteSpriteRenderer: {fileID: 1102209945827594975}
   Emotes:

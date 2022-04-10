@@ -11,12 +11,15 @@ namespace PathCreation.Utility {
         /// Returns point at time 't' (between 0 and 1) along bezier curve defined by 4 points (anchor_1, control_1, control_2, anchor_2)
         public static Vector3 EvaluateCurve (Vector3[] points, float t) {
             return EvaluateCurve (points[0], points[1], points[2], points[3], t);
-        }
+        }        
 
         /// Returns point at time 't' (between 0 and 1)  along bezier curve defined by 4 points (anchor_1, control_1, control_2, anchor_2)
         public static Vector3 EvaluateCurve (Vector3 a1, Vector3 c1, Vector3 c2, Vector3 a2, float t) {
             t = Mathf.Clamp01 (t);
-            return (1 - t) * (1 - t) * (1 - t) * a1 + 3 * (1 - t) * (1 - t) * t * c1 + 3 * (1 - t) * t * t * c2 + t * t * t * a2;
+            var tt = t * t;
+            var u = 1 - t;
+            var uu = u * u;
+            return uu * u * a1 + 3 * uu * t * c1 + 3 * u * tt * c2 + tt * t * a2;
         }
 
         /// Returns a vector tangent to the point at time 't'

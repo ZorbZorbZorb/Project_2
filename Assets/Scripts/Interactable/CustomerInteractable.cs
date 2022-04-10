@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Customers;
+using UnityEngine;
 
 namespace Assets.Scripts.Objects {
     public enum InteractableType {

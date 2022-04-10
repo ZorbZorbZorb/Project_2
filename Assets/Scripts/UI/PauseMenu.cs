@@ -13,7 +13,7 @@ namespace Assets.Scripts {
         public GameObject Canvas;
 
         [SerializeField]
-        public SpriteRenderer Overlay;
+        public Image Overlay;
 
         [SerializeField]
         public Text CenterText;

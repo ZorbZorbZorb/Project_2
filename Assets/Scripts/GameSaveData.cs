@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Objects;
+﻿using Assets.Scripts.Areas;
+using Assets.Scripts.Objects;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

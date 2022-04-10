@@ -1,8 +1,10 @@
-﻿public enum Location {
-    None,
-    Outside, 
-    Bar, 
-    Hallway, 
-    BathroomM, 
-    BathroomF
+﻿namespace Assets.Scripts {
+    public enum Location {
+        None,
+        Outside,
+        Bar,
+        Hallway,
+        BathroomM,
+        BathroomF
+    }
 }

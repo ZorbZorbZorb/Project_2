@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Collections;
 
-namespace Assets.Scripts.Characters {
+namespace Assets.Scripts.Customers {
     [Serializable]
     public class CustomerSpriteController {
 

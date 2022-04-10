@@ -1,3 +1,4 @@
+using Assets.Scripts.Customers;
 using Assets.Scripts.Objects;
 using System.Collections.Generic;
 using UnityEngine;

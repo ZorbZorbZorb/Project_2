@@ -7,7 +7,7 @@ using static Collections;
 using Random = UnityEngine.Random;
 using UnityEngine.Animations;
 
-namespace Assets.Scripts.Characters {
+namespace Assets.Scripts.Customers {
     [Serializable]
     public class CustomerAnimator {
 
@@ -99,7 +99,7 @@ namespace Assets.Scripts.Characters {
                 .ToArray();
 
             // Change the colors just a bit.
-            var colorMultiplier = new Vector4(Random.Range(0.85f, 1.15f), Random.Range(0.85f, 1.15f), Random.Range(0.85f, 1.15f), 1f);
+            var colorMultiplier = new Vector4(Random.Range(0.9f, 1.15f), Random.Range(0.85f, 1.2f), Random.Range(0.9f, 1.15f), 1f);
             femaleColor.r = Math.Min(femaleColor.r * colorMultiplier.x, 1f);
             femaleColor.g = Math.Min(femaleColor.g * colorMultiplier.y, 1f);
             femaleColor.b = Math.Min(femaleColor.b * colorMultiplier.z, 1f);

@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.Scripts.MetaObjects {
+namespace Assets.Scripts.Customers {
     public class NavigationNode : MonoBehaviour {
         ///<summary>
         /// The first location this node connects
