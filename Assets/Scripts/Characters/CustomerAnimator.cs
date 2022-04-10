@@ -21,9 +21,9 @@ namespace Assets.Scripts.Characters {
         private string animationStateName;
         private string animationStateNameLast;
 
-        private static Color normalColor = new Color(1f, 1f, 1f);
-        private static Color femaleColor = new Color(1f, 175f / 255f, 175f / 255f);
-        private static Color maleColor = new Color(175f / 255f, 175f / 255f, 255f);
+        private Color normalColor = new Color(1f, 1f, 1f);
+        private Color femaleColor = new Color(1f, 175f / 255f, 175f / 255f);
+        private Color maleColor = new Color(175f / 255f, 175f / 255f, 255f);
 
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
@@ -97,6 +97,15 @@ namespace Assets.Scripts.Characters {
             clipNames = animator.runtimeAnimatorController.animationClips
                 .Select(x => x.name)
                 .ToArray();
+
+            // Change the colors just a bit.
+            var colorMultiplier = new Vector4(Random.Range(0.85f, 1.15f), Random.Range(0.85f, 1.15f), Random.Range(0.85f, 1.15f), 1f);
+            femaleColor.r = Math.Min(femaleColor.r * colorMultiplier.x, 1f);
+            femaleColor.g = Math.Min(femaleColor.g * colorMultiplier.y, 1f);
+            femaleColor.b = Math.Min(femaleColor.b * colorMultiplier.z, 1f);
+            maleColor.r = Math.Min(maleColor.r * colorMultiplier.x, 1f);
+            maleColor.g = Math.Min(maleColor.g * colorMultiplier.y, 1f);
+            maleColor.b = Math.Min(maleColor.b * colorMultiplier.z, 1f);
         }
 
         #region Static methods for looking up animations
