@@ -94,6 +94,17 @@
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\Objects\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\Interface\BuildMenu.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\BezierPath.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\EndOfPathInstruction.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\GlobalDisplaySettings.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\MinMax3D.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\PathCreator.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\PathCreatorData.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\PathSpace.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Objects\VertexPath.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Utility\CubicBezierUtility.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Utility\MathUtility.cs" />
+    <Compile Include="Assets\Scripts\PathCreation\Utility\VertexPathUtility.cs" />
     <Compile Include="Assets\Scripts\Prefabs.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -518,6 +529,36 @@
     <Reference Include="Unity.InternalAPIEditorBridge.001">
       <HintPath>Library\ScriptAssemblies\Unity.InternalAPIEditorBridge.001.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.CoreModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.DeviceSimulatorModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.DeviceSimulatorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.DiagnosticsModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.DiagnosticsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.GraphViewModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.GraphViewModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.PackageManagerUIModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.PackageManagerUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.QuickSearchModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.QuickSearchModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.SceneTemplateModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.SceneTemplateModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TextCoreFontEngineModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.TextCoreFontEngineModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TextCoreTextEngineModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.TextCoreTextEngineModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
     </Reference>
@@ -526,6 +567,21 @@
     </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIBuilderModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIBuilderModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIElementsModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIElementsSamplesModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIElementsSamplesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UIServiceModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.UIServiceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UnityConnectModule">
+      <HintPath>..\Program Files\Unity\Hub\Editor\2021.2.17f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>Build\Project_2_Data\Managed\UnityEngine.dll</HintPath>
@@ -693,8 +749,7 @@
       <HintPath>Build\Project_2_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

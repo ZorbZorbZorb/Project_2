@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using Assets.Scripts.Characters;
 using Assets.Scripts.Objects;
+using PathCreation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,11 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class Customer : MonoBehaviour {
+    private void Awake() {
+        // Cache sorting layer id
+        SRenderer.sortingLayerName = "AboveOverlay";
+        sortingLayerIdAboveOverlay = SRenderer.sortingLayerID;
+    }
     void Start() {
         if ( Destination == null ) {
             Destination = Assets.Scripts.Navigation.CustomerSpawnpoint;
@@ -439,11 +445,14 @@ public class Customer : MonoBehaviour {
         List<Vector3> vectors = new List<Vector3>() { transform.position };
         vectors.AddRange(Assets.Scripts.Navigation.Navigate(Location, target.Location));
         vectors.Add(target.GetCustomerPosition(Gender));
-        Navigation.AddRange(vectors);
         Destination = vectors.Last();
         AtDestination = false;
+
+        var bezierPath = new BezierPath(vectors, isClosed: false);
+        path = new VertexPath(bezierPath, GameController.GC.transform, 1f);
+        moveProgress = 0f;
     }
-    
+
     /// <summary>
     /// Moves the customer from where they are currently located to the location's point
     ///   Movement begins next MoveUpdate.
@@ -459,9 +468,12 @@ public class Customer : MonoBehaviour {
         List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, location);
         if ( vectors.Any() ) {
             vectors.Insert(0, transform.position);
-            Navigation.AddRange(vectors);
             Destination = vectors.Last();
             AtDestination = false;
+
+            var bezierPath = new BezierPath(vectors, isClosed: false);
+            path = new VertexPath(bezierPath, GameController.GC.transform, 1f);
+            moveProgress = 0f;
         }
         else {
             Debug.LogWarning("MoveTo(Location) called for location customer is already in", this);
@@ -469,71 +481,61 @@ public class Customer : MonoBehaviour {
     }
     private void MoveUpdate() {
         // If navigation array is empty, or we are at the final point, return
-        if ( Navigation.Count < 1 ) {
-            AtDestination = true;
-            return;
-        }
-        else if ( transform.position == Navigation.Last() ) {
-            Navigation.Clear();
-            AtDestination = true;
+        if ( path == null ) {
             return;
         }
 
-        Vector3 next = Navigation.First();
-        if ( transform.position.x != next.x || transform.position.y != next.y ) {
-            float distanceX = Math.Abs(transform.position.x - next.x);
-            float distanceY = Math.Abs(transform.position.y - next.y);
-            float moveAmount = Math.Max(2.1f * ( distanceX + distanceY ), (float)MoveSpeed);
-            transform.position = Vector3.MoveTowards(transform.position, next, moveAmount * Time.deltaTime);
+        moveProgress += ((float)MoveSpeed / path.length) * Time.deltaTime;
+        transform.position = path.GetPointAtTime(moveProgress, EndOfPathInstruction.Stop);
+        if ( moveProgress >= 1f ) {
+            path = null;
+            moveProgress = 0f;
+            return;
         }
-        else {
-            Navigation.Remove(next);
-        }
-
-
 
         // Should we switch the character in and out of the bathroom wall overlay layer?
-        if (transform.position.x > BathroomStartX) {
+        if ( transform.position.x > BathroomStartX ) {
             if ( transform.position.y >= BathroomStartY ) {
                 SRenderer.sortingLayerID = 0;
-                Debug.Log($"Moved to layer {SRenderer.sortingLayerName}");
             }
             else {
-                SRenderer.sortingLayerName = "AboveOverlay";
-                Debug.Log($"Moved to layer AboveOverlay {SRenderer.sortingLayerName}");
+                SRenderer.sortingLayerID = sortingLayerIdAboveOverlay;
             }
         }
     }
-    /// <summary>
-    /// Calculates a linear bezier point
-    /// </summary>
-    /// <param name="t">Time, from 0f to 1f</param>
-    /// <param name="pointA">Starting point</param>
-    /// <param name="pointB">Ending point</param>
-    /// <returns>BezierPoint</returns>
-    public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB) {
-        return pointA + t * (pointA - pointB);
-    }
-    /// <summary>
-    /// Calculates a quadratic bezier point
-    /// </summary>
-    /// <param name="t">Time, from 0f to 1f</param>
-    /// <param name="pointA">Starting point</param>
-    /// <param name="pointB">Approached point</param>
-    /// <param name="pointC">Ending point</param>
-    /// <returns>BezierPoint</returns>
-    public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB, Vector3 pointC) {
-        float u = 1f - t;
-        float uu = u * u;
-        float tt = t * t;
-        return (uu * pointA) + ( 2f * u * t * pointB ) + (tt * pointC);
-    }
+    ///// <summary>
+    ///// Calculates a linear bezier point
+    ///// </summary>
+    ///// <param name="t">Time, from 0f to 1f</param>
+    ///// <param name="pointA">Starting point</param>
+    ///// <param name="pointB">Ending point</param>
+    ///// <returns>BezierPoint</returns>
+    //public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB) {
+    //    return pointA + t * (pointA - pointB);
+    //}
+    ///// <summary>
+    ///// Calculates a quadratic bezier point
+    ///// </summary>
+    ///// <param name="t">Time, from 0f to 1f</param>
+    ///// <param name="pointA">Starting point</param>
+    ///// <param name="pointB">Approached point</param>
+    ///// <param name="pointC">Ending point</param>
+    ///// <returns>BezierPoint</returns>
+    //public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB, Vector3 pointC) {
+    //    float u = 1f - t;
+    //    float uu = u * u;
+    //    float tt = t * t;
+    //    return (uu * pointA) + ( 2f * u * t * pointB ) + (tt * pointC);
+    //}
     public bool AtDestination { get; private set; }
-    private float moveProgress = 0f;
+    public VertexPath path;
+    public float moveProgress = 0f;
 
     /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
     public static float BathroomStartX;
     public static float BathroomStartY;
+
+    private int sortingLayerIdAboveOverlay = -1;
 
     public SpriteRenderer SRenderer;
     public Animator animator;
@@ -584,7 +586,6 @@ public class Customer : MonoBehaviour {
 
     // Movement
     public Vector3 Destination;
-    public List<Vector3> Navigation = new List<Vector3>();
     public double MoveSpeed;
 
     #region Sprites
@@ -662,7 +663,7 @@ public class Customer : MonoBehaviour {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
-        else if (UseSink(GetCurrentBathroom()) ) {
+        else if ( UseSink(GetCurrentBathroom()) ) {
             // Handled in UseSink(Bathroom)
         }
         else {
@@ -733,7 +734,7 @@ public class Customer : MonoBehaviour {
     ///   also clears any occupying reference for this customer
     /// </summary>
     public void Unoccupy() {
-        if (Occupying != null) {
+        if ( Occupying != null ) {
             Occupying.OccupiedBy = null;
             Occupying = null;
         }
@@ -761,8 +762,8 @@ public class Customer : MonoBehaviour {
         }
     }
     private void OnMouseOver() {
-        if (Occupying != null) {
-            if (Occupying is Toilet toilet) {
+        if ( Occupying != null ) {
+            if ( Occupying is Toilet toilet ) {
                 toilet.OnMouseOver();
             }
         }
@@ -845,7 +846,7 @@ public class Customer : MonoBehaviour {
     }
     public bool MenuOptionGotoSink() {
         if ( GetCurrentBathroom().HasSinkForRelief ) {
-            Occupy(GetCurrentBathroom().GetSink()); 
+            Occupy(GetCurrentBathroom().GetSink());
             BeginPeeingWithThing();
             return true;
         }
@@ -895,7 +896,7 @@ public class Customer : MonoBehaviour {
     /// <returns>True if customer can use sink or get in line, false if they cannot</returns>
     public bool UseSink(Bathroom bathroom) {
         // If the customer was already occupying a sink don't use a sink
-        if (Occupying != null && Occupying.IType == InteractableType.Sink) {
+        if ( Occupying != null && Occupying.IType == InteractableType.Sink ) {
             Debug.LogError("UseSink called but customer just relieved using sink. This was disabled as of commit #247");
             return false;
         }
@@ -905,13 +906,13 @@ public class Customer : MonoBehaviour {
         }
 
         Sink sink = bathroom.GetSink();
-        if (sink != null) {
+        if ( sink != null ) {
             sink.UseForWash(this);
             return true;
         }
         else {
             WaitingSpot spot = bathroom.SinksLine.GetNextWaitingSpot();
-            if (spot != null) {
+            if ( spot != null ) {
                 Occupy(spot);
                 return true;
             }
