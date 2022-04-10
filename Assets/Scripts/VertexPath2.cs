@@ -1,6 +1,4 @@
-﻿using PathCreation;
-using PathCreation.Utility;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts {
     ///<summary>
@@ -17,7 +15,7 @@ namespace Assets.Scripts {
     ///    for 2D applications.
     ///  </para>
     ///</summary>    
-    internal class VertexPath2 {
+    public class VertexPath2 {
         
         #region Fields
 
@@ -36,8 +34,8 @@ namespace Assets.Scripts {
         public readonly Bounds bounds;
 
         // Default values and constants:    
-        const int accuracy = 10; // A scalar for how many times bezier path is divided when determining vertex positions
-        const float minVertexSpacing = .01f;
+        const float accuracy = 0.02f; // A scalar for how many times bezier path is divided when determining vertex positions
+        const float minVertexSpacing = 1f;
 
         Transform transform;
 
@@ -49,17 +47,17 @@ namespace Assets.Scripts {
         ///<param name="maxAngleError">How much can the angle of the path change before a vertex is added. This allows fewer vertices to be generated in straighter sections.</param>
         ///<param name="minVertexDst">Vertices won't be added closer together than this distance, regardless of angle error.</param>
         public VertexPath2(BezierPath bezierPath, Transform transform, float maxAngleError = 0.3f, float minVertexDst = 0) :
-            this(bezierPath, VertexPathUtility.SplitBezierPathByAngleError(bezierPath, maxAngleError, minVertexDst, VertexPath2.accuracy), transform) { }
+            this(bezierPath, VertexPath2Utility.SplitBezierPathByAngleError(bezierPath, maxAngleError, minVertexDst, VertexPath2.accuracy), transform) { }
 
         /// <summary> Splits bezier path into array of vertices along the path.</summary>
         ///<param name="maxAngleError">How much can the angle of the path change before a vertex is added. This allows fewer vertices to be generated in straighter sections.</param>
         ///<param name="minVertexDst">Vertices won't be added closer together than this distance, regardless of angle error.</param>
         ///<param name="accuracy">Higher value means the change in angle is checked more frequently.</param>
         public VertexPath2(BezierPath bezierPath, Transform transform, float vertexSpacing) :
-            this(bezierPath, VertexPathUtility.SplitBezierPathEvenly(bezierPath, Mathf.Max(vertexSpacing, minVertexSpacing), VertexPath2.accuracy), transform) { }
+            this(bezierPath, VertexPath2Utility.SplitBezierPathEvenly(bezierPath, Mathf.Max(vertexSpacing, minVertexSpacing), VertexPath2.accuracy), transform) { }
 
         /// Internal contructor
-        VertexPath2(BezierPath bezierPath, VertexPathUtility.PathSplitData pathSplitData, Transform transform) {
+        VertexPath2(BezierPath bezierPath, VertexPath2Utility.PathSplitData pathSplitData, Transform transform) {
             this.transform = transform;
             space = bezierPath.Space;
             isClosedLoop = bezierPath.IsClosed;
@@ -70,7 +68,6 @@ namespace Assets.Scripts {
             localTangents = new Vector2[numVerts];
             cumulativeLengthAtEachVertex = new float[numVerts];
             times = new float[numVerts];
-            bounds = new Bounds(( pathSplitData.minMax.Min + pathSplitData.minMax.Max ) / 2, pathSplitData.minMax.Max - pathSplitData.minMax.Min);
 
             // Loop through the data and assign to arrays.
             for ( int i = 0; i < localPoints.Length; i++ ) {

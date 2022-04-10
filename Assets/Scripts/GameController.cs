@@ -193,7 +193,7 @@ public partial class GameController : MonoBehaviour {
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             Think();
-            StupidDebugThink();
+            StupidIdiotDebugThink();
 
             // Update time and funds display once per second.
             barTimeDisplay.text = barTime.ToString("hh:mm tt");
@@ -230,7 +230,7 @@ public partial class GameController : MonoBehaviour {
             }
         }
     }
-    private void StupidDebugThink() {
+    private void StupidIdiotDebugThink() {
         foreach(Customer customer in CustomersManager.Customers) {
             if ( customer.AtDestination ) {
                 if ( customer.Location == Location.Bar ) {
@@ -238,13 +238,21 @@ public partial class GameController : MonoBehaviour {
                 }
                 else if (customer.Location == Location.Hallway) {
                     if ( customer.GetCurrentBathroom().Line.IsNextInLine(customer) ) {
-                        customer.MenuOptionGotoToilet();
+                        if (customer.GetCurrentBathroom().HasUrinalAvailable) {
+                            customer.MenuOptionGotoUrinal();
+                        }
+                        else {
+                            customer.MenuOptionGotoToilet();
+                        }
                     }
                 }
             }
         }
-        if (CustomersManager.Customers.Count < CustomersManager.MaxCustomers) {
-            var c = CustomersManager.CreateCustomer(desperate: true);
+        var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
+        if ( remaining > 0) {
+            for ( int i = 0; i < remaining; i++ ) {
+                CustomersManager.CreateCustomer(desperate: true);
+            }
         }
     }
     private void Think() {

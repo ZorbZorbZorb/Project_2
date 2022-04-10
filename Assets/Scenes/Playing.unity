@@ -4187,24 +4187,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1073256462}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3442aff535fefcc42b8aaa5063b90b4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 21e90e88f98e0c54c9ec21d173024ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Point1:
-    rid: 5072688306026446848
+    rid: 5072688397648920582
   Point2:
-    rid: 5072688306026446849
+    rid: 5072688397648920583
   UseBothPoints: 1
   references:
     version: 2
     RefIds:
-    - rid: 5072688306026446848
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920582
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 1541293330}
         Location: 4
-    - rid: 5072688306026446849
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920583
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 305319721}
         Location: 3
@@ -4856,24 +4856,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1214612704}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3442aff535fefcc42b8aaa5063b90b4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 21e90e88f98e0c54c9ec21d173024ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Point1:
-    rid: 5072688306026446848
+    rid: 5072688397648920576
   Point2:
-    rid: 5072688306026446849
+    rid: 5072688397648920577
   UseBothPoints: 0
   references:
     version: 2
     RefIds:
-    - rid: 5072688306026446848
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920576
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 818883907}
         Location: 3
-    - rid: 5072688306026446849
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920577
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 1984526335}
         Location: 2
@@ -5648,24 +5648,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1564684467}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3442aff535fefcc42b8aaa5063b90b4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 21e90e88f98e0c54c9ec21d173024ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Point1:
-    rid: 5072688306026446848
+    rid: 5072688397648920578
   Point2:
-    rid: 5072688306026446849
+    rid: 5072688397648920579
   UseBothPoints: 0
   references:
     version: 2
     RefIds:
-    - rid: 5072688306026446848
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920578
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 205417093}
         Location: 2
-    - rid: 5072688306026446849
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920579
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 847539998}
         Location: 1
@@ -5836,24 +5836,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1608879110}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3442aff535fefcc42b8aaa5063b90b4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 21e90e88f98e0c54c9ec21d173024ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Point1:
-    rid: 5072688306026446848
+    rid: 5072688397648920580
   Point2:
-    rid: 5072688306026446849
+    rid: 5072688397648920581
   UseBothPoints: 1
   references:
     version: 2
     RefIds:
-    - rid: 5072688306026446848
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920580
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 1455084242}
         Location: 5
-    - rid: 5072688306026446849
-      type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
+    - rid: 5072688397648920581
+      type: {class: NavigationPoint, ns: Assets.Scripts.Customers, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 165141158}
         Location: 3

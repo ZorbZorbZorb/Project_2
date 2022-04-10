@@ -71,7 +71,7 @@ namespace Assets.Scripts.Areas {
             return Urinals.First(x => x.OccupiedBy == null);
         }
         public Sink GetSink() {
-            return Sinks.First(x => x.OccupiedBy == null);
+            return Sinks.FirstOrDefault(x => x.OccupiedBy == null);
         }
 
         void Awake() {

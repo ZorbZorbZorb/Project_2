@@ -1,8 +1,5 @@
-using Assets.Scripts;
 using Assets.Scripts.Areas;
-using Assets.Scripts.Customers;
 using Assets.Scripts.Objects;
-using PathCreation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -490,13 +487,14 @@ namespace Assets.Scripts.Customers {
             for ( int i = 1; i < vectors.Count(); i++ ) {
                 ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
             }
-            Path = new VertexPath(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
+            Path = new VertexPath2(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
             PathLength = Path.length;
-            //DebugDrawVertexPath(Path, SRenderer.color);
-            //IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
-            //Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+            MovementType = MovementType.Path;
+            DebugDrawVertexPath(Path, SRenderer.color);
+            IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
+            Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
         }
-        private static void DebugDrawVertexPath(VertexPath vertexPath, Color color, float time = 20f) {
+        private static void DebugDrawVertexPath(VertexPath2 vertexPath, Color color, float time = 3f) {
             for ( int i = 1; i < vertexPath.localPoints.Length; i++ ) {
                 var p0 = vertexPath.localPoints[i - 1];
                 var p1 = vertexPath.localPoints[i];
@@ -508,31 +506,27 @@ namespace Assets.Scripts.Customers {
                 case MovementType.None:
                     return;
                 case MovementType.Path:
+                    PathProgress += ( (float)MoveSpeed / Path.length ) * Time.deltaTime;
+                    transform.position = Path.GetPointAtTime(PathProgress, EndOfPathInstruction.Stop);
+                    if ( PathProgress >= 1f ) {
+                        Path = null;
+                        PathProgress = 0f;
+                        MovementType = MovementType.None;
+                        return;
+                    }
+
+                    // Should we switch the character in and out of the bathroom wall overlay layer?
+                    if ( transform.position.x > BathroomStartX ) {
+                        if ( transform.position.y >= BathroomStartY ) {
+                            SRenderer.sortingLayerID = 0;
+                        }
+                        else {
+                            SRenderer.sortingLayerID = sortingLayerIdAboveOverlay;
+                        }
+                    }
                     break;
                 case MovementType.Linear:
                     break;
-            }
-            // If navigation array is empty, or we are at the final point, return
-            if ( Path == null ) {
-                return;
-            }
-
-            PathProgress += ( (float)MoveSpeed / Path.length ) * Time.deltaTime;
-            transform.position = Path.GetPointAtTime(PathProgress, EndOfPathInstruction.Stop);
-            if ( PathProgress >= 1f ) {
-                Path = null;
-                PathProgress = 0f;
-                return;
-            }
-
-            // Should we switch the character in and out of the bathroom wall overlay layer?
-            if ( transform.position.x > BathroomStartX ) {
-                if ( transform.position.y >= BathroomStartY ) {
-                    SRenderer.sortingLayerID = 0;
-                }
-                else {
-                    SRenderer.sortingLayerID = sortingLayerIdAboveOverlay;
-                }
             }
         }
         /// <summary>
@@ -568,8 +562,8 @@ namespace Assets.Scripts.Customers {
             float tt = t * t;
             return ( uu * pointA ) + ( 2f * u * t * pointB ) + ( tt * pointC );
         }
-        public bool AtDestination => Path == null;
-        public VertexPath Path;
+        public bool AtDestination => MovementType == MovementType.None;
+        public VertexPath2 Path;
         public float PathProgress = 0f;
         public float ApproximatePathLength;
         public float PathLength;
@@ -760,7 +754,7 @@ namespace Assets.Scripts.Customers {
                 Location = thing.Location;
                 // Move the customer to the thing. Flip sprite if necessary
                 if ( thing.Alignment == Alignment.Horizontal ) {
-                    SRenderer.flipX = thing.Facing == Orientation.West;
+                    SRenderer.flipX = thing.Facing == Orientation.East;
                 }
 
                 Location = thing.Location;

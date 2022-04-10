@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace PathCreation.Utility {
+namespace Assets.Scripts {
     public static class MathUtility {
 
         static PosRotScale LockTransformToSpace (Transform t, PathSpace space) {
@@ -14,7 +14,6 @@ namespace PathCreation.Utility {
                 t.position = new Vector3 (t.position.x, 0, t.position.z);
             }
 
-            //float maxScale = Mathf.Max (t.localScale.x * t.parent.localScale.x, t.localScale.y * t.parent.localScale.y, t.localScale.z * t.parent.localScale.z);
             float maxScale = Mathf.Max (t.lossyScale.x, t.lossyScale.y, t.lossyScale.z);
 
             t.localScale = Vector3.one * maxScale;

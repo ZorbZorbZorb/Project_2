@@ -58,11 +58,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Areas\Area2D.cs" />
+    <Compile Include="Assets\Scripts\BezierPath.cs" />
+    <Compile Include="Assets\Scripts\CubicBezierUtility.cs" />
     <Compile Include="Assets\Scripts\Customers\CustomerManager.cs" />
+    <Compile Include="Assets\Scripts\EndOfPathInstruction.cs" />
     <Compile Include="Assets\Scripts\GameSaveData.cs" />
     <Compile Include="Assets\Scripts\Customers\Bladder.cs" />
+    <Compile Include="Assets\Scripts\MathUtility.cs" />
     <Compile Include="Assets\Scripts\Objects\Line.cs" />
     <Compile Include="Assets\Scripts\Customers\CustomerSpriteController.cs" />
+    <Compile Include="Assets\Scripts\PathSpace.cs" />
     <Compile Include="Assets\Scripts\UI\Freecam.cs" />
     <Compile Include="Assets\Scripts\Customers\Emotes.cs" />
     <Compile Include="Assets\Scripts\Location.cs" />
@@ -93,19 +98,9 @@
     <Compile Include="Assets\Scripts\Collections.cs" />
     <Compile Include="Assets\Scripts\Areas\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\UI\BuildMenu.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\BezierPath.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\EndOfPathInstruction.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\GlobalDisplaySettings.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\MinMax3D.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\PathCreator.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\PathCreatorData.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\PathSpace.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Objects\VertexPath.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Utility\CubicBezierUtility.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Utility\MathUtility.cs" />
-    <Compile Include="Assets\Scripts\PathCreation\Utility\VertexPathUtility.cs" />
     <Compile Include="Assets\Scripts\Prefabs.cs" />
     <Compile Include="Assets\Scripts\VertexPath2.cs" />
+    <Compile Include="Assets\Scripts\VertexPath2Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
