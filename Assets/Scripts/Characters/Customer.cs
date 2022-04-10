@@ -445,6 +445,12 @@ public class Customer : MonoBehaviour {
         List<Vector2> vectors = Assets.Scripts.Navigation.Navigate(Location, target.Location);
         vectors.Insert(0, transform.position);
         vectors.Add(target.GetCustomerPosition(Gender));
+        // Hotfix for pathing glitching out with only two vectors
+        if ( vectors.Count == 2 ) {
+            Debug.LogWarning($"MoveTo(CustomerInteractable) {Location} to {target.Location} only includeds two vectors!", this);
+            var middleVector = ( vectors[0] + vectors[1] ) / 2f;
+            vectors.Insert(1, middleVector);
+        }
         SetPath(vectors);
     }
 
@@ -463,6 +469,12 @@ public class Customer : MonoBehaviour {
         List<Vector2> vectors = Assets.Scripts.Navigation.Navigate(Location, location);
         if ( vectors.Any() ) {
             vectors.Insert(0, transform.position);
+            // Hotfix for pathing glitching out with only two vectors
+            if ( vectors.Count == 2 ) {
+                Debug.LogWarning($"MoveTo(Location) {Location} to {location} only includeds two vectors!", this);
+                var middleVector = ( vectors[0] + vectors[1] ) / 2f;
+                vectors.Insert(1, middleVector);
+            }
             SetPath(vectors);
         }
         else {
@@ -470,33 +482,36 @@ public class Customer : MonoBehaviour {
         }
     }
     private void SetPath(List<Vector2> vectors) {
-        IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
-        Debug.Log($"Moving along path ({vectors.Count()}) [{string.Join(",", strings)}]", this);
+        PathProgress = 0f;
         BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
-        float totalDistance = 0f;
+        ApproximatePathLength = 0f;
         for ( int i = 1; i < vectors.Count(); i++ ) {
-            totalDistance += Vector2.Distance(vectors[0], vectors[1]);
-
+            ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
         }
-        path = new VertexPath(bezierPath, GameController.GC.transform, totalDistance / 20f);
-        moveProgress = 0f;
-        for ( int i = 1; i < path.localPoints.Length; i++ ) {
-            var p0 = path.localPoints[i - 1];
-            var p1 = path.localPoints[i];
-            Debug.DrawLine(p0, p1, SRenderer.color, 20f);
+        Path = new VertexPath(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
+        PathLength = Path.length;
+        DebugDrawVertexPath(Path, SRenderer.color);
+        IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
+        Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+    }
+    private static void DebugDrawVertexPath(VertexPath vertexPath, Color color, float time = 20f) {
+        for ( int i = 1; i < vertexPath.localPoints.Length; i++ ) {
+            var p0 = vertexPath.localPoints[i - 1];
+            var p1 = vertexPath.localPoints[i];
+            Debug.DrawLine(p0, p1, color, time);
         }
     }
     private void MoveUpdate() {
         // If navigation array is empty, or we are at the final point, return
-        if ( path == null ) {
+        if ( Path == null ) {
             return;
         }
 
-        moveProgress += ( (float)MoveSpeed / path.length ) * Time.deltaTime;
-        transform.position = path.GetPointAtTime(moveProgress, EndOfPathInstruction.Stop);
-        if ( moveProgress >= 1f ) {
-            path = null;
-            moveProgress = 0f;
+        PathProgress += ( (float)MoveSpeed / Path.length ) * Time.deltaTime;
+        transform.position = Path.GetPointAtTime(PathProgress, EndOfPathInstruction.Stop);
+        if ( PathProgress >= 1f ) {
+            Path = null;
+            PathProgress = 0f;
             return;
         }
 
@@ -508,6 +523,15 @@ public class Customer : MonoBehaviour {
             else {
                 SRenderer.sortingLayerID = sortingLayerIdAboveOverlay;
             }
+        }
+    }
+    /// <summary>
+    /// Debugging function that moves the customer to the end of their path instantly.
+    /// </summary>
+    public void TeleportToDestination() {
+        if ( Path != null) {
+            transform.position = Path.GetPointAtTime(1f, EndOfPathInstruction.Stop);
+            Path = null;
         }
     }
     /// <summary>
@@ -534,9 +558,11 @@ public class Customer : MonoBehaviour {
         float tt = t * t;
         return ( uu * pointA ) + ( 2f * u * t * pointB ) + ( tt * pointC );
     }
-    public bool AtDestination => path == null;
-    public VertexPath path;
-    public float moveProgress = 0f;
+    public bool AtDestination => Path == null;
+    public VertexPath Path;
+    public float PathProgress = 0f;
+    public float ApproximatePathLength;
+    public float PathLength;
 
     /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
     public static float BathroomStartX;
@@ -802,7 +828,7 @@ public class Customer : MonoBehaviour {
     /// <returns></returns>
     public bool CanDisplayBathroomMenu() {
         bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
-        bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.doorwayQueue.IsNextInLine(this);
+        bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.Line.IsNextInLine(this);
         bool wet = IsWet || IsWetting;
         return AtDestination && !wet && ( inBathroom || firstInLine );
     }
@@ -823,9 +849,11 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the waiting room
     public WaitingSpot MenuOptionGotoWaiting() {
-        if ( GetCurrentBathroom().waitingRoom.HasOpenWaitingSpot() ) {
-            WaitingSpot waitingSpot = GetCurrentBathroom().waitingRoom.GetNextWaitingSpot();
+        Bathroom bathroom = GetCurrentBathroom();
+        if ( bathroom.waitingRoom.HasOpenWaitingSpot() ) {
+            WaitingSpot waitingSpot = bathroom.waitingRoom.GetNextWaitingSpot();
             Occupy(waitingSpot);
+            bathroom.UpdateAvailibility();
             return waitingSpot;
         }
         else {
@@ -835,24 +863,30 @@ public class Customer : MonoBehaviour {
     }
     // Sends this customer to the toilets.
     public bool MenuOptionGotoToilet() {
-        if ( GetCurrentBathroom().HasToiletAvailable ) {
-            Occupy(GetCurrentBathroom().GetToilet());
+        Bathroom bathroom = GetCurrentBathroom();
+        if ( bathroom.HasToiletAvailable ) {
+            Occupy(bathroom.GetToilet());
+            bathroom.UpdateAvailibility();
             BeginPeeingWithThing();
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoUrinal() {
-        if ( GetCurrentBathroom().HasUrinalAvailable ) {
-            Occupy(GetCurrentBathroom().GetUrinal());
+        Bathroom bathroom = GetCurrentBathroom();
+        if ( bathroom.HasUrinalAvailable ) {
+            Occupy(bathroom.GetUrinal());
+            bathroom.UpdateAvailibility();
             BeginPeeingWithThing();
             return true;
         }
         return false;
     }
     public bool MenuOptionGotoSink() {
-        if ( GetCurrentBathroom().HasSinkForRelief ) {
-            Occupy(GetCurrentBathroom().GetSink());
+        Bathroom bathroom = GetCurrentBathroom();
+        if ( bathroom.HasSinkForRelief ) {
+            Occupy(bathroom.GetSink());
+            bathroom.UpdateAvailibility();
             BeginPeeingWithThing();
             return true;
         }
@@ -881,10 +915,10 @@ public class Customer : MonoBehaviour {
     #region CustomerPhysicalActions
     // Goes to the doorway queue
     public bool GetInLine(Bathroom bathroom) {
-        if ( bathroom.doorwayQueue.HasOpenWaitingSpot() ) {
+        if ( bathroom.Line.HasOpenWaitingSpot() ) {
             // Makes customer hold on for a while longer when entering doorway.
             bladder.ResetLossOfControlTime();
-            WaitingSpot waitingSpot = bathroom.doorwayQueue.GetNextWaitingSpot();
+            WaitingSpot waitingSpot = bathroom.Line.GetNextWaitingSpot();
             Occupy(waitingSpot);
             Location = Location.Hallway;
             CanReenterBathroom = false;

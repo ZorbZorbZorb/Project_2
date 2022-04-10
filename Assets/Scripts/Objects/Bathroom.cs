@@ -17,7 +17,7 @@ public class Bathroom : MonoBehaviour {
     // Change to single waiting spot, shared among all sinks
     public Line SinksLine;
 
-    public DoorwayQueue doorwayQueue;
+    public DoorwayQueue Line;
     public WaitingRoom waitingRoom;
 
     public Location Location;
@@ -57,7 +57,7 @@ public class Bathroom : MonoBehaviour {
     public void AddLineSpot(WaitingSpot spot) {
         spot.Bathroom = this;
         spot.Location = Location.Hallway;
-        doorwayQueue.waitingSpots.Add(spot);
+        Line.waitingSpots.Add(spot);
     }
     public void AddSinkLineSpot(WaitingSpot spot) {
         spot.Bathroom = this;
@@ -77,9 +77,9 @@ public class Bathroom : MonoBehaviour {
     void Awake() {
         Area.Area = GetComponent<BoxCollider2D>();
         // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
-        doorwayQueue.Bathroom = this;
+        Line.Bathroom = this;
         waitingRoom.Bathroom = this;
-        doorwayQueue.waitingSpots.ForEach(x => x.Bathroom = this);
+        Line.waitingSpots.ForEach(x => x.Bathroom = this);
         waitingRoom.WaitingSpots.ForEach(x => x.Bathroom = this);
         SinksLine.Items.ForEach(x => x.Bathroom = this);
         switch (Location) {
@@ -100,25 +100,27 @@ public class Bathroom : MonoBehaviour {
         }
     }
     void Update() {
-
         // Update doorway queue
-        doorwayQueue.Update();
+        Line.Update();
 
         // Dequeue sinks line into sinks
         if ( SinksLine.HasAnyoneInLine() ) {
             SinksLine.Update();
             Sink sink = Sinks.FirstOrDefault(x => x.Unoccupied);
-            if ( sink != null) {
+            if ( sink != null ) {
                 sink.UseForWash(SinksLine.GetNextInLine());
             }
         }
 
         // Update the turbo-state-machine 9000
+        UpdateAvailibility();
+    }
+
+    public void UpdateAvailibility() {
         HasToiletAvailable = Toilets.Any(x => x.OccupiedBy == null);
         HasUrinalAvailable = Urinals.Any(x => x.OccupiedBy == null);
         HasSinkForRelief = !SinksLine.HasAnyoneInLine() && Sinks.Any(x => x.OccupiedBy == null);
         HasSinkForWash = HasSinkForRelief;
         HasSinkForAny = HasSinkForWash || HasSinkForRelief;
-
     }
 }
