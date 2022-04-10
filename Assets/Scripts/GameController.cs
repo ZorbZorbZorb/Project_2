@@ -60,7 +60,6 @@ public partial class GameController : MonoBehaviour {
     public int AdvanceBarTimeByXMinutes;
 
     public int ticksSinceLastSpawn = 0;
-    public int maxCustomers = 14;
     public double nightStartFunds;
     public bool GameStarted = false;
     public bool GameLost = false;
@@ -130,6 +129,7 @@ public partial class GameController : MonoBehaviour {
         }
         else {
             ReadyToStartNight = true;
+            CustomersManager.MaxCustomers = Bar.Singleton.Seats.Count;
         }
     }
     void Update() {
@@ -223,12 +223,12 @@ public partial class GameController : MonoBehaviour {
     }
     private void Think() {
         // Update max seating in bar
-        maxCustomers = Bar.Singleton.Seats
+        CustomersManager.MaxCustomers = Bar.Singleton.Seats
             .Where(x => !x.IsSoiled)
             .Count();
 
         // End the game if too many seats are soiled
-        if ( maxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
+        if ( CustomersManager.MaxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
             if ( !DebugNoLose ) {
                 GameEnd = true;
                 GameLost = true;
@@ -360,8 +360,8 @@ public partial class GameController : MonoBehaviour {
         InBuildMenu = false;
         ReadyToStartNight = true;
         Time.timeScale = 1;
-        BuildMenu.Close();
-        maxCustomers = Bar.Singleton.Seats.Count;
+        BuildMenu.Close(); 
+        CustomersManager.MaxCustomers = Bar.Singleton.Seats.Count;
     }
     /// <summary>
     /// Pauses the game.
