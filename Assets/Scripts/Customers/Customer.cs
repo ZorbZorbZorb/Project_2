@@ -441,6 +441,7 @@ namespace Assets.Scripts.Customers {
         /// position properties if available
         /// </param>
         public void MoveTo(CustomerInteractable target) {
+            // If the intended move location is different from the customers location, use a bezier path
             List<Vector2> vectors = Navigation.Navigate(Location, target.Location);
             vectors.Insert(0, transform.position);
             vectors.Add(target.GetCustomerPosition(Gender));
@@ -450,9 +451,8 @@ namespace Assets.Scripts.Customers {
                 var middleVector = ( vectors[0] + vectors[1] ) / 2f;
                 vectors.Insert(1, middleVector);
             }
-            SetPath(vectors);
+            SetPath(vectors.ToArray());
         }
-
         /// <summary>
         /// Moves the customer from where they are currently located to the location's point
         ///   Movement begins next MoveUpdate.
@@ -474,20 +474,27 @@ namespace Assets.Scripts.Customers {
                     var middleVector = ( vectors[0] + vectors[1] ) / 2f;
                     vectors.Insert(1, middleVector);
                 }
-                SetPath(vectors);
+                SetPath(vectors.ToArray());
             }
             else {
                 Debug.LogWarning("MoveTo(Location) called for location customer is already in", this);
             }
         }
-        private void SetPath(List<Vector2> vectors) {
+        private void SetPath(Vector2[] vectors) {
             PathProgress = 0f;
-            BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
-            ApproximatePathLength = 0f;
-            for ( int i = 1; i < vectors.Count(); i++ ) {
-                ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
+            var cache = VertexPath2.PathCache;
+            if (VertexPath2.PathCache.ContainsKey(vectors)) {
+                Path = VertexPath2.PathCache[vectors];
             }
-            Path = new VertexPath2(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
+            else {
+                BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
+                ApproximatePathLength = 0f;
+                for ( int i = 1; i < vectors.Count(); i++ ) {
+                    ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
+                }
+                Path = new VertexPath2(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
+                VertexPath2.PathCache.Add(vectors, Path);
+            }
             PathLength = Path.length;
             MovementType = MovementType.Path;
             DebugDrawVertexPath(Path, SRenderer.color);

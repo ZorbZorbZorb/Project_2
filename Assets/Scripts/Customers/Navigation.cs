@@ -39,7 +39,7 @@ namespace Assets.Scripts.Customers {
                 // Get all potential unexplored locations we can reach from current
                 var unexploredOptions = getReachableLocations(current)
                     .Where(x => !explored.Contains(x));
-                if (unexploredOptions.Any()) {
+                if ( unexploredOptions.Any() ) {
                     // Explore a reachable unexplored location
                     Location location = unexploredOptions.First();
                     NavigationNode node = nodes[location].First(x => x.GetOther(location) == current);
@@ -47,7 +47,7 @@ namespace Assets.Scripts.Customers {
                     path.Add(node);
                     current = location;
                 }
-                else if (path.Count > 0) {
+                else if ( path.Count > 0 ) {
                     // Back out of an explored location
                     NavigationNode node = path.Last();
                     current = node.GetOther(current);
@@ -68,7 +68,7 @@ namespace Assets.Scripts.Customers {
                 NavigationNode node = path[i];
                 bool isFinal = i == path.Count() - 1;
                 // Always use both points if this is the final node and path length is too short
-                if (node.UseBothPoints || (isFinal && results.Count() < 2 )) {
+                if ( node.NodeUseType == NodeUseType.Both || ( isFinal && results.Count() < 2 ) ) {
                     AddPoints(node);
                 }
                 else {
@@ -89,11 +89,21 @@ namespace Assets.Scripts.Customers {
                 }
             }
             void AddPoint(NavigationNode node) {
-                if ( node.Point1.Location == current ) {
-                    results.Add(node.Point2.Transform.position);
+                if (node.NodeUseType == NodeUseType.Inner) {
+                    if ( node.Point1.Location == current ) {
+                        results.Add(node.Point1.Transform.position);
+                    }
+                    else {
+                        results.Add(node.Point2.Transform.position);
+                    }
                 }
                 else {
-                    results.Add(node.Point1.Transform.position);
+                    if ( node.Point1.Location == current ) {
+                        results.Add(node.Point2.Transform.position);
+                    }
+                    else {
+                        results.Add(node.Point1.Transform.position);
+                    }
                 }
             }
         }

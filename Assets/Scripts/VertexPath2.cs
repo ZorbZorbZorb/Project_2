@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts {
     ///<summary>
@@ -38,6 +39,8 @@ namespace Assets.Scripts {
         const float minVertexSpacing = 1f;
 
         Transform transform;
+
+        public static readonly Dictionary<Vector2[], VertexPath2> PathCache = new Dictionary<Vector2[], VertexPath2>();
 
         #endregion
 

@@ -249,10 +249,8 @@ public partial class GameController : MonoBehaviour {
             }
         }
         var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
-        if ( remaining > 0) {
-            for ( int i = 0; i < remaining; i++ ) {
-                CustomersManager.CreateCustomer(desperate: true);
-            }
+        for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
+            CustomersManager.CreateCustomer(desperate: true);
         }
     }
     private void Think() {
