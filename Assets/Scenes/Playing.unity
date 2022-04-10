@@ -2066,7 +2066,7 @@ MonoBehaviour:
   nightMaxTime: 30
   nightMaxCustomerSpawnTime: 20
   DebugRapidFill: 0
-  DebugRapidPee: 1
+  DebugRapidPee: 0
   DebugNoLose: 0
   DebugSpawnOneCustomerOnly: 0
   DebugEndNightNow: 0
@@ -4291,11 +4291,13 @@ MonoBehaviour:
       data:
         Transform: {fileID: 1541293330}
         Location: 4
+        HandleAnchor: {fileID: 0}
     - rid: 5072688306026446849
       type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 305319721}
         Location: 3
+        HandleAnchor: {fileID: 0}
 --- !u!1 &1093229261
 GameObject:
   m_ObjectHideFlags: 0
@@ -4959,11 +4961,13 @@ MonoBehaviour:
       data:
         Transform: {fileID: 818883907}
         Location: 3
+        HandleAnchor: {fileID: 0}
     - rid: 5072688306026446849
       type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 1984526335}
         Location: 2
+        HandleAnchor: {fileID: 0}
 --- !u!1 &1256516402
 GameObject:
   m_ObjectHideFlags: 0
@@ -5674,11 +5678,13 @@ MonoBehaviour:
       data:
         Transform: {fileID: 205417093}
         Location: 2
+        HandleAnchor: {fileID: 0}
     - rid: 5072688306026446849
       type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 847539998}
         Location: 1
+        HandleAnchor: {fileID: 0}
 --- !u!1 &1579740118
 GameObject:
   m_ObjectHideFlags: 0
@@ -5861,11 +5867,13 @@ MonoBehaviour:
       data:
         Transform: {fileID: 1455084242}
         Location: 5
+        HandleAnchor: {fileID: 0}
     - rid: 5072688306026446849
       type: {class: NavigationPoint, ns: Assets.Scripts.MetaObjects, asm: Assembly-CSharp}
       data:
         Transform: {fileID: 165141158}
         Location: 3
+        HandleAnchor: {fileID: 0}
 --- !u!1 &1612449049
 GameObject:
   m_ObjectHideFlags: 0

@@ -436,14 +436,14 @@ public class Customer : MonoBehaviour {
     /// position properties if available
     /// </param>
     public void MoveTo(CustomerInteractable target) {
-        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, target.Location);
-        var final = Gender == 'm' ? target.CustomerPositionM : target.CustomerPositionF;
-        final.z = 0;
-        vectors.Add(final);
+        List<Vector3> vectors = new List<Vector3>() { transform.position };
+        vectors.AddRange(Assets.Scripts.Navigation.Navigate(Location, target.Location));
+        vectors.Add(target.GetCustomerPosition(Gender));
         Navigation.AddRange(vectors);
         Destination = vectors.Last();
         AtDestination = false;
     }
+    
     /// <summary>
     /// Moves the customer from where they are currently located to the location's point
     ///   Movement begins next MoveUpdate.
@@ -458,19 +458,28 @@ public class Customer : MonoBehaviour {
     public void MoveTo(Location location) {
         List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, location);
         if ( vectors.Any() ) {
+            vectors.Insert(0, transform.position);
             Navigation.AddRange(vectors);
             Destination = vectors.Last();
             AtDestination = false;
         }
+        else {
+            Debug.LogWarning("MoveTo(Location) called for location customer is already in", this);
+        }
     }
     private void MoveUpdate() {
-        AtDestination = Navigation.Count == 0;
-        if ( AtDestination ) {
+        // If navigation array is empty, or we are at the final point, return
+        if ( Navigation.Count < 1 ) {
+            AtDestination = true;
+            return;
+        }
+        else if ( transform.position == Navigation.Last() ) {
+            Navigation.Clear();
+            AtDestination = true;
             return;
         }
 
         Vector3 next = Navigation.First();
-
         if ( transform.position.x != next.x || transform.position.y != next.y ) {
             float distanceX = Math.Abs(transform.position.x - next.x);
             float distanceY = Math.Abs(transform.position.y - next.y);
@@ -480,6 +489,8 @@ public class Customer : MonoBehaviour {
         else {
             Navigation.Remove(next);
         }
+
+
 
         // Should we switch the character in and out of the bathroom wall overlay layer?
         if (transform.position.x > BathroomStartX) {
@@ -493,7 +504,32 @@ public class Customer : MonoBehaviour {
             }
         }
     }
+    /// <summary>
+    /// Calculates a linear bezier point
+    /// </summary>
+    /// <param name="t">Time, from 0f to 1f</param>
+    /// <param name="pointA">Starting point</param>
+    /// <param name="pointB">Ending point</param>
+    /// <returns>BezierPoint</returns>
+    public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB) {
+        return pointA + t * (pointA - pointB);
+    }
+    /// <summary>
+    /// Calculates a quadratic bezier point
+    /// </summary>
+    /// <param name="t">Time, from 0f to 1f</param>
+    /// <param name="pointA">Starting point</param>
+    /// <param name="pointB">Approached point</param>
+    /// <param name="pointC">Ending point</param>
+    /// <returns>BezierPoint</returns>
+    public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB, Vector3 pointC) {
+        float u = 1f - t;
+        float uu = u * u;
+        float tt = t * t;
+        return (uu * pointA) + ( 2f * u * t * pointB ) + (tt * pointC);
+    }
     public bool AtDestination { get; private set; }
+    private float moveProgress = 0f;
 
     /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
     public static float BathroomStartX;
