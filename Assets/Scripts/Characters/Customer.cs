@@ -12,18 +12,12 @@ using Random = UnityEngine.Random;
 
 public class Customer : MonoBehaviour {
     private void Awake() {
+        UID = GameController.GetUid();
         // Cache sorting layer id
         SRenderer.sortingLayerName = "AboveOverlay";
         sortingLayerIdAboveOverlay = SRenderer.sortingLayerID;
     }
     void Start() {
-        if ( Destination == null ) {
-            Destination = Assets.Scripts.Navigation.CustomerSpawnpoint;
-        }
-        UID = GameController.GetUid();
-
-        // Set up the emotes system for this customer
-        Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
     }
     void Update() {
         // Fastest possible exit
@@ -71,7 +65,11 @@ public class Customer : MonoBehaviour {
     public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
         marshal = CustomerSpriteController.Controller[Gender];
 
+        // Set up the customers animator
         customerAnimator = new CustomerAnimator(this, SRenderer, animator, marshal);
+
+        // Set up the emotes system for this customer
+        Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
 
         // Get references to game objects for the customer
         BathroomMenuCanvas = gameObject.transform.Find("BathroomMenuCanvas").GetComponent<Canvas>();
@@ -106,6 +104,11 @@ public class Customer : MonoBehaviour {
 
         UrinateStartDelay = 4d;
         UrinateStopDelay = 6d;
+
+        customerAnimator.Update();
+        Emotes.Update();
+        BathroomMenu.Update();
+        ReliefMenu.Update();
 
         bladder.Update();
         UpdateDesperationState();
@@ -208,7 +211,6 @@ public class Customer : MonoBehaviour {
             ThinkAboutThingsInBar();
         }
     }
-
     private void ThinkAboutThingsInBar() {
 
         // Should get up to pee?
@@ -288,7 +290,6 @@ public class Customer : MonoBehaviour {
             }
         }
     }
-
     public void BuyDrink() {
         Debug.Log($"Customer {UID} bought a drink");
         LastDrinkAt = TotalTimeAtBar;
@@ -296,7 +297,6 @@ public class Customer : MonoBehaviour {
         //Funds -= Bar.DrinkCost;
         //GameController.AddFunds(Bar.DrinkCost);
     }
-
     #region Wants to X...
     public bool WantsToEnterBathroom() {
         return bladder.FeltNeed > 0.40d;
@@ -442,15 +442,10 @@ public class Customer : MonoBehaviour {
     /// position properties if available
     /// </param>
     public void MoveTo(CustomerInteractable target) {
-        List<Vector3> vectors = new List<Vector3>() { transform.position };
-        vectors.AddRange(Assets.Scripts.Navigation.Navigate(Location, target.Location));
+        List<Vector2> vectors = Assets.Scripts.Navigation.Navigate(Location, target.Location);
+        vectors.Insert(0, transform.position);
         vectors.Add(target.GetCustomerPosition(Gender));
-        Destination = vectors.Last();
-        AtDestination = false;
-
-        var bezierPath = new BezierPath(vectors, isClosed: false);
-        path = new VertexPath(bezierPath, GameController.GC.transform, 1f);
-        moveProgress = 0f;
+        SetPath(vectors);
     }
 
     /// <summary>
@@ -465,18 +460,30 @@ public class Customer : MonoBehaviour {
     /// position properties if available
     /// </param>
     public void MoveTo(Location location) {
-        List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, location);
+        List<Vector2> vectors = Assets.Scripts.Navigation.Navigate(Location, location);
         if ( vectors.Any() ) {
             vectors.Insert(0, transform.position);
-            Destination = vectors.Last();
-            AtDestination = false;
-
-            var bezierPath = new BezierPath(vectors, isClosed: false);
-            path = new VertexPath(bezierPath, GameController.GC.transform, 1f);
-            moveProgress = 0f;
+            SetPath(vectors);
         }
         else {
             Debug.LogWarning("MoveTo(Location) called for location customer is already in", this);
+        }
+    }
+    private void SetPath(List<Vector2> vectors) {
+        IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
+        Debug.Log($"Moving along path ({vectors.Count()}) [{string.Join(",", strings)}]", this);
+        BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
+        float totalDistance = 0f;
+        for ( int i = 1; i < vectors.Count(); i++ ) {
+            totalDistance += Vector2.Distance(vectors[0], vectors[1]);
+
+        }
+        path = new VertexPath(bezierPath, GameController.GC.transform, totalDistance / 20f);
+        moveProgress = 0f;
+        for ( int i = 1; i < path.localPoints.Length; i++ ) {
+            var p0 = path.localPoints[i - 1];
+            var p1 = path.localPoints[i];
+            Debug.DrawLine(p0, p1, SRenderer.color, 20f);
         }
     }
     private void MoveUpdate() {
@@ -485,7 +492,7 @@ public class Customer : MonoBehaviour {
             return;
         }
 
-        moveProgress += ((float)MoveSpeed / path.length) * Time.deltaTime;
+        moveProgress += ( (float)MoveSpeed / path.length ) * Time.deltaTime;
         transform.position = path.GetPointAtTime(moveProgress, EndOfPathInstruction.Stop);
         if ( moveProgress >= 1f ) {
             path = null;
@@ -503,31 +510,31 @@ public class Customer : MonoBehaviour {
             }
         }
     }
-    ///// <summary>
-    ///// Calculates a linear bezier point
-    ///// </summary>
-    ///// <param name="t">Time, from 0f to 1f</param>
-    ///// <param name="pointA">Starting point</param>
-    ///// <param name="pointB">Ending point</param>
-    ///// <returns>BezierPoint</returns>
-    //public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB) {
-    //    return pointA + t * (pointA - pointB);
-    //}
-    ///// <summary>
-    ///// Calculates a quadratic bezier point
-    ///// </summary>
-    ///// <param name="t">Time, from 0f to 1f</param>
-    ///// <param name="pointA">Starting point</param>
-    ///// <param name="pointB">Approached point</param>
-    ///// <param name="pointC">Ending point</param>
-    ///// <returns>BezierPoint</returns>
-    //public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB, Vector3 pointC) {
-    //    float u = 1f - t;
-    //    float uu = u * u;
-    //    float tt = t * t;
-    //    return (uu * pointA) + ( 2f * u * t * pointB ) + (tt * pointC);
-    //}
-    public bool AtDestination { get; private set; }
+    /// <summary>
+    /// Calculates a linear bezier point
+    /// </summary>
+    /// <param name="t">Time, from 0f to 1f</param>
+    /// <param name="pointA">Starting point</param>
+    /// <param name="pointB">Ending point</param>
+    /// <returns>BezierPoint</returns>
+    public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB) {
+        return pointA + t * ( pointA - pointB );
+    }
+    /// <summary>
+    /// Calculates a quadratic bezier point
+    /// </summary>
+    /// <param name="t">Time, from 0f to 1f</param>
+    /// <param name="pointA">Starting point</param>
+    /// <param name="pointB">Approached point</param>
+    /// <param name="pointC">Ending point</param>
+    /// <returns>BezierPoint</returns>
+    public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB, Vector3 pointC) {
+        float u = 1f - t;
+        float uu = u * u;
+        float tt = t * t;
+        return ( uu * pointA ) + ( 2f * u * t * pointB ) + ( tt * pointC );
+    }
+    public bool AtDestination => path == null;
     public VertexPath path;
     public float moveProgress = 0f;
 
@@ -585,7 +592,6 @@ public class Customer : MonoBehaviour {
     public CustomerInteractable Occupying;
 
     // Movement
-    public Vector3 Destination;
     public double MoveSpeed;
 
     #region Sprites
@@ -896,11 +902,11 @@ public class Customer : MonoBehaviour {
     /// <returns>True if customer can use sink or get in line, false if they cannot</returns>
     public bool UseSink(Bathroom bathroom) {
         // If the customer was already occupying a sink don't use a sink
-        if ( Occupying != null && Occupying.IType == InteractableType.Sink ) {
-            Debug.LogError("UseSink called but customer just relieved using sink. This was disabled as of commit #247");
-            return false;
-        }
-        else {
+        if ( Occupying != null ) {
+            if ( Occupying.IType == InteractableType.Sink ) {
+                Debug.LogError("UseSink called but customer just relieved using sink. This was disabled as of commit #247");
+                return false;
+            }
             Occupying.OccupiedBy = null;
             Occupying = null;
         }

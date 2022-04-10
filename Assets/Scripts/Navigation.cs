@@ -25,10 +25,10 @@ namespace Assets.Scripts {
         /// <returns>
         /// List of <see cref="Vector3"/>s to reach <paramref name="destination"/> from <paramref name="source"/> 
         /// </returns>
-        static public List<Vector3> Navigate(Location source, Location destination) {
+        static public List<Vector2> Navigate(Location source, Location destination) {
             // Return empty if source is already destination
             if ( source == destination ) {
-                return new List<Vector3>();
+                return new List<Vector2>();
             }
 
             List<NavigationNode> path = new List<NavigationNode>();
@@ -64,14 +64,14 @@ namespace Assets.Scripts {
 
             // Return the path
             current = source;
-            List<Vector3> results = new List<Vector3>();
+            List<Vector2> results = new List<Vector2>();
             foreach ( NavigationNode node in path ) {
                 if (node.Point1.Location == current) {
-                    results.Add(node.Point1.Transform.position);
+                    //results.Add(node.Point1.Transform.position);
                     results.Add(node.Point2.Transform.position);
                 }
                 else {
-                    results.Add(node.Point2.Transform.position);
+                    //results.Add(node.Point2.Transform.position);
                     results.Add(node.Point1.Transform.position);
                 }
                 current = node.GetOther(current);
