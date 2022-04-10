@@ -16,6 +16,7 @@ namespace Assets.Scripts.MetaObjects {
         [SerializeField]
         [SerializeReference]
         public NavigationPoint Point2 = new NavigationPoint();
+        public bool UseBothPoints;
         public Location[] Locations => new Location[2] { Point1.Location, Point2.Location };
         public NavigationPoint GetOther(Location source) {
             return Point1.Location == source ? Point2 : Point1;

@@ -48,3 +48,9 @@ TagManager:
   - name: AboveOverlay
     uniqueID: 2531440951
     locked: 0
+  - name: BlockSight
+    uniqueID: 3112491823
+    locked: 0
+  - name: AboveBlockSight
+    uniqueID: 401320327
+    locked: 0

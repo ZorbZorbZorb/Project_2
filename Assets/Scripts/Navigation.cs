@@ -67,12 +67,22 @@ namespace Assets.Scripts {
             List<Vector2> results = new List<Vector2>();
             foreach ( NavigationNode node in path ) {
                 if (node.Point1.Location == current) {
-                    //results.Add(node.Point1.Transform.position);
-                    results.Add(node.Point2.Transform.position);
+                    if (node.UseBothPoints) {
+                        results.Add(node.Point1.Transform.position);
+                        results.Add(node.Point2.Transform.position);
+                    }
+                    else {
+                        results.Add(node.Point2.Transform.position);
+                    }
                 }
                 else {
-                    //results.Add(node.Point2.Transform.position);
-                    results.Add(node.Point1.Transform.position);
+                    if ( node.UseBothPoints ) {
+                        results.Add(node.Point2.Transform.position);
+                        results.Add(node.Point1.Transform.position);
+                    }
+                    else {
+                        results.Add(node.Point1.Transform.position);
+                    }
                 }
                 current = node.GetOther(current);
             }
