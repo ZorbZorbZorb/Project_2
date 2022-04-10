@@ -30,10 +30,6 @@ namespace Assets.Scripts {
         ControlMode controlMode;
         [SerializeField, HideInInspector]
         float autoControlLength = .3f;
-        [SerializeField, HideInInspector]
-        bool boundsUpToDate;
-        [SerializeField, HideInInspector]
-        Bounds bounds;
 
         // Normals settings
         [SerializeField, HideInInspector]
@@ -541,7 +537,6 @@ namespace Assets.Scripts {
 
         // Called when the path is modified
         public void NotifyPathModified() {
-            boundsUpToDate = false;
             if ( OnModified != null ) {
                 OnModified();
             }

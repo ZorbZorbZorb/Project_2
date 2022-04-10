@@ -498,8 +498,8 @@ namespace Assets.Scripts.Customers {
             PathLength = Path.length;
             MovementType = MovementType.Path;
             DebugDrawVertexPath(Path, SRenderer.color);
-            IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
-            Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+            //IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
+            //Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
         }
         private static void DebugDrawVertexPath(VertexPath2 vertexPath, Color color, float time = 3f) {
             for ( int i = 1; i < vertexPath.localPoints.Length; i++ ) {

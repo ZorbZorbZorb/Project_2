@@ -40,17 +40,32 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Floor
+    uniqueID: 1994599243
+    locked: 0
+  - name: FloorOverlay
+    uniqueID: 1908133155
+    locked: 0
+  - name: Wall
+    uniqueID: 3969957955
+    locked: 0
+  - name: Object
+    uniqueID: 2180697359
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BlockingObject
+    uniqueID: 3112491823
+    locked: 0
+  - name: BlockingWall
+    uniqueID: 1143660101
     locked: 0
   - name: Overlay
     uniqueID: 1902529827
     locked: 0
   - name: AboveOverlay
     uniqueID: 2531440951
-    locked: 0
-  - name: BlockSight
-    uniqueID: 3112491823
     locked: 0
   - name: AboveBlockSight
     uniqueID: 401320327

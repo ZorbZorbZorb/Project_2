@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1908133155
+  m_SortingLayer: -3
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: 4adeaf2d2b1c7417e89f026626d8264f, type: 3}
   m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.6039216}
@@ -129,6 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1522d85a7b4f24547a8fcacdea55ea55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Location: 0
   OccupiedBy: {fileID: 0}
   MainSRenderer: {fileID: 0}
   AltSRenderer: {fileID: 0}
@@ -136,6 +137,6 @@ MonoBehaviour:
   MainSpritesSideways: []
   AltSprites: []
   AltSpritesSideways: []
-  SpotBathroom: {fileID: 0}
-  CustomerState: 2
+  Bathroom: {fileID: 0}
+  WaitingSpotType: 0
   Wet: 0

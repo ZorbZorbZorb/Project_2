@@ -636,8 +636,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1763526345
-  m_SortingLayer: 2
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 412447343141054261, guid: 973fe8dcf6a771542b294eaf0ffe4be4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1242,6 +1242,7 @@ MonoBehaviour:
   Location: 0
   Occupying: {fileID: 0}
   MoveSpeed: 600
+  MovementType: 0
   BladderCircleTransform: {fileID: 1102209947407415471}
   EmoteSpriteRenderer: {fileID: 1102209945827594975}
   Emotes:

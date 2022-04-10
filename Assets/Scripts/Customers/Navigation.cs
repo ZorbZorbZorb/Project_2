@@ -67,8 +67,7 @@ namespace Assets.Scripts.Customers {
             for ( int i = 0; i < path.Count(); i++ ) {
                 NavigationNode node = path[i];
                 bool isFinal = i == path.Count() - 1;
-                // Always use both points if this is the final node and path length is too short
-                if ( node.NodeUseType == NodeUseType.Both || ( isFinal && results.Count() < 2 ) ) {
+                if ( node.NodeUseType == NodeUseType.Both ) {
                     AddPoints(node);
                 }
                 else {
