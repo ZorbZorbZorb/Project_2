@@ -28,7 +28,7 @@ public partial class Collections : MonoBehaviour {
         //   No. Do this using next action chaining.
 
         spriteToilet = Resources.Load<Sprite>("Sprites/Entities/Toilet");
-        spriteToiletOpen = Resources.Load<Sprite>("Sprites/Entities/Toilet_Open");
+        spriteToiletOpened = Resources.Load<Sprite>("Sprites/Entities/Toilet_Open");
         spriteToiletClosed = Resources.Load<Sprite>("Sprites/Entities/Toilet");
         spriteUrinal = Resources.Load<Sprite>("Sprites/Entities/Urinal");
         spriteUrinalSideways = Resources.Load<Sprite>("Sprites/Entities/Urinal_Side");
@@ -87,7 +87,7 @@ public partial class Collections : MonoBehaviour {
     }
 
     public static Sprite spriteToilet;
-    public static Sprite spriteToiletOpen;
+    public static Sprite spriteToiletOpened;
     public static Sprite spriteToiletClosed;
     public static Sprite spriteUrinal;
     public static Sprite spriteUrinalSideways;

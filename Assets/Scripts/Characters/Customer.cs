@@ -437,7 +437,9 @@ public class Customer : MonoBehaviour {
     /// </param>
     public void MoveTo(CustomerInteractable target) {
         List<Vector3> vectors = Assets.Scripts.Navigation.Navigate(Location, target.Location);
-        vectors.Add(Gender == 'm' ? target.CustomerPositionM : target.CustomerPositionF);
+        var final = Gender == 'm' ? target.CustomerPositionM : target.CustomerPositionF;
+        final.z = 0;
+        vectors.Add(final);
         Navigation.AddRange(vectors);
         Destination = vectors.Last();
         AtDestination = false;
@@ -478,8 +480,24 @@ public class Customer : MonoBehaviour {
         else {
             Navigation.Remove(next);
         }
+
+        // Should we switch the character in and out of the bathroom wall overlay layer?
+        if (transform.position.x > BathroomStartX) {
+            if ( transform.position.y >= BathroomStartY ) {
+                SRenderer.sortingLayerID = 0;
+                Debug.Log($"Moved to layer {SRenderer.sortingLayerName}");
+            }
+            else {
+                SRenderer.sortingLayerName = "AboveOverlay";
+                Debug.Log($"Moved to layer AboveOverlay {SRenderer.sortingLayerName}");
+            }
+        }
     }
     public bool AtDestination { get; private set; }
+
+    /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
+    public static float BathroomStartX;
+    public static float BathroomStartY;
 
     public SpriteRenderer SRenderer;
     public Animator animator;
@@ -675,14 +693,13 @@ public class Customer : MonoBehaviour {
         }
     }
     /// <summary>
-    /// Tells any <see cref="CustomerInteractable" that it is no longer occupied by this customer, and
-    ///   also />
+    /// Tells any <see cref="CustomerInteractable"/>that it is no longer occupied by this customer, and 
+    ///   also clears any occupying reference for this customer
     /// </summary>
     public void Unoccupy() {
         if (Occupying != null) {
             Occupying.OccupiedBy = null;
             Occupying = null;
-
         }
     }
     #endregion
@@ -705,6 +722,20 @@ public class Customer : MonoBehaviour {
         }
         else {
             BathroomMenu.Toggle();
+        }
+    }
+    private void OnMouseOver() {
+        if (Occupying != null) {
+            if (Occupying is Toilet toilet) {
+                toilet.OnMouseOver();
+            }
+        }
+    }
+    private void OnMouseExit() {
+        if ( Occupying != null ) {
+            if ( Occupying is Toilet toilet ) {
+                toilet.OnMouseExit();
+            }
         }
     }
 

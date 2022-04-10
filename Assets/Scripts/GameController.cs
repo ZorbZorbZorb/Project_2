@@ -88,6 +88,12 @@ public partial class GameController : MonoBehaviour {
         // Freecam should always be attached to the main camera
         Cam = Camera.main.GetComponent<Freecam>();
 
+        // Set the customer's static variables
+        Customer.BathroomStartX =
+            Bathroom.BathroomM.Area.Area.bounds.min.x - ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.x );
+        Customer.BathroomStartY =
+            Bathroom.BathroomM.Area.Area.bounds.min.y + ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.y );
+
         // Shut off all of the Area2d colliders
         Bathroom.BathroomM.Area.Area.enabled = false;
         Bathroom.BathroomF.Area.Area.enabled = false;
