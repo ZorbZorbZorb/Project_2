@@ -17,6 +17,7 @@ namespace Assets.Scripts.Customers {
             sortingLayerIdAboveOverlay = SRenderer.sortingLayerID;
         }
         void Start() {
+            Emotes.Start();
         }
         void Update() {
             // Fastest possible exit
@@ -72,9 +73,6 @@ namespace Assets.Scripts.Customers {
             // Set up the customers animator
             customerAnimator = new CustomerAnimator(this, SRenderer, animator, marshal);
 
-            // Set up the emotes system for this customer
-            Emotes = new Emotes(this, EmoteSpriteRenderer, BladderCircleTransform, EmotesBladderAmountText);
-
             // Get references to game objects for the customer
             BathroomMenuCanvas = gameObject.transform.Find("BathroomMenuCanvas").GetComponent<Canvas>();
             ReliefMenuCanvas = gameObject.transform.Find("ReliefMenuCanvas").GetComponent<Canvas>();
@@ -120,6 +118,7 @@ namespace Assets.Scripts.Customers {
         }
 
         #region NextAction
+
         public bool HasNext = false;
         public delegate void NextAction();
         public NextAction Next;
@@ -132,6 +131,7 @@ namespace Assets.Scripts.Customers {
             NextWhenTrue = whenTrue;
             Next = d;
         }
+
         #endregion
 
         internal float DeltaTime { get; private set; }
@@ -303,6 +303,7 @@ namespace Assets.Scripts.Customers {
             //Funds -= Bar.DrinkCost;
             //GameController.AddFunds(Bar.DrinkCost);
         }
+
         #region Wants to X...
         public bool WantsToEnterBathroom() {
             return bladder.FeltNeed > 0.40d;
@@ -436,6 +437,9 @@ namespace Assets.Scripts.Customers {
             DesperationStateChangeThisUpdate = DesperationState != LastDesperationState;
             LastDesperationState = DesperationState;
         }
+
+        #region Movement
+
         /// <summary>
         /// Moves the customer from where they are currently located to the target's vector3.
         ///   Movement begins next MoveUpdate.
@@ -673,9 +677,14 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         public float PathMoveSpeedMultiplier => -Mathf.Pow(-( 0.8f - ( PathTime * 1.6f ) ), 4) + 1.1f;
 
+        public float MoveSpeed;
+        public MovementType MovementType = MovementType.None;
+
         /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
         public static float BathroomStartX;
         public static float BathroomStartY;
+        
+        #endregion
 
         private int sortingLayerIdAboveOverlay = -1;
 
@@ -726,16 +735,8 @@ namespace Assets.Scripts.Customers {
         public Location Location = Location.None;
         public CustomerInteractable Occupying;
 
-        // Movement
-        public float MoveSpeed;
-        public MovementType MovementType = MovementType.None;
-
-        #region Sprites
         // Class that contains all of the emotes / thought bubbles / etc for the person
-        [SerializeField] public RectTransform BladderCircleTransform;
-        [SerializeField] public SpriteRenderer EmoteSpriteRenderer;
         public Emotes Emotes;
-        #endregion
 
         #region Desperation/Wetting/Peeing
         // Current willingness to use a urinal for relief

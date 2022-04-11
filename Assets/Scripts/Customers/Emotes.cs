@@ -12,15 +12,17 @@ namespace Assets.Scripts.Customers {
         public SpriteRenderer EmoteSpriteRenderer;
         [SerializeField]
         public Text BladderAmountText;
-        [SerializeField] public double bladderWidthCalculationFactor1 = -0.6d;
-        [SerializeField] public double bladderWidthCalculationFactor2 = 1.2d;
-        [SerializeField] public double bladderWidthCalculationFactor3 = 1.8d;
-        [SerializeField] public double bladderHeightCalculationFactor1 = 0.2;
+        public Canvas Canvas;
+        public GameObject BladderDisplay;
+        const double bladderWidthCalculationFactor1 = -0.6d;
+        const double bladderWidthCalculationFactor2 = 1.2d;
+        const double bladderWidthCalculationFactor3 = 1.8d;
+        const double bladderHeightCalculationFactor1 = 0.2;
 
         public Emote currentEmote = null;
         public float? remaining = null;
         private bool bladderCircleActive = false;
-        public readonly Customer Customer;
+        public Customer Customer;
         public void Update() {
             // Update emotes
             EmoteUpdate();
@@ -56,14 +58,9 @@ namespace Assets.Scripts.Customers {
                 double scaleY = 80f;
 
                 // Note, Code breaks down at bladder sizes over AverageMax * 2.
-                //      Bom will be sad.
                 factor = Customer.bladder.Max / Customer.bladder.AverageMax;
                 multiplier = ( ( (factor / 2) * Math.PI ) - Math.PI / 2 ) * 0.5;
                 multiplier = Math.Max(0.5, Math.Min(1.5, factor));
-
-                //value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
-                //width = (Math.Sin((value + bladderWidthCalculationFactor1 ) * Math.PI) + bladderWidthCalculationFactor2) / bladderWidthCalculationFactor3;
-                //height = Math.Max(0.15, Customer.bladder.Percentage / 1.3 + bladderHeightCalculationFactor1);
 
                 value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
                 width = ( Math.Sin(( (value * 1.2d )+ bladderWidthCalculationFactor1 ) * 2.5) + bladderWidthCalculationFactor2 ) / bladderWidthCalculationFactor3;
@@ -79,8 +76,10 @@ namespace Assets.Scripts.Customers {
             }
         }
         public void ShowBladderCircle(bool value) {
-            bladderCircleActive = value;
-            BladderCircleTransform.gameObject.SetActive(value);
+            if (bladderCircleActive != value) {
+                bladderCircleActive = value;
+                BladderDisplay.SetActive(value);
+            }
         }
         public void Emote(Emote emote) => Emote(emote, null);
         public void Emote(Emote emote, float? time) {
@@ -96,11 +95,10 @@ namespace Assets.Scripts.Customers {
             }
         }
 
-        public Emotes(Customer customer, SpriteRenderer emoteSpriteRenderer, RectTransform bladderCircleTransform, Text bladderAmountText) {
-            Customer = customer;
-            EmoteSpriteRenderer = emoteSpriteRenderer;
-            BladderCircleTransform = bladderCircleTransform;
-            BladderAmountText = bladderAmountText;
+        public void Start() {
+            Canvas.sortingLayerName = "UI"; 
+            BladderDisplay.SetActive(false);
+            bladderCircleActive = false;
         }
     }
 }
