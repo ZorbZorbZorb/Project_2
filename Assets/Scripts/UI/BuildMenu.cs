@@ -97,7 +97,7 @@ namespace Assets.Scripts {
 
                     // Set up the click action
                     clickable.OnClick = () => {
-                        if ( GameController.GC.DebugInfiniteMoney || GameController.GC.Game.Funds >= option.Cost ) {
+                        if ( GameController.GC.InfiniteFunds || GameController.GC.Game.Funds >= option.Cost ) {
                             // Subtract funds
                             GameController.GC.Game.Funds -= option.Cost;
                             GameController.GC.UpdateFundsDisplay();

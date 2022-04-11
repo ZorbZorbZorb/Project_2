@@ -25,7 +25,7 @@ namespace Assets.Scripts.Customers {
             }
 
             DeltaTime = Time.deltaTime;
-            if ( GC.DebugUltraRapidSpeed ) {
+            if ( GC.RapidSimulation ) {
                 DeltaTime *= 10f;
             }
 
@@ -60,7 +60,7 @@ namespace Assets.Scripts.Customers {
             MoveUpdate();
 
             // Debug logging
-            if ( GameController.GC.DebugStateLogging ) {
+            if ( GameController.GC.LogCustomerStates ) {
                 FrameActionDebug();
             }
 
@@ -528,7 +528,7 @@ namespace Assets.Scripts.Customers {
             PathLength = Path.length;
             PathMoveSpeed = MoveSpeed / Path.length;
             MovementType = MovementType.Path;
-            if ( GameController.GC.DebugDrawPaths ) {
+            if ( GameController.GC.DrawCustomerPaths ) {
                 DebugDrawVertexPath(Path, customerAnimator.Color);
                 IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
                 Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
@@ -722,7 +722,7 @@ namespace Assets.Scripts.Customers {
             }
             // Only if they're about to lose it
             if ( customer.Gender == 'f' ) {
-                return GC.DebugCustomersWillinglyUseAny || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93;
+                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93;
             }
             throw new NotImplementedException();
         }
@@ -730,11 +730,11 @@ namespace Assets.Scripts.Customers {
         public static bool WillUseSink(Customer customer) {
             // It's just a weird urinal you wash your hands in, right?
             if ( customer.Gender == 'm' ) {
-                return GC.DebugCustomersWillinglyUseAny || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93d;
+                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93d;
             }
             // Girls will only use the sink if they're wetting themselves
             if ( customer.Gender == 'f' ) {
-                return GC.DebugCustomersWillinglyUseAny || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.99d;
+                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.99d;
             }
             throw new NotImplementedException();
         }

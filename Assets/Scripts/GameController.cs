@@ -11,6 +11,32 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public partial class GameController : MonoBehaviour {
+    [Header("Settings")]
+    public bool DisplayNightStartSplash = true;
+    public bool DisplayBuildMenuOnFirstNight = false;
+
+    [Header("Debugging")]
+    public bool RapidSimulation = false;
+    public bool OnlySpawnOneCustomer = false;
+    public bool LogCustomerStates = false;
+    public bool DrawCustomerPaths = false;
+
+    [Header("Cheats")]
+    public bool RapidBladderFill = false;
+    public bool RapidBladderEmpty = false;
+    public bool RapidCustomerSpawn = false;
+    public bool CustomersWillUseAnything = false;
+    public bool InfiniteFunds = false;
+    public bool NoLose = false;
+    public bool FreezeTime = false;
+    public bool Autoplay = false;
+
+    [Header("Commands")]
+    public bool EndNightNow = false;
+    public bool BuildEverything = false;
+
+    [Header("Other")]
+
     // Build menu
     public bool InBuildMenu;
     public BuildMenu BuildMenu;
@@ -26,22 +52,7 @@ public partial class GameController : MonoBehaviour {
     public int nightMaxTime = 30;
     public int nightMaxCustomerSpawnTime = 20;
 
-    // Debugging, options and cheats for development
-    public bool DebugRapidFill = false;
-    public bool DebugRapidPee = false;
-    public bool DebugUltraRapidSpeed = false;
-    public bool DebugNoLose = false;
-    public bool DebugSpawnOneCustomerOnly = false;
-    public bool DebugEndNightNow = false;
-    public bool DebugDisplayBuildMenuOnFirstNight = false;
-    public bool DebugInfiniteMoney = false;
-    public bool DebugBuildAll = false;
-    public bool DebugCustomersWillinglyUseAny = false;
-    public bool DebugStateLogging = false;
-    public bool DebugDrawPaths = false;
-    public bool DisplayNightStartSplash = true;
-    public bool DebugFreezeTime = false;
-    public bool DebugAutoplay = false;
+
 
     // State booleans
     public bool SpawningEnabled = true;
@@ -135,7 +146,7 @@ public partial class GameController : MonoBehaviour {
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 0, 0);
 
         // Start build mode if not first night
-        if ( DebugDisplayBuildMenuOnFirstNight || Game.Night > 1 ) {
+        if ( DisplayBuildMenuOnFirstNight || Game.Night > 1 ) {
             StartBuildMode();
         }
         else {
@@ -164,8 +175,8 @@ public partial class GameController : MonoBehaviour {
                 CustomersManager.CreateCustomer(desperate: true);
 
                 // Debugging only
-                if ( DebugSpawnOneCustomerOnly ) {
-                    DebugSpawnOneCustomerOnly = false;
+                if ( OnlySpawnOneCustomer ) {
+                    OnlySpawnOneCustomer = false;
                     SpawningEnabled = false;
                 }
             }
@@ -173,7 +184,7 @@ public partial class GameController : MonoBehaviour {
                 return;
             }
         }
-        else if ( DebugEndNightNow || GameEnd ) {
+        else if ( EndNightNow || GameEnd ) {
             if ( !GamePaused ) {
                 if ( GameLost ) {
                     PauseGame();
@@ -192,7 +203,7 @@ public partial class GameController : MonoBehaviour {
         }
 
         var deltaTime = Time.deltaTime;
-        if (DebugUltraRapidSpeed) {
+        if (RapidSimulation) {
             deltaTime *= 10f;
         }
         runTime += deltaTime;
@@ -201,7 +212,7 @@ public partial class GameController : MonoBehaviour {
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             Think();
-            if (DebugAutoplay) {
+            if (Autoplay) {
                 StupidIdiotAutoplayThing();
             }
             // Update time and funds display once per second.
@@ -241,8 +252,10 @@ public partial class GameController : MonoBehaviour {
     }
     private void StupidIdiotAutoplayThing() {
         var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
-        for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
-            CustomersManager.CreateCustomer(desperate: true);
+        if ( RapidCustomerSpawn ) {
+            for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
+                CustomersManager.CreateCustomer(desperate: true);
+            }
         }
         foreach ( Customer customer in CustomersManager.Customers ) {
             if ( customer.AtDestination ) {
@@ -288,7 +301,7 @@ public partial class GameController : MonoBehaviour {
 
         // End the game if too many seats are soiled
         if ( CustomersManager.MaxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
-            if ( !DebugNoLose ) {
+            if ( !NoLose ) {
                 GameEnd = true;
                 GameLost = true;
                 return;
@@ -318,7 +331,7 @@ public partial class GameController : MonoBehaviour {
 
         // Update the bar time
         if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
-            if (!DebugFreezeTime) {
+            if (!FreezeTime) {
                 AdvanceTime();
             }
         }

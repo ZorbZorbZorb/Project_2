@@ -126,7 +126,7 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         private void DoBladderFill() {
             double amountToAdd = FillRate * customer.DeltaTime;
-            if ( GameController.GC.DebugRapidFill ) {
+            if ( GameController.GC.RapidBladderFill ) {
                 amountToAdd *= 3;
             }
             Amount += amountToAdd;
@@ -154,7 +154,7 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         private void DoBladderEmpty() {
             double amountToRemove = Math.Min(DrainRateNow * customer.DeltaTime, Amount);
-            if ( GameController.GC.DebugRapidPee ) {
+            if ( GameController.GC.RapidBladderEmpty ) {
                 amountToRemove *= 3;
             }
             Amount -= amountToRemove;
