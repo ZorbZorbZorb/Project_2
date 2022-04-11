@@ -1986,13 +1986,13 @@ MonoBehaviour:
   DebugNoLose: 0
   DebugSpawnOneCustomerOnly: 0
   DebugEndNightNow: 0
-  DebugDisplayBuildMenuOnFirstNight: 1
+  DebugDisplayBuildMenuOnFirstNight: 0
   DebugInfiniteMoney: 0
   DebugBuildAll: 0
   DebugCustomersWillinglyUseAny: 0
   DebugStateLogging: 0
-  DebugDrawPaths: 0
-  DisplayNightStartSplash: 1
+  DebugDrawPaths: 1
+  DisplayNightStartSplash: 0
   DebugFreezeTime: 0
   DebugAutoplay: 0
   SpawningEnabled: 1
@@ -3099,7 +3099,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
-  m_SortingLayerID: 0
+  m_SortingLayerID: -1005482833
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!1 &804891566
@@ -3833,6 +3833,8 @@ MonoBehaviour:
   Line:
     Bathroom: {fileID: 0}
     waitingSpots: []
+    PhantomEntrySpot: {fileID: 0}
+    CustomersEnteringQueue: []
   waitingRoom:
     Bathroom: {fileID: 0}
     WaitingSpots: []
@@ -6024,6 +6026,8 @@ MonoBehaviour:
   Line:
     Bathroom: {fileID: 0}
     waitingSpots: []
+    PhantomEntrySpot: {fileID: 0}
+    CustomersEnteringQueue: []
   waitingRoom:
     Bathroom: {fileID: 0}
     WaitingSpots: []

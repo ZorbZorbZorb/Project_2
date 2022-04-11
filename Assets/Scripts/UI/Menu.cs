@@ -44,7 +44,7 @@ namespace Assets.Scripts {
         /// <para>The canvas is enabled or disabled to open and close the menu.</para>
         /// </summary>
         [SerializeField]
-        private readonly Canvas canvas;
+        public readonly Canvas canvas;
         /// <summary>
         /// Code to call when checking if the menu can be opened right now
         /// <para>Accepts any function that returns bool</para>
@@ -101,6 +101,7 @@ namespace Assets.Scripts {
         }
         public Menu(Canvas _canvas) {
             canvas = _canvas;
+            canvas.sortingLayerName = "UI";
             canOpenNow = () => { return true; };
             Enabled = canvas.gameObject.activeSelf;
         }

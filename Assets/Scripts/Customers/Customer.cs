@@ -966,17 +966,13 @@ namespace Assets.Scripts.Customers {
         #region CustomerPhysicalActions
         // Goes to the doorway queue
         public bool GetInLine(Bathroom bathroom) {
-            if ( bathroom.Line.HasOpenWaitingSpot() ) {
+            CanReenterBathroom = false;
+            if (bathroom.TryEnterQueue(this)) {
                 // Makes customer hold on for a while longer when entering doorway.
                 bladder.ResetLossOfControlTime();
-                WaitingSpot waitingSpot = bathroom.Line.GetNextWaitingSpot();
-                Occupy(waitingSpot);
-                Location = Location.Hallway;
-                CanReenterBathroom = false;
                 return true;
             }
             else {
-                CanReenterBathroom = false;
                 return false;
             }
         }

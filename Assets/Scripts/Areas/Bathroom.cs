@@ -1,3 +1,4 @@
+using Assets.Scripts.Customers;
 using Assets.Scripts.Objects;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,17 @@ namespace Assets.Scripts.Areas {
             spot.Bathroom = this;
             spot.Location = Location.Hallway;
             Line.waitingSpots.Add(spot);
+
+            if (Line.PhantomEntrySpot != null) {
+                Line.PhantomEntrySpot.transform.position = spot.transform.position;
+            }
+            else {
+                // Set the lines phantom waiting spot
+                Line.PhantomEntrySpot = Instantiate(Prefabs.PrefabSpot);
+                Line.PhantomEntrySpot.MainSRenderer.enabled = false;
+                Line.PhantomEntrySpot.Location = Location.Hallway;
+                Line.PhantomEntrySpot.WaitingSpotType = WaitingSpotType.Line;
+            }
         }
         public void AddSinkLineSpot(WaitingSpot spot) {
             spot.Bathroom = this;
@@ -74,7 +86,16 @@ namespace Assets.Scripts.Areas {
         public Sink GetSink() {
             return Sinks.FirstOrDefault(x => x.OccupiedBy == null);
         }
-
+        public bool TryEnterQueue(Customer customer) {
+            if ( !Line.HasOpenWaitingSpot() ) {
+                return false;
+            }
+            else {
+                customer.Occupy(Line.PhantomEntrySpot);
+                Line.CustomersEnteringQueue.Add(customer);
+                return true;
+            }
+        }
         void Awake() {
             Area.Area = GetComponent<BoxCollider2D>();
             // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
@@ -116,7 +137,6 @@ namespace Assets.Scripts.Areas {
             // Update the turbo-state-machine 9000
             UpdateAvailibility();
         }
-
         public void UpdateAvailibility() {
             HasToiletAvailable = Toilets.Any(x => x.OccupiedBy == null);
             HasUrinalAvailable = Urinals.Any(x => x.OccupiedBy == null);

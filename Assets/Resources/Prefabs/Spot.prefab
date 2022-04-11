@@ -131,7 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Location: 0
   OccupiedBy: {fileID: 0}
-  MainSRenderer: {fileID: 0}
+  MainSRenderer: {fileID: 2264547218086496117}
   AltSRenderer: {fileID: 0}
   MainSprites: []
   MainSpritesSideways: []

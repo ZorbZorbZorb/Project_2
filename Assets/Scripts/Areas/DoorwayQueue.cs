@@ -2,23 +2,26 @@ using Assets.Scripts.Customers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Assets.Scripts.Areas {
     [Serializable]
     public class DoorwayQueue {
         public Bathroom Bathroom;
         public List<WaitingSpot> waitingSpots = new List<WaitingSpot>();
+        public WaitingSpot PhantomEntrySpot;
+        public List<Customer> CustomersEnteringQueue = new List<Customer>();
 
         public void Update() {
             // Advance queue
             AdvanceQueue();
+            // All canadians approaching the queue must enter the queue on arrival
+            var canadians = CustomersEnteringQueue.Where(x => x.AtDestination).ToArray();
+            for ( int eh = canadians.Length; eh-- > 0; ) {
+                var canadian = canadians[eh];
+                canadian.Occupy(GetNextWaitingSpot());
+                CustomersEnteringQueue.Remove(canadian);
+            }
         }
-
-        public int UID => _uid;
-        private readonly int _uid = GameController.GetUid();
-
-
         public bool IsNextInLine(Customer customer) {
             for ( int i = 0; i < waitingSpots.Count(); i++ ) {
                 if ( waitingSpots[i].OccupiedBy == customer ) {
@@ -33,11 +36,9 @@ namespace Assets.Scripts.Areas {
             }
             return waitingSpots[0].OccupiedBy == customer;
         }
-
         public bool HasOpenWaitingSpot() {
-            return waitingSpots.Any(x => x.Unoccupied);
+            return waitingSpots.Where(x => x.Unoccupied).Count() - CustomersEnteringQueue.Count() > 0;
         }
-
         public WaitingSpot GetNextWaitingSpot() {
             for ( int i = 0; i < waitingSpots.Count; i++ ) {
                 WaitingSpot current = waitingSpots[i];
@@ -45,10 +46,8 @@ namespace Assets.Scripts.Areas {
                     return current;
                 }
             }
-            Debug.LogError("Used GetNextWaitingSpot without checking if any spots exist. Dumbass!");
             return null;
         }
-
         public void AdvanceQueue() {
             // Move everyone up to the lowest place in queue
             for ( int i = 0; i++ < waitingSpots.Count - 1; ) {
