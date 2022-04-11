@@ -23,11 +23,30 @@ namespace Assets.Scripts.Customers {
         public float? remaining = null;
         private bool bladderCircleActive = false;
         public Customer Customer;
+        private bool flipped = false;
         public void Update() {
             // Update emotes
             EmoteUpdate();
             // Update bladder display
             BladderDisplayUpdate();
+            // Flip emotes if need be
+            if (Customer.Occupying?.Facing == Objects.Orientation.East) {
+                if (!flipped) {
+                    FlipEmoteX();
+                }
+            }
+            else if (flipped) {
+                FlipEmoteX();
+            }
+
+            void FlipEmoteX() {
+                flipped = !flipped;
+                //BladderDisplay.transform.localPosition *= new Vector2(-1, 1);
+                EmoteSpriteRenderer.transform.localPosition *= new Vector2(-1, 1);
+                EmoteSpriteRenderer.flipX = flipped;
+                //var eulerAngles = BladderDisplay.transform.localRotation.eulerAngles;
+                //EmoteSpriteRenderer.transform.localRotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y + 180, eulerAngles.z);
+            }
         }
         void EmoteUpdate() {
             // Update emotes
