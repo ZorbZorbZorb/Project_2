@@ -41,6 +41,7 @@ public partial class GameController : MonoBehaviour {
     public bool DebugDrawPaths = false;
     public bool DisplayNightStartSplash = true;
     public bool DebugFreezeTime = false;
+    public bool DebugAutoplay = false;
 
     // State booleans
     public bool SpawningEnabled = true;
@@ -200,8 +201,9 @@ public partial class GameController : MonoBehaviour {
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             Think();
-            StupidIdiotDebugThink();
-
+            if (DebugAutoplay) {
+                StupidIdiotAutoplayThing();
+            }
             // Update time and funds display once per second.
             barTimeDisplay.text = barTime.ToString("hh:mm tt");
         }
@@ -237,7 +239,7 @@ public partial class GameController : MonoBehaviour {
             }
         }
     }
-    private void StupidIdiotDebugThink() {
+    private void StupidIdiotAutoplayThing() {
         var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
         for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
             CustomersManager.CreateCustomer(desperate: true);
@@ -271,6 +273,7 @@ public partial class GameController : MonoBehaviour {
                 }
             }
         }
+        // TODO: Convert this into its own debug toggle
         foreach(var seat in Bar.Singleton.Seats) {
             if (seat.OccupiedBy == null && seat.IsSoiled) {
                 seat.IsSoiled = false;

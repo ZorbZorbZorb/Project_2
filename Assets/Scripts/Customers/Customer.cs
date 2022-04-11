@@ -452,13 +452,23 @@ namespace Assets.Scripts.Customers {
             List<Vector2> vectors = Navigation.Navigate(Location, target.Location);
             vectors.Insert(0, transform.position);
             vectors.Add(target.GetCustomerPosition(Gender));
-            // Hotfix for pathing glitching out with only two vectors
-            if ( vectors.Count == 2 ) {
-                Debug.LogWarning($"MoveTo(CustomerInteractable) {Location} to {target.Location} only includeds two vectors!", this);
-                var middleVector = ( vectors[0] + vectors[1] ) / 2f;
-                vectors.Insert(1, middleVector);
+            switch (vectors.Count) {
+                //case 2:
+                //    break;
+                //case 3: 
+                //    break;
+                //case 4:
+                //    break;
+                default:
+                    // Hotfix for pathing glitching out with only two vectors
+                    if ( vectors.Count == 2 ) {
+                        Debug.LogWarning($"MoveTo(CustomerInteractable) {Location} to {target.Location} only includeds two vectors!", this);
+                        var middleVector = ( vectors[0] + vectors[1] ) / 2f;
+                        vectors.Insert(1, middleVector);
+                    }
+                    SetPath(vectors.ToArray());
+                    break;
             }
-            SetPath(vectors.ToArray());
         }
         /// <summary>
         /// Moves the customer from where they are currently located to the location's point
