@@ -11,8 +11,8 @@ namespace Assets.Scripts {
     public class GameSaveData {
         [Serializable]
         public class Option {
-            public int X;
-            public int Y;
+            public double X;
+            public double Y;
             public List<InteractableType> Options;
             public InteractableType? Current;
             public Orientation Facing;
@@ -43,12 +43,13 @@ namespace Assets.Scripts {
             instances = ApplyToArea(bathroom, Mens);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
-            AddSpot((5d, 1d), bathroom, WaitingSpotType.Bathroom);
-            AddSpot((4d, 1d), bathroom, WaitingSpotType.Bathroom);
+            AddSpot((3d, 1d), bathroom, WaitingSpotType.Bathroom);
+            AddSpot((2d, 1d), bathroom, WaitingSpotType.Bathroom);
             // Add line spots
-            AddSpot((2d, -0.5d), bathroom, WaitingSpotType.Line);
-            AddSpot((1d, -0.5d), bathroom, WaitingSpotType.Line);
-            AddSpot((0d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((2.25d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((1.25d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((0.25d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((-0.75d, -0.5d), bathroom, WaitingSpotType.Line);
             // Add sink spot
             AddSpot((1d, 2.5d), bathroom, WaitingSpotType.Sink);
 
@@ -57,12 +58,13 @@ namespace Assets.Scripts {
             instances = ApplyToArea(bathroom, Womens);
             instances.ForEach(x => bathroom.AddInteractable(x));
             // Add waiting spots
-            AddSpot((5d, 1d), bathroom, WaitingSpotType.Bathroom);
-            AddSpot((4d, 1d), bathroom, WaitingSpotType.Bathroom);
+            AddSpot((3d, 1d), bathroom, WaitingSpotType.Bathroom);
+            AddSpot((2d, 1d), bathroom, WaitingSpotType.Bathroom);
             // Add line spots
-            AddSpot((2d, -0.5d), bathroom, WaitingSpotType.Line);
-            AddSpot((1d, -0.5d), bathroom, WaitingSpotType.Line);
-            AddSpot((0d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((2.25d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((1.25d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((0.25d, -0.5d), bathroom, WaitingSpotType.Line);
+            AddSpot((-0.75d, -0.5d), bathroom, WaitingSpotType.Line);
             // Add sink spot
             AddSpot((1d, 2.5d), bathroom, WaitingSpotType.Sink);
 

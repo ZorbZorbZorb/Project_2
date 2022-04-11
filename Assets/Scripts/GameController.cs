@@ -3,7 +3,6 @@ using Assets.Scripts.Areas;
 using Assets.Scripts.Customers;
 using Assets.Scripts.UI;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,6 +29,7 @@ public partial class GameController : MonoBehaviour {
     // Debugging, options and cheats for development
     public bool DebugRapidFill = false;
     public bool DebugRapidPee = false;
+    public bool DebugUltraRapidSpeed = false;
     public bool DebugNoLose = false;
     public bool DebugSpawnOneCustomerOnly = false;
     public bool DebugEndNightNow = false;
@@ -38,14 +38,16 @@ public partial class GameController : MonoBehaviour {
     public bool DebugBuildAll = false;
     public bool DebugCustomersWillinglyUseAny = false;
     public bool DebugStateLogging = false;
+    public bool DebugDrawPaths = false;
     public bool DisplayNightStartSplash = true;
+    public bool DebugFreezeTime = false;
 
     // State booleans
     public bool SpawningEnabled = true;
     public bool CanPause = true;
     public static bool CreateNewSaveData = true;  // Hey, turn this off on build
     public bool DisplayedNightStartSplashScreen = false;
-    
+
     // Managers
     public CustomerManager CustomersManager;
 
@@ -188,8 +190,13 @@ public partial class GameController : MonoBehaviour {
             }
         }
 
-        runTime += Time.deltaTime;
-        timeAcc += Time.deltaTime;
+        var deltaTime = Time.deltaTime;
+        if (DebugUltraRapidSpeed) {
+            deltaTime *= 10f;
+        }
+        runTime += deltaTime;
+        timeAcc += deltaTime;
+
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             Think();
@@ -212,7 +219,7 @@ public partial class GameController : MonoBehaviour {
                 }
             }
             // Camera movement hotkeys
-            if (Input.GetKeyDown(KeyCode.D)) {
+            if ( Input.GetKeyDown(KeyCode.D) ) {
                 Cam.PanTo(Bathroom.BathroomF.transform.position);
                 Cam.ZoomTo(450);
             }
@@ -224,33 +231,50 @@ public partial class GameController : MonoBehaviour {
                 Cam.PanTo(Freecam.Center);
                 Cam.ZoomTo(600);
             }
-            if (Input.GetKeyDown(KeyCode.W)) {
+            if ( Input.GetKeyDown(KeyCode.W) ) {
                 Cam.PanTo(Freecam.Center);
                 Cam.ZoomTo(600);
             }
         }
     }
     private void StupidIdiotDebugThink() {
-        foreach(Customer customer in CustomersManager.Customers) {
+        var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
+        for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
+            CustomersManager.CreateCustomer(desperate: true);
+        }
+        foreach ( Customer customer in CustomersManager.Customers ) {
             if ( customer.AtDestination ) {
                 if ( customer.Location == Location.Bar ) {
                     customer.Leave();
+                    break;
                 }
-                else if (customer.Location == Location.Hallway) {
-                    if ( customer.GetCurrentBathroom().Line.IsNextInLine(customer) ) {
-                        if (customer.GetCurrentBathroom().HasUrinalAvailable) {
-                            customer.MenuOptionGotoUrinal();
-                        }
-                        else {
+                if ( customer.Location == Location.Hallway ) {
+                    var bathroom = customer.GetCurrentBathroom();
+                    if ( bathroom.Line.IsNextInLine(customer) ) {
+                        if ( bathroom.HasToiletAvailable ) {
                             customer.MenuOptionGotoToilet();
+                            break;
+                        }
+                        else if ( bathroom.HasUrinalAvailable && Customer.WillUseUrinal(customer)) {
+                            customer.MenuOptionGotoUrinal();
+                            break;
+                        }
+                        else if (bathroom.HasSinkForRelief && Customer.WillUseSink(customer) ) {
+                            customer.MenuOptionGotoSink();
+                            break;
+                        }
+                        else if ( bathroom.HasWaitingSpot ) {
+                            customer.MenuOptionGotoWaiting();
+                            break;
                         }
                     }
                 }
             }
         }
-        var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
-        for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
-            CustomersManager.CreateCustomer(desperate: true);
+        foreach(var seat in Bar.Singleton.Seats) {
+            if (seat.OccupiedBy == null && seat.IsSoiled) {
+                seat.IsSoiled = false;
+            }
         }
     }
     private void Think() {
@@ -291,7 +315,9 @@ public partial class GameController : MonoBehaviour {
 
         // Update the bar time
         if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
-            AdvanceTime();
+            if (!DebugFreezeTime) {
+                AdvanceTime();
+            }
         }
     }
 
@@ -392,7 +418,7 @@ public partial class GameController : MonoBehaviour {
         InBuildMenu = false;
         ReadyToStartNight = true;
         Time.timeScale = 1;
-        BuildMenu.Close(); 
+        BuildMenu.Close();
         CustomersManager.MaxCustomers = Bar.Singleton.Seats.Count;
     }
     /// <summary>

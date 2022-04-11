@@ -53,7 +53,7 @@
 		},
 		{
 		"X":0,
-		"Y":1,
+		"Y":0.5,
 		"Options":["Urinal"],
 		"Current":"Urinal",
 		"Facing":"East"
@@ -92,7 +92,7 @@
 		"X":4,
 		"Y":4,
 		"Options":["Toilet"],
-		"Current":null,
+		"Current":"Toilet",
 		"Facing":"South"
 		},
 		{
@@ -101,6 +101,13 @@
 		"Options":["Toilet"],
 		"Current":"Toilet",
 		"Facing":"South"
+		},
+		{
+		"X":0,
+		"Y":0.5,
+		"Options":["Urinal"],
+		"Current":"Urinal",
+		"Facing":"East"
 		}
 	],
 	"Bar": [

@@ -24,6 +24,7 @@ namespace Assets.Scripts.Customers {
         private Color normalColor = new Color(1f, 1f, 1f);
         private Color femaleColor = new Color(1f, 175f / 255f, 175f / 255f);
         private Color maleColor = new Color(175f / 255f, 175f / 255f, 255f);
+        public Color Color => customer.Gender == 'm' ? maleColor : femaleColor;
 
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
@@ -46,7 +47,7 @@ namespace Assets.Scripts.Customers {
                     animator.enabled = true;
                     animator.Play(animationStateName);
                     // For debugging, we only have one animation set right now. Change the color of the animation so it matches the genderand isnt confusing.
-                    renderer.color = customer.Gender == 'm' ? maleColor : femaleColor;
+                    renderer.color = Color;
                 }
                 else {
                     animator.enabled = false;

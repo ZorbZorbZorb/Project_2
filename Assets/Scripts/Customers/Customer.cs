@@ -24,10 +24,15 @@ namespace Assets.Scripts.Customers {
                 return;
             }
 
-            TotalTimeAtBar += Time.deltaTime;
-            MinTimeAtBarNow += Time.deltaTime;
-            MinTimeBetweenChecksNow += Time.deltaTime;
-            NextDelay -= Time.deltaTime;
+            DeltaTime = Time.deltaTime;
+            if ( GC.DebugUltraRapidSpeed ) {
+                DeltaTime *= 10f;
+            }
+
+            TotalTimeAtBar += DeltaTime;
+            MinTimeAtBarNow += DeltaTime;
+            MinTimeBetweenChecksNow += DeltaTime;
+            NextDelay -= DeltaTime;
 
             // Update bladder
             bladder.Update();
@@ -60,7 +65,7 @@ namespace Assets.Scripts.Customers {
             }
 
         }
-        public static GameController GC = null;
+
         public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
             marshal = CustomerSpriteController.Controller[Gender];
 
@@ -129,6 +134,8 @@ namespace Assets.Scripts.Customers {
         }
         #endregion
 
+        internal float DeltaTime { get; private set; }
+        public static GameController GC = null;
         public Bathroom GetCurrentBathroom() {
             switch ( Location ) {
                 case Location.BathroomF:
@@ -398,7 +405,7 @@ namespace Assets.Scripts.Customers {
                 // Display unzip/pantsdown animation
                 else if ( !bladder.Emptying ) {
                     if ( RemainingUrinateStartDelay > 0 ) {
-                        RemainingUrinateStartDelay -= 1 * Time.deltaTime;
+                        RemainingUrinateStartDelay -= 1 * DeltaTime;
                     }
                     else {
                         bladder.Emptying = true;
@@ -483,7 +490,7 @@ namespace Assets.Scripts.Customers {
         private void SetPath(Vector2[] vectors) {
             PathProgress = 0f;
             var cache = VertexPath2.PathCache;
-            if (VertexPath2.PathCache.ContainsKey(vectors)) {
+            if ( VertexPath2.PathCache.ContainsKey(vectors) ) {
                 Path = VertexPath2.PathCache[vectors];
             }
             else {
@@ -496,10 +503,13 @@ namespace Assets.Scripts.Customers {
                 VertexPath2.PathCache.Add(vectors, Path);
             }
             PathLength = Path.length;
+            PathMoveSpeed = (float)MoveSpeed / Path.length;
             MovementType = MovementType.Path;
-            DebugDrawVertexPath(Path, SRenderer.color);
-            //IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
-            //Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+            if (GameController.GC.DebugDrawPaths) {
+                DebugDrawVertexPath(Path, customerAnimator.Color);
+                IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
+                Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+            }
         }
         private static void DebugDrawVertexPath(VertexPath2 vertexPath, Color color, float time = 3f) {
             for ( int i = 1; i < vertexPath.localPoints.Length; i++ ) {
@@ -513,27 +523,35 @@ namespace Assets.Scripts.Customers {
                 case MovementType.None:
                     return;
                 case MovementType.Path:
-                    PathProgress += ( (float)MoveSpeed / Path.length ) * Time.deltaTime;
-                    transform.position = Path.GetPointAtTime(PathProgress, EndOfPathInstruction.Stop);
+                    PathProgress += PathMoveSpeed * DeltaTime;
                     if ( PathProgress >= 1f ) {
+                        transform.position = Path.GetPointAtTime(1f, EndOfPathInstruction.Stop);
                         Path = null;
                         PathProgress = 0f;
                         MovementType = MovementType.None;
                         return;
                     }
-
-                    // Should we switch the character in and out of the bathroom wall overlay layer?
-                    if ( transform.position.x > BathroomStartX ) {
-                        if ( transform.position.y >= BathroomStartY ) {
-                            SRenderer.sortingLayerID = 0;
-                        }
-                        else {
-                            SRenderer.sortingLayerID = sortingLayerIdAboveOverlay;
-                        }
+                    else {
+                        transform.position = Path.GetPointAtTime(PathProgress, EndOfPathInstruction.Stop);
                     }
+                    // If at end of path, end movement
                     break;
                 case MovementType.Linear:
-                    break;
+                    throw new NotImplementedException();
+                case MovementType.Quadratic:
+                    throw new NotImplementedException();
+                case MovementType.CubicQuadratic:
+                    throw new NotImplementedException();
+            }
+
+            // Should we switch the character in and out of the bathroom wall overlay layer?
+            if ( transform.position.x > BathroomStartX ) {
+                if ( transform.position.y >= BathroomStartY ) {
+                    SRenderer.sortingLayerID = 0;
+                }
+                else {
+                    SRenderer.sortingLayerID = sortingLayerIdAboveOverlay;
+                }
             }
         }
         /// <summary>
@@ -552,7 +570,7 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointA">Starting point</param>
         /// <param name="pointB">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB) {
+        public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
             return pointA + t * ( pointA - pointB );
         }
         /// <summary>
@@ -563,17 +581,33 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointB">Approached point</param>
         /// <param name="pointC">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public Vector3 GetBezierPoint(float t, Vector3 pointA, Vector3 pointB, Vector3 pointC) {
+        public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC) {
             float u = 1f - t;
             float uu = u * u;
             float tt = t * t;
             return ( uu * pointA ) + ( 2f * u * t * pointB ) + ( tt * pointC );
+        }
+        /// <summary>
+        /// Calculates a cubic quadratic bezier point
+        /// </summary>
+        /// <param name="t">Time, from 0f to 1f</param>
+        /// <param name="pointA">Starting point</param>
+        /// <param name="pointB">Approached point 1</param>
+        /// <param name="pointC">Approached point 2</param>
+        /// <param name="pointD">Ending point</param>
+        /// <returns>BezierPoint</returns>
+        public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+            var tt = t * t;
+            var u = 1 - t;
+            var uu = u * u;
+            return uu * u * pointA + 3 * uu * t * pointB + 3 * u * tt * pointC + tt * t * pointD;
         }
         public bool AtDestination => MovementType == MovementType.None;
         public VertexPath2 Path;
         public float PathProgress = 0f;
         public float ApproximatePathLength;
         public float PathLength;
+        public float PathMoveSpeed;
 
         /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
         public static float BathroomStartX;
@@ -641,26 +675,26 @@ namespace Assets.Scripts.Customers {
 
         #region Desperation/Wetting/Peeing
         // Current willingness to use a urinal for relief
-        public bool WillUseUrinal(Customer customer) {
+        public static bool WillUseUrinal(Customer customer) {
             // Yup
             if ( customer.Gender == 'm' ) {
                 return true;
             }
             // Only if they're about to lose it
             if ( customer.Gender == 'f' ) {
-                return GC.DebugCustomersWillinglyUseAny || bladder.LosingControl || bladder.FeltNeed > 0.93;
+                return GC.DebugCustomersWillinglyUseAny || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93;
             }
             throw new NotImplementedException();
         }
         // Current willingness to use a sink for relief
-        public bool WillUseSink(Customer customer) {
+        public static bool WillUseSink(Customer customer) {
             // It's just a weird urinal you wash your hands in, right?
             if ( customer.Gender == 'm' ) {
-                return GC.DebugCustomersWillinglyUseAny || bladder.LosingControl || bladder.FeltNeed > 0.93d;
+                return GC.DebugCustomersWillinglyUseAny || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93d;
             }
             // Girls will only use the sink if they're wetting themselves
             if ( customer.Gender == 'f' ) {
-                return GC.DebugCustomersWillinglyUseAny || bladder.LosingControl || bladder.FeltNeed > 0.99d;
+                return GC.DebugCustomersWillinglyUseAny || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.99d;
             }
             throw new NotImplementedException();
         }
@@ -702,20 +736,15 @@ namespace Assets.Scripts.Customers {
             Emotes.ShowBladderCircle(false);
             ActionState = Collections.CustomerActionState.None;
             if ( IsWet ) {
-                MoveTo(Location.Outside);
-                Location = Location.Outside;
-                Occupying.OccupiedBy = null;
-                Occupying = null;
+                Leave();
             }
-            else if ( UseSink(GetCurrentBathroom()) ) {
+            else if ( Occupying.IType != InteractableType.Sink && UseSink(GetCurrentBathroom()) ) {
                 // Handled in UseSink(Bathroom)
             }
             else {
-                ActionState = Collections.CustomerActionState.None;
                 Seat seat = Bar.Singleton.GetOpenSeat();
                 Occupy(seat);
             }
-
             if ( ReliefType == ReliefType.Toilet ) {
                 ( (Toilet)Occupying ).AltSRenderer.sprite = Collections.spriteStallOpened;
             }
@@ -962,16 +991,14 @@ namespace Assets.Scripts.Customers {
                 sink.UseForWash(this);
                 return true;
             }
-            else {
-                WaitingSpot spot = bathroom.SinksLine.GetNextWaitingSpot();
-                if ( spot != null ) {
+            else if ( bathroom.SinksLine.HasOpenWaitingSpot() ) {
+                if (bathroom.Sinks.Any(x => x.OccupiedBy.ActionState == Collections.CustomerActionState.WashingHands)) {
+                    WaitingSpot spot = bathroom.SinksLine.GetNextWaitingSpot();
                     Occupy(spot);
                     return true;
                 }
-                else {
-                    return false;
-                }
             }
+            return false;
         }
         // Goes back to the bar
         public void EnterBar(Seat seat) {
@@ -1005,6 +1032,8 @@ namespace Assets.Scripts.Customers {
     public enum MovementType {
         None,
         Linear,
+        Quadratic,
+        CubicQuadratic,
         Path
     }
 }

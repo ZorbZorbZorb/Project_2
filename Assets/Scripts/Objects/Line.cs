@@ -45,7 +45,7 @@ namespace Assets.Scripts {
         }
 
         public bool HasOpenWaitingSpot() {
-            return Items.Where(x => x.OccupiedBy == null).Any();
+            return Items.Any(x => x.OccupiedBy == null);
         }
 
         public WaitingSpot GetNextWaitingSpot() {

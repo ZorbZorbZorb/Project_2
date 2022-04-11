@@ -28,6 +28,7 @@ namespace Assets.Scripts.Areas {
         public bool HasSinkForRelief { get; private set; }
         public bool HasSinkForWash { get; private set; }
         public bool HasSinkForAny { get; private set; }
+        public bool HasWaitingSpot { get; private set; }
 
         /// <summary>
         /// Adds the provided interactable to the room and handles rigging it up for use by customers
@@ -122,6 +123,7 @@ namespace Assets.Scripts.Areas {
             HasSinkForRelief = !SinksLine.HasAnyoneInLine() && Sinks.Any(x => x.OccupiedBy == null);
             HasSinkForWash = HasSinkForRelief;
             HasSinkForAny = HasSinkForWash || HasSinkForRelief;
+            HasWaitingSpot = waitingRoom.HasOpenWaitingSpot();
         }
     }
 }

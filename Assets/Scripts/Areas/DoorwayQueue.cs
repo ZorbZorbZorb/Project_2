@@ -50,32 +50,25 @@ namespace Assets.Scripts.Areas {
         }
 
         public void AdvanceQueue() {
-            for ( int i = 1; i < waitingSpots.Count(); i++ ) {
-                // If spot ahead is empty
-                if ( waitingSpots[i - 1].OccupiedBy == null ) {
-                    // If current spot is empty
-                    if ( waitingSpots[i].OccupiedBy == null ) {
-                        for ( int j = i + 1; j < waitingSpots.Count(); j++ ) {
-                            if ( waitingSpots[j].OccupiedBy != null ) {
-                                // Move customer in spot j to spot i - 1
-                                waitingSpots[j].OccupiedBy.Occupy(waitingSpots[i - 1]);
-                                waitingSpots[j].OccupiedBy = null;
-                                // And break loop j ffs
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        // No move if customer is piss pant)
-                        if ( waitingSpots[i].OccupiedBy.IsWet ) {
-                            continue;
-                        }
-
-                        // Move customer in spot i to spot i - 1
-                        waitingSpots[i].OccupiedBy.Occupy(waitingSpots[i - 1]);
-                        waitingSpots[i].OccupiedBy = null;
+            // Move everyone up to the lowest place in queue
+            for ( int i = 0; i++ < waitingSpots.Count - 1; ) {
+                var occupant = waitingSpots[i].OccupiedBy;
+                if ( occupant != null && occupant.AtDestination && !occupant.IsWet ) {
+                    WaitingSpot lowest = lowestEmpty(i);
+                    if ( lowest != null ) {
+                        occupant.Occupy(lowest);
                     }
                 }
+            }
+            //Returns the lowest (closest to front of line) empty (unoccupied) spot
+            WaitingSpot lowestEmpty(int end) {
+                for ( int i = 0; i < end; i++ ) {
+                    var occupant = waitingSpots[i].OccupiedBy;
+                    if ( occupant == null ) {
+                        return waitingSpots[i];
+                    }
+                }
+                return null;
             }
         }
     }

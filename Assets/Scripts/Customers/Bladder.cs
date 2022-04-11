@@ -75,16 +75,16 @@ namespace Assets.Scripts.Customers {
                                 StruggleStopSpurtNow = false;
                             }
                             else {
-                                DrainRateNow += ( 15d * Time.deltaTime );
+                                DrainRateNow += ( 15d * customer.DeltaTime );
                             }
                         }
                         else {
                             // Guys will be better at interrupting peeing than girls
                             if ( customer.Gender == 'm' ) {
-                                DrainRateNow -= ( 16d * Time.deltaTime );
+                                DrainRateNow -= ( 16d * customer.DeltaTime );
                             }
                             else {
-                                DrainRateNow -= ( 8d * Time.deltaTime );
+                                DrainRateNow -= ( 8d * customer.DeltaTime );
                             }
                         }
                         // To make it more interesting heres some naive for spurting when stopping
@@ -103,7 +103,7 @@ namespace Assets.Scripts.Customers {
             // If Losing Control
             else if ( LosingControl ) {
                 DoBladderFill();
-                double timeToSubtract = 1 * Time.deltaTime;
+                double timeToSubtract = 1 * customer.DeltaTime;
                 LossOfControlTimeNow -= timeToSubtract;
                 if ( LossOfControlTimeNow <= 0 ) {
                     LosingControl = false;
@@ -125,25 +125,25 @@ namespace Assets.Scripts.Customers {
         /// Fill a customers bladder. Called once per update
         /// </summary>
         private void DoBladderFill() {
-            double amountToAdd = FillRate * Time.deltaTime;
+            double amountToAdd = FillRate * customer.DeltaTime;
             if ( GameController.GC.DebugRapidFill ) {
-                amountToAdd *= 10;
+                amountToAdd *= 3;
             }
             Amount += amountToAdd;
             if ( Stomach > 0 ) {
-                amountToAdd = Time.deltaTime * ( 2 + ( Stomach / 200 ) );
+                amountToAdd = customer.DeltaTime * ( 2 + ( Stomach / 200 ) );
                 Stomach -= amountToAdd;
                 Amount += amountToAdd;
             }
             double percentFull = Percentage;
             if ( percentFull > 0.8d && percentFull < 1.0d ) {
-                ControlRemaining -= 0.5 * Time.deltaTime;
+                ControlRemaining -= 0.5 * customer.DeltaTime;
                 if ( ControlRemaining < 0 ) {
                     ControlRemaining = 0;
                 }
             }
             else if ( percentFull > 1.0d ) {
-                ControlRemaining -= 5 * Time.deltaTime;
+                ControlRemaining -= 5 * customer.DeltaTime;
                 if ( ControlRemaining < 0 ) {
                     ControlRemaining = 0;
                 }
@@ -153,9 +153,9 @@ namespace Assets.Scripts.Customers {
         /// Empty a customers bladder. Called once per update
         /// </summary>
         private void DoBladderEmpty() {
-            double amountToRemove = Math.Min(DrainRateNow * Time.deltaTime, Amount);
+            double amountToRemove = Math.Min(DrainRateNow * customer.DeltaTime, Amount);
             if ( GameController.GC.DebugRapidPee ) {
-                amountToRemove *= 4;
+                amountToRemove *= 3;
             }
             Amount -= amountToRemove;
             if ( Percentage < 0.9d ) {
