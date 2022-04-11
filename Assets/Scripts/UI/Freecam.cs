@@ -133,7 +133,7 @@ namespace Assets.Scripts.UI {
             }
             else {
                 float amount = 20f + ( distance * 2f );
-                transform.position = Vector3.MoveTowards(transform.position, panIntent, amount * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, panIntent, amount * Time.fixedDeltaTime);
             }
         }
         private void ZoomCamera(float axis) {
