@@ -452,11 +452,46 @@ namespace Assets.Scripts.Customers {
         /// position properties if available
         /// </param>
         public void MoveTo(CustomerInteractable target) {
-            // Get navigation from
-            List<Vector2> vectors = Navigation.Navigate(Location, target.Location);
-            vectors.Insert(0, transform.position);
-            vectors.Add(target.GetCustomerPosition(Gender));
-            MoveTo(vectors.ToArray());
+            Vector2[] vectors;
+            // Are we in the same location as the target?
+            if ( Location == target.Location ) {
+                switch ( Location ) {
+                    case Location.BathroomM:
+                    case Location.BathroomF:
+                        Bathroom bathroom = GetCurrentBathroom();
+                        if ( target.IType == InteractableType.Sink ) {
+                            vectors = new Vector2[] {
+                                transform.position,
+                                bathroom.SinksLine.Items[0].transform.position,
+                                target.GetCustomerPosition(Gender)
+                            };
+                        }
+                        else {
+                            vectors = new Vector2[] {
+                                transform.position,
+                                (Vector2)bathroom.transform.position + bathroom.Area.Area.offset,
+                                target.GetCustomerPosition(Gender)
+                            };
+                        }
+                        break;
+                    default:
+                        vectors = new Vector2[] {
+                            transform.position,
+                            target.GetCustomerPosition(Gender)
+                        }; 
+                        break;
+                }
+            }
+            // Navigate to the target, then move to it.
+            else {
+                var navigation = Navigation.Navigate(Location, target.Location);
+                vectors = new Vector2[navigation.Count + 2];
+                vectors[0] = transform.position;
+                navigation.CopyTo(vectors, 1);
+                vectors[navigation.Count + 1] = target.GetCustomerPosition(Gender);
+            }
+
+            MoveTo(vectors);
         }
         /// <summary>
         /// Moves the customer from where they are currently located to the location's point
@@ -506,7 +541,6 @@ namespace Assets.Scripts.Customers {
             MovementType = MovementType.Manual;
 
             void SetBezierPath(Vector2[] vectors) {
-                var cache = VertexPath2.PathCache;
                 if ( VertexPath2.PathCache.ContainsKey(vectors) ) {
                     Path = VertexPath2.PathCache[vectors];
                 }
@@ -516,7 +550,10 @@ namespace Assets.Scripts.Customers {
                     for ( int i = 1; i < vectors.Count(); i++ ) {
                         ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
                     }
-                    Path = new VertexPath2(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
+                    Path = new VertexPath2(bezierPath, GameController.GC.transform, 20f);
+                    if ( VertexPath2.PathCache.Count > 2000 ) {
+                        VertexPath2.PathCache.Clear();
+                    }
                     VertexPath2.PathCache.Add(vectors, Path);
                 }
                 PathLength = Path.length;
@@ -524,8 +561,9 @@ namespace Assets.Scripts.Customers {
                 MovementType = MovementType.Path;
                 if ( GameController.GC.DrawCustomerPaths ) {
                     DebugDrawVertexPath(Path, customerAnimator.Color);
-                    IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
-                    Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+                    if ( Path.localPoints.Count() > 300 ) {
+                        Debug.Log($"Creating long path (np={Path.localPoints.Length} nv={vectors.Count()})", this);
+                    }
                 }
             }
         }
@@ -661,7 +699,7 @@ namespace Assets.Scripts.Customers {
                 last = next;
             }
             while ( t < 1f );
-            return l + Vector2.Distance(last, pointD);
+            return l + Vector2.Distance(last, pointC);
         }
         public bool AtDestination => MovementType == MovementType.None;
         public Vector2[] PathVectors = new Vector2[0];
@@ -683,7 +721,7 @@ namespace Assets.Scripts.Customers {
         /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
         public static float BathroomStartX;
         public static float BathroomStartY;
-        
+
         #endregion
 
         private int sortingLayerIdAboveOverlay = -1;

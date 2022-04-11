@@ -14,7 +14,7 @@ public partial class Collections : MonoBehaviour {
 
         // Create customer sprite marshals
         CustomerSpriteController.Controller = new Dictionary<char, CustomerSpriteController>();
-        CustomerSpriteController.NewController('m', "Sprites/People/m");
+        CustomerSpriteController.NewController('m', "Sprites/People/nm");
         CustomerSpriteController.NewController('f', "Sprites/People/n");
 
         Emote.PeeStrong =       new Emote("Sprites/Bubbles/Stream_3");

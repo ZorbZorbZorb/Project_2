@@ -73,6 +73,7 @@ namespace Assets.Scripts {
             float currentPathLength = 0;
             float dstSinceLastVertex = 0;
 
+            int iterations = 0;
             // Go through all segments and split up into vertices
             for ( int segmentIndex = 0; segmentIndex < bezierPath.NumSegments; segmentIndex++ ) {
                 Vector2[] segmentPoints = bezierPath.GetPointsInSegment(segmentIndex);
@@ -81,6 +82,7 @@ namespace Assets.Scripts {
                 float increment = 1f / divisions;
 
                 for ( float t = increment; t <= 1; t += increment ) {
+                    iterations++;
                     bool isLastPointOnPath = ( t + increment > 1 && segmentIndex == bezierPath.NumSegments - 1 );
                     if ( isLastPointOnPath ) {
                         t = 1;

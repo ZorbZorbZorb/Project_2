@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Objects\Line.cs" />
     <Compile Include="Assets\Scripts\Customers\CustomerSpriteController.cs" />
     <Compile Include="Assets\Scripts\PathSpace.cs" />
+    <Compile Include="Assets\Scripts\UI\CameraPosition.cs" />
     <Compile Include="Assets\Scripts\UI\Freecam.cs" />
     <Compile Include="Assets\Scripts\Customers\Emotes.cs" />
     <Compile Include="Assets\Scripts\Location.cs" />

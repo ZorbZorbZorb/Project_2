@@ -36,7 +36,7 @@ namespace Assets.Scripts {
 
         // Default values and constants:    
         const float accuracy = 0.01f; // A scalar for how many times bezier path is divided when determining vertex positions
-        const float minVertexSpacing = 20f;
+        const float minVertexSpacing = 10f;
 
         Transform transform;
 
