@@ -232,9 +232,9 @@ namespace Assets.Scripts.Customers {
             }
 
             // Should buy drink?
-            if ( WantsToBuyDrink() && Funds >= Bar.DrinkCost && DesperationState != Collections.CustomerDesperationState.State4 ) {
-                BuyDrink();
-            }
+            //if ( WantsToBuyDrink() && Funds >= Bar.DrinkCost && DesperationState != Collections.CustomerDesperationState.State4 ) {
+            //    BuyDrink();
+            //}
 
             // Returns true if think about things in bar should return.
             bool ThinkAboutEnteringBathroom() {
@@ -245,7 +245,7 @@ namespace Assets.Scripts.Customers {
 
                 // If they're about to wet and werent just turned away, have them try to go to the bathroom
                 if ( bladder.StartedLosingControlThisFrame ) {
-                    Debug.Log($"Customer {UID} trying to enter bathroom because they are losing control.");
+                    //Debug.Log($"Customer {UID} trying to enter bathroom because they are losing control.");
                     bladder.ResetLossOfControlTime();
                     if ( TryEnterBathroom() ) {
                         return true;
@@ -268,13 +268,13 @@ namespace Assets.Scripts.Customers {
                 // If they got more desperate this frame and have waited at least a third the required time, should they run to the bathroom right now?
                 if ( DesperationStateChangeThisUpdate && ( MinTimeAtBarNow * 3d ) > MinTimeAtBar ) {
                     if ( DesperationState == Collections.CustomerDesperationState.State3 ) {
-                        Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
+                        //Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
                         if ( TryEnterBathroom() ) {
                             return true;
                         }
                     }
                     if ( DesperationState == Collections.CustomerDesperationState.State4 ) {
-                        Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
+                        //Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
                         if ( TryEnterBathroom() ) {
                             return true;
                         }
@@ -297,7 +297,7 @@ namespace Assets.Scripts.Customers {
             }
         }
         public void BuyDrink() {
-            Debug.Log($"Customer {UID} bought a drink");
+            //Debug.Log($"Customer {UID} bought a drink");
             LastDrinkAt = TotalTimeAtBar;
             bladder.Stomach += Bar.DrinkAmount;
             //Funds -= Bar.DrinkCost;
@@ -310,7 +310,7 @@ namespace Assets.Scripts.Customers {
         public bool WantsToLeaveBar() {
             Collections.CustomerDesperationState[] tooDesperateStates;
 
-            if ( GC.timeTicksElapsed >= ( GC.nightMaxCustomerSpawnTime + GC.nightMaxCustomerSpawnTime / 2 ) ) {
+            if ( GC.timeTicksElapsed >= ( GC.NightMaxCustomerSpawnTime + GC.NightMaxCustomerSpawnTime / 2 ) ) {
                 tooDesperateStates = new Collections.CustomerDesperationState[] {
                 Collections.CustomerDesperationState.State4
             };
@@ -327,7 +327,7 @@ namespace Assets.Scripts.Customers {
             bool wetted = IsWet && !IsWetting;
             bool stayedTooLong = EnteredTicksElapsed - GC.timeTicksElapsed > 10;
             bool noMoreFunds = Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f;
-            bool tooLateAtNight = GC.timeTicksElapsed >= GC.nightMaxCustomerSpawnTime;
+            bool tooLateAtNight = GC.timeTicksElapsed >= GC.NightMaxCustomerSpawnTime;
 
             // Compound assertions
             bool wouldNormallyLeave = stayedTooLong || noMoreFunds || tooLateAtNight;
@@ -486,52 +486,43 @@ namespace Assets.Scripts.Customers {
             PathVectors = vectors.ToArray();
             switch ( vectors.Length ) {
                 case 2:
-                    SetLinearPath(PathVectors);
+                    PathLength = Vector2.Distance(vectors[0], vectors[1]);
                     break;
-                //case 3:
-                //    break;
-                //case 4:
-                //    break;
+                case 3:
+                    PathLength = EstimatePathLength(vectors[0], vectors[1], vectors[2]);
+                    break;
+                case 4:
+                    PathLength = EstimatePathLength(vectors[0], vectors[1], vectors[2], vectors[3]);
+                    break;
                 default:
-                    SetPath(PathVectors);
-                    break;
+                    SetBezierPath(PathVectors);
+                    return;
             }
-        }
-        private void SetLinearPath(Vector2[] vectors) {
-            Debug.Log("Moving linear to interactable", this);
-            PathLength = Vector2.Distance(vectors[0], vectors[1]);
-            ApproximatePathLength = PathLength;
             PathMoveSpeed = MoveSpeed / PathLength;
-            MovementType = MovementType.Linear;
-        }
-        private void SetQuadraticPath(Vector2[] vectors) {
-            throw new NotImplementedException();
-        }
-        private void SetCubicQuadraticPath(Vector2[] vectors) {
-            throw new NotImplementedException();
-        }
-        private void SetPath(Vector2[] vectors) {
-            Debug.Log("Moving path to interactable", this);
-            var cache = VertexPath2.PathCache;
-            if ( VertexPath2.PathCache.ContainsKey(vectors) ) {
-                Path = VertexPath2.PathCache[vectors];
-            }
-            else {
-                BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
-                ApproximatePathLength = 0f;
-                for ( int i = 1; i < vectors.Count(); i++ ) {
-                    ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
+            MovementType = MovementType.Manual;
+
+            void SetBezierPath(Vector2[] vectors) {
+                var cache = VertexPath2.PathCache;
+                if ( VertexPath2.PathCache.ContainsKey(vectors) ) {
+                    Path = VertexPath2.PathCache[vectors];
                 }
-                Path = new VertexPath2(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
-                VertexPath2.PathCache.Add(vectors, Path);
-            }
-            PathLength = Path.length;
-            PathMoveSpeed = MoveSpeed / Path.length;
-            MovementType = MovementType.Path;
-            if ( GameController.GC.DrawCustomerPaths ) {
-                DebugDrawVertexPath(Path, customerAnimator.Color);
-                IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
-                Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+                else {
+                    BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
+                    ApproximatePathLength = 0f;
+                    for ( int i = 1; i < vectors.Count(); i++ ) {
+                        ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
+                    }
+                    Path = new VertexPath2(bezierPath, GameController.GC.transform, ApproximatePathLength / 10f);
+                    VertexPath2.PathCache.Add(vectors, Path);
+                }
+                PathLength = Path.length;
+                PathMoveSpeed = MoveSpeed / Path.length;
+                MovementType = MovementType.Path;
+                if ( GameController.GC.DrawCustomerPaths ) {
+                    DebugDrawVertexPath(Path, customerAnimator.Color);
+                    IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
+                    Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
+                }
             }
         }
         private static void DebugDrawVertexPath(VertexPath2 vertexPath, Color color, float time = 3f) {
@@ -559,22 +550,29 @@ namespace Assets.Scripts.Customers {
                         transform.position = Path.GetPointAtTime(PathTime, EndOfPathInstruction.Stop);
                     }
                     break;
-                case MovementType.Linear:
+                case MovementType.Manual:
                     PathTime += PathMoveSpeed * PathMoveSpeedMultiplier * DeltaTime;
                     if ( PathTime >= 1f ) {
-                        transform.position = PathVectors[1];
-                        PathTime = 0f;
+                        transform.position = PathVectors.Last();
                         MovementType = MovementType.None;
                         break;
                     }
                     else {
-                        transform.position = GetBezierPoint(PathTime, PathVectors[0], PathVectors[1]);
+                        switch ( PathVectors.Length ) {
+                            case 2:
+                                transform.position = GetBezierPoint(PathTime, PathVectors[0], PathVectors[1]);
+                                break;
+                            case 3:
+                                transform.position = GetBezierPoint(PathTime, PathVectors[0], PathVectors[1], PathVectors[2]);
+                                break;
+                            case 4:
+                                transform.position = GetBezierPoint(PathTime, PathVectors[0], PathVectors[1], PathVectors[2], PathVectors[3]);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
                     }
                     break;
-                case MovementType.Quadratic:
-                    throw new NotImplementedException();
-                case MovementType.CubicQuadratic:
-                    throw new NotImplementedException();
             }
 
             // Should we switch the character in and out of the bathroom wall overlay layer?
@@ -603,7 +601,7 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointA">Starting point</param>
         /// <param name="pointB">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
+        public static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
             return pointA + t * ( pointB - pointA );
         }
         /// <summary>
@@ -614,7 +612,7 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointB">Approached point</param>
         /// <param name="pointC">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC) {
+        public static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC) {
             float u = 1f - t;
             float uu = u * u;
             float tt = t * t;
@@ -629,11 +627,37 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointC">Approached point 2</param>
         /// <param name="pointD">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+        public static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
             var tt = t * t;
             var u = 1 - t;
             var uu = u * u;
             return uu * u * pointA + 3 * uu * t * pointB + 3 * u * tt * pointC + tt * t * pointD;
+        }
+        public static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
+            float l = 0f;
+            float t = 0.1f;
+            Vector2 last = pointA;
+            do {
+                Vector2 next = GetBezierPoint(t, pointA, pointB, pointC);
+                l += Vector2.Distance(last, next);
+                t += 0.1f;
+                last = next;
+            }
+            while ( t < 1f );
+            return l + Vector2.Distance(last, pointC);
+        }
+        public static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+            float l = 0f;
+            float t = 0.1f;
+            Vector2 last = pointA;
+            do {
+                Vector2 next = GetBezierPoint(t, pointA, pointB, pointC, pointD);
+                l += Vector2.Distance(last, next);
+                t += 0.1f;
+                last = next;
+            }
+            while ( t < 1f );
+            return l + Vector2.Distance(last, pointD);
         }
         public bool AtDestination => MovementType == MovementType.None;
         public Vector2[] PathVectors = new Vector2[0];
@@ -751,7 +775,7 @@ namespace Assets.Scripts.Customers {
             RemainingUrinateStopDelay = UrinateStopDelay;
             if ( bladder.LosingControl ) {
                 RemainingUrinateStopDelay *= 2.5d;
-                Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
+                //Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
             }
             ReliefType reliefType = Occupying?.RType ?? ReliefType.None;
             switch ( reliefType ) {
@@ -770,7 +794,6 @@ namespace Assets.Scripts.Customers {
             }
         }
         public void EndPeeingWithThing() {
-            Debug.Log($"Customer {UID} finished relieving themselves.");
             IsRelievingSelf = false;
             Emotes.Emote(null);
             Emotes.ShowBladderCircle(false);
@@ -808,7 +831,6 @@ namespace Assets.Scripts.Customers {
             ActionState = Collections.CustomerActionState.Wetting;
         }
         public void EndPeeingSelf() {
-            Debug.Log("StopWettingSelf");
             Emotes.Emote(null);
             Emotes.ShowBladderCircle(false);
             IsWetting = false;
@@ -1058,7 +1080,7 @@ namespace Assets.Scripts.Customers {
             MoveTo(Location.Outside);
             Location = Location.Outside;
             SetNext(0f, () => {
-                GameController.GC.CustomersManager.RemoveCustomer(this);
+                GameController.GC.CM.RemoveCustomer(this);
             }, () => AtDestination);
         }
         #endregion
@@ -1067,9 +1089,7 @@ namespace Assets.Scripts.Customers {
 
     public enum MovementType {
         None,
-        Linear,
-        Quadratic,
-        CubicQuadratic,
+        Manual,
         Path
     }
 }

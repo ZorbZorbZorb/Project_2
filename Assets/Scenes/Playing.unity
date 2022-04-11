@@ -1456,7 +1456,7 @@ RectTransform:
   m_GameObject: {fileID: 381911810}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 634875907}
@@ -1464,8 +1464,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -4200, y: 250}
-  m_SizeDelta: {x: 400, y: 200}
+  m_AnchoredPosition: {x: -4200, y: 240}
+  m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &381911812
 MonoBehaviour:
@@ -1489,7 +1489,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 80
+    m_FontSize: 160
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -1963,6 +1963,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DisplayNightStartSplash: 0
+  DisplayBuildMenuOnFirstNight: 0
+  NightMaxTime: 30
+  NightMaxCustomerSpawnTime: 20
+  Autoplay: 0
+  RapidSimulation: 0
+  OnlySpawnOneCustomer: 0
+  LogCustomerStates: 0
+  DrawCustomerPaths: 1
+  RapidBladderFill: 0
+  RapidBladderEmpty: 0
+  RapidCustomerSpawn: 0
+  CustomersWillUseAnything: 0
+  InfiniteFunds: 0
+  NoLose: 0
+  FreezeTime: 0
+  EndNight: 0
+  BuildEverything: 0
   InBuildMenu: 0
   BuildMenu:
     Canvas: {fileID: 2119711402}
@@ -1978,28 +1996,10 @@ MonoBehaviour:
     MainMenuButton: {fileID: 1807863692}
     ContinueButton: {fileID: 288984385}
   runTime: 0
-  nightMaxTime: 30
-  nightMaxCustomerSpawnTime: 20
-  DebugRapidFill: 0
-  DebugRapidPee: 0
-  DebugUltraRapidSpeed: 0
-  DebugNoLose: 0
-  DebugSpawnOneCustomerOnly: 1
-  DebugEndNightNow: 0
-  DebugDisplayBuildMenuOnFirstNight: 0
-  DebugInfiniteMoney: 0
-  DebugBuildAll: 0
-  DebugCustomersWillinglyUseAny: 0
-  DebugStateLogging: 0
-  DebugDrawPaths: 1
-  DisplayNightStartSplash: 0
-  DebugFreezeTime: 0
-  DebugAutoplay: 0
-  DebugSpawnMany: 0
   SpawningEnabled: 1
   CanPause: 1
   DisplayedNightStartSplashScreen: 0
-  CustomersManager:
+  CM:
     MaxCustomers: 0
     Customers: []
     CustomersHolder: {fileID: 0}
@@ -5323,7 +5323,7 @@ RectTransform:
   m_GameObject: {fileID: 1330818074}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 634875907}
@@ -5331,8 +5331,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5500, y: 250}
-  m_SizeDelta: {x: 400, y: 200}
+  m_AnchoredPosition: {x: -5500, y: 240}
+  m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1330818076
 MonoBehaviour:
@@ -5356,7 +5356,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 80
+    m_FontSize: 160
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1

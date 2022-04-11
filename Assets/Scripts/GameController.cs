@@ -11,11 +11,17 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public partial class GameController : MonoBehaviour {
+
+    #region Fields
+
     [Header("Settings")]
     public bool DisplayNightStartSplash = true;
     public bool DisplayBuildMenuOnFirstNight = false;
+    public int NightMaxTime = 30;
+    public int NightMaxCustomerSpawnTime = 20;
 
     [Header("Debugging")]
+    public bool Autoplay = false;
     public bool RapidSimulation = false;
     public bool OnlySpawnOneCustomer = false;
     public bool LogCustomerStates = false;
@@ -29,39 +35,48 @@ public partial class GameController : MonoBehaviour {
     public bool InfiniteFunds = false;
     public bool NoLose = false;
     public bool FreezeTime = false;
-    public bool Autoplay = false;
 
     [Header("Commands")]
-    public bool EndNightNow = false;
+    public bool EndNight = false;
     public bool BuildEverything = false;
 
-    [Header("Other")]
-
     // Build menu
+    [HideInInspector]
     public bool InBuildMenu;
     public BuildMenu BuildMenu;
 
+    [Header("Other")]
     // Pause menu
     public PauseMenu PauseMenu;
+    [HideInInspector]
     public static bool GamePaused { get; private set; } = false;
 
     /// <summary>Accumulates <see cref="Time.deltaTime"/> on update</summary>
+    [HideInInspector]
     public float runTime = 0f;
     /// <summary>Accumulates <see cref="Time.deltaTime"/> on update to call <see cref="Think"/> every 1 second</summary>
+    [HideInInspector]
     private float timeAcc = 0f;
-    public int nightMaxTime = 30;
-    public int nightMaxCustomerSpawnTime = 20;
-
-
 
     // State booleans
+    [HideInInspector]
     public bool SpawningEnabled = true;
+    [HideInInspector]
     public bool CanPause = true;
+    [HideInInspector]
     public static bool CreateNewSaveData = true;  // Hey, turn this off on build
+    [HideInInspector]
     public bool DisplayedNightStartSplashScreen = false;
 
-    // Managers
-    public CustomerManager CustomersManager;
+    /// <summary><see cref="CustomerManager"/> singleton. Tracks custromers and handles spawning.</summary>
+    [HideInInspector]
+    public CustomerManager CM;
+    /// <summary><see cref="GameController"/> singleton</summary>
+    [HideInInspector]
+    public static GameController GC = null;
+    /// <summary><see cref="Freecam"/> singleton</summary>
+    [HideInInspector]
+    public static Freecam FC = null;
 
     // Save data
     public GameSaveData Game;
@@ -90,10 +105,9 @@ public partial class GameController : MonoBehaviour {
     public Text NightStartText;
     public Image NightStartOverlay;
 
-    /// <summary><see cref="GameController"/> singleton</summary>
-    public static GameController GC = null;
-    /// <summary><see cref="Cam"/> singleton</summary>
-    public static Freecam Cam = null;
+
+
+    #endregion
 
     void Start() {
         if ( GC != null ) {
@@ -103,9 +117,9 @@ public partial class GameController : MonoBehaviour {
         Customer.GC = this;
 
         // Freecam should always be attached to the main camera
-        Cam = Camera.main.GetComponent<Freecam>();
+        FC = Camera.main.GetComponent<Freecam>();
 
-        CustomersManager = new CustomerManager() {
+        CM = new CustomerManager() {
             CustomersHolder = GameObject.FindGameObjectWithTag("CustomersHolder")
         };
 
@@ -121,7 +135,7 @@ public partial class GameController : MonoBehaviour {
         Bar.Singleton.Area.Area.enabled = false;
 
         // Lock up the camera
-        Cam.Locked = true;
+        FC.Locked = true;
 
         // Clear the menu system's caches.
         Menu.ClearForSceneReload();
@@ -151,7 +165,7 @@ public partial class GameController : MonoBehaviour {
         }
         else {
             ReadyToStartNight = true;
-            CustomersManager.MaxCustomers = Bar.Singleton.Seats.Count;
+            CM.MaxCustomers = Bar.Singleton.Seats.Count;
         }
     }
     void Update() {
@@ -172,7 +186,7 @@ public partial class GameController : MonoBehaviour {
                 ResumeGame();
                 GameStarted = true;
                 CanPause = true;
-                CustomersManager.CreateCustomer(desperate: true);
+                CM.CreateCustomer(desperate: true);
 
                 // Debugging only
                 if ( OnlySpawnOneCustomer ) {
@@ -184,7 +198,7 @@ public partial class GameController : MonoBehaviour {
                 return;
             }
         }
-        else if ( EndNightNow || GameEnd ) {
+        else if ( EndNight || GameEnd ) {
             if ( !GamePaused ) {
                 if ( GameLost ) {
                     PauseGame();
@@ -233,31 +247,31 @@ public partial class GameController : MonoBehaviour {
             }
             // Camera movement hotkeys
             if ( Input.GetKeyDown(KeyCode.D) ) {
-                Cam.PanTo(Bathroom.BathroomF.transform.position);
-                Cam.ZoomTo(450);
+                FC.PanTo(Bathroom.BathroomF.transform.position);
+                FC.ZoomTo(450);
             }
             if ( Input.GetKeyDown(KeyCode.A) ) {
-                Cam.PanTo(Bathroom.BathroomM.transform.position);
-                Cam.ZoomTo(450);
+                FC.PanTo(Bathroom.BathroomM.transform.position);
+                FC.ZoomTo(450);
             }
             if ( Input.GetKeyDown(KeyCode.S) ) {
-                Cam.PanTo(Freecam.Center);
-                Cam.ZoomTo(600);
+                FC.PanTo(Freecam.Center);
+                FC.ZoomTo(600);
             }
             if ( Input.GetKeyDown(KeyCode.W) ) {
-                Cam.PanTo(Freecam.Center);
-                Cam.ZoomTo(600);
+                FC.PanTo(Freecam.Center);
+                FC.ZoomTo(600);
             }
         }
     }
     private void StupidIdiotAutoplayThing() {
-        var remaining = CustomersManager.MaxCustomers - CustomersManager.Customers.Count;
+        var remaining = CM.MaxCustomers - CM.Customers.Count;
         if ( RapidCustomerSpawn ) {
             for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
-                CustomersManager.CreateCustomer(desperate: true);
+                CM.CreateCustomer(desperate: true);
             }
         }
-        foreach ( Customer customer in CustomersManager.Customers ) {
+        foreach ( Customer customer in CM.Customers ) {
             if ( customer.AtDestination ) {
                 if ( customer.Location == Location.Bar ) {
                     customer.Leave();
@@ -295,12 +309,12 @@ public partial class GameController : MonoBehaviour {
     }
     private void Think() {
         // Update max seating in bar
-        CustomersManager.MaxCustomers = Bar.Singleton.Seats
+        CM.MaxCustomers = Bar.Singleton.Seats
             .Where(x => !x.IsSoiled)
             .Count();
 
         // End the game if too many seats are soiled
-        if ( CustomersManager.MaxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
+        if ( CM.MaxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
             if ( !NoLose ) {
                 GameEnd = true;
                 GameLost = true;
@@ -309,23 +323,23 @@ public partial class GameController : MonoBehaviour {
         }
 
         // Stop spawning customers when its too late
-        if ( timeTicksElapsed >= nightMaxCustomerSpawnTime ) {
+        if ( timeTicksElapsed >= NightMaxCustomerSpawnTime ) {
             SpawningEnabled = false;
 
             // End game at end time or everyone has left
-            if ( !CustomersManager.Customers.Any() || timeTicksElapsed >= nightMaxTime ) {
+            if ( !CM.Customers.Any() || timeTicksElapsed >= NightMaxTime ) {
                 GameEnd = true;
                 return;
             }
         }
 
         // Customer spawning
-        if ( SpawningEnabled && !CustomersManager.AtCapacity ) {
+        if ( SpawningEnabled && !CM.AtCapacity ) {
             ticksSinceLastSpawn++;
             bool spawnNow = Random.Range(0, 6) == 0;
             if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
                 ticksSinceLastSpawn = 0;
-                Customer customer = CustomersManager.CreateCustomer(desperate: false);
+                Customer customer = CM.CreateCustomer(desperate: false);
             }
         }
 
@@ -435,7 +449,7 @@ public partial class GameController : MonoBehaviour {
         ReadyToStartNight = true;
         Time.timeScale = 1;
         BuildMenu.Close();
-        CustomersManager.MaxCustomers = Bar.Singleton.Seats.Count;
+        CM.MaxCustomers = Bar.Singleton.Seats.Count;
     }
     /// <summary>
     /// Pauses the game.
@@ -444,10 +458,10 @@ public partial class GameController : MonoBehaviour {
     void PauseGame() {
         Time.timeScale = 0;
         GamePaused = true;
-        Cam.Locked = true;
+        FC.Locked = true;
         // These two shouldnt be done in production, its just a bandaid. Add a cached last pan last zoom to return to ???
-        Cam.ZoomTo(Freecam.MinZoom, instant: true);
-        Cam.UnpanCamera();
+        FC.ZoomTo(Freecam.MinZoom, instant: true);
+        FC.UnpanCamera();
         // Close all open menus.
         Menu.CloseAllOpenMenus();
         PauseMenu.Open();
@@ -463,7 +477,7 @@ public partial class GameController : MonoBehaviour {
         }
         Time.timeScale = 1;
         GamePaused = false;
-        Cam.Locked = false;
+        FC.Locked = false;
         PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
@@ -476,7 +490,7 @@ public partial class GameController : MonoBehaviour {
     /// </summary>
     private void AdvanceTime() {
         // Generate funds for customers in bar
-        double amount = ( CustomersManager.CustomersInBar.Count() * 3d ) + ( CustomersManager.CustomersInBathroom.Count() * 1d );
+        double amount = ( CM.CustomersInBar.Count() * 3d ) + ( CM.CustomersInBathroom.Count() * 1d );
         Game.Funds += amount;
         UpdateFundsDisplay();
         // TODO: Have a little money emote display above each customer in the bar who generated funds.

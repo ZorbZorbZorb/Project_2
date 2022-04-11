@@ -23,8 +23,11 @@ namespace Assets.Scripts {
             public bool isTable;
         }
 
+        [HideInInspector]
         public List<Option> Mens;
+        [HideInInspector]
         public List<Option> Womens;
+        [HideInInspector]
         public List<BarOption> bar;
 
         public int Night;
