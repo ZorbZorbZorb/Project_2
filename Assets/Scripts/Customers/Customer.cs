@@ -448,27 +448,11 @@ namespace Assets.Scripts.Customers {
         /// position properties if available
         /// </param>
         public void MoveTo(CustomerInteractable target) {
-            // If the intended move location is different from the customers location, use a bezier path
+            // Get navigation from
             List<Vector2> vectors = Navigation.Navigate(Location, target.Location);
             vectors.Insert(0, transform.position);
             vectors.Add(target.GetCustomerPosition(Gender));
-            switch (vectors.Count) {
-                //case 2:
-                //    break;
-                //case 3: 
-                //    break;
-                //case 4:
-                //    break;
-                default:
-                    // Hotfix for pathing glitching out with only two vectors
-                    if ( vectors.Count == 2 ) {
-                        Debug.LogWarning($"MoveTo(CustomerInteractable) {Location} to {target.Location} only includeds two vectors!", this);
-                        var middleVector = ( vectors[0] + vectors[1] ) / 2f;
-                        vectors.Insert(1, middleVector);
-                    }
-                    SetPath(vectors.ToArray());
-                    break;
-            }
+            MoveTo(vectors.ToArray());
         }
         /// <summary>
         /// Moves the customer from where they are currently located to the location's point
@@ -485,20 +469,49 @@ namespace Assets.Scripts.Customers {
             List<Vector2> vectors = Navigation.Navigate(Location, location);
             if ( vectors.Any() ) {
                 vectors.Insert(0, transform.position);
-                // Hotfix for pathing glitching out with only two vectors
-                if ( vectors.Count == 2 ) {
-                    Debug.LogWarning($"MoveTo(Location) {Location} to {location} only includeds two vectors!", this);
-                    var middleVector = ( vectors[0] + vectors[1] ) / 2f;
-                    vectors.Insert(1, middleVector);
-                }
-                SetPath(vectors.ToArray());
+                MoveTo(vectors.ToArray());
             }
             else {
                 Debug.LogWarning("MoveTo(Location) called for location customer is already in", this);
             }
         }
+        /// <summary>
+        /// Internal method that sets up customer pathing for an array of vectors.
+        /// No logic exists here to determine where they should go, just calls the correct
+        /// function to set the customer to move in <see cref="MoveUpdate"/>.
+        /// </summary>
+        /// <param name="vectors"></param>
+        private void MoveTo(Vector2[] vectors) {
+            PathTime = 0f;
+            PathVectors = vectors.ToArray();
+            switch ( vectors.Length ) {
+                case 2:
+                    SetLinearPath(PathVectors);
+                    break;
+                //case 3:
+                //    break;
+                //case 4:
+                //    break;
+                default:
+                    SetPath(PathVectors);
+                    break;
+            }
+        }
+        private void SetLinearPath(Vector2[] vectors) {
+            Debug.Log("Moving linear to interactable", this);
+            PathLength = Vector2.Distance(vectors[0], vectors[1]);
+            ApproximatePathLength = PathLength;
+            PathMoveSpeed = MoveSpeed / PathLength;
+            MovementType = MovementType.Linear;
+        }
+        private void SetQuadraticPath(Vector2[] vectors) {
+            throw new NotImplementedException();
+        }
+        private void SetCubicQuadraticPath(Vector2[] vectors) {
+            throw new NotImplementedException();
+        }
         private void SetPath(Vector2[] vectors) {
-            PathProgress = 0f;
+            Debug.Log("Moving path to interactable", this);
             var cache = VertexPath2.PathCache;
             if ( VertexPath2.PathCache.ContainsKey(vectors) ) {
                 Path = VertexPath2.PathCache[vectors];
@@ -513,9 +526,9 @@ namespace Assets.Scripts.Customers {
                 VertexPath2.PathCache.Add(vectors, Path);
             }
             PathLength = Path.length;
-            PathMoveSpeed = (float)MoveSpeed / Path.length;
+            PathMoveSpeed = MoveSpeed / Path.length;
             MovementType = MovementType.Path;
-            if (GameController.GC.DebugDrawPaths) {
+            if ( GameController.GC.DebugDrawPaths ) {
                 DebugDrawVertexPath(Path, customerAnimator.Color);
                 IEnumerable<string> strings = vectors.Select(p => $"({Math.Round(p.x)},{Math.Round(p.y)})");
                 Debug.Log($"Moving l={PathLength} n={vectors.Count()} v=[{string.Join(",", strings)}]", this);
@@ -533,21 +546,31 @@ namespace Assets.Scripts.Customers {
                 case MovementType.None:
                     return;
                 case MovementType.Path:
-                    PathProgress += PathMoveSpeed * DeltaTime;
-                    if ( PathProgress >= 1f ) {
+                    PathTime += PathMoveSpeed * PathMoveSpeedMultiplier * DeltaTime;
+                    if ( PathTime >= 1f ) {
+                        // If at end of path, end movement
                         transform.position = Path.GetPointAtTime(1f, EndOfPathInstruction.Stop);
                         Path = null;
-                        PathProgress = 0f;
+                        PathTime = 0f;
                         MovementType = MovementType.None;
-                        return;
+                        break;
                     }
                     else {
-                        transform.position = Path.GetPointAtTime(PathProgress, EndOfPathInstruction.Stop);
+                        transform.position = Path.GetPointAtTime(PathTime, EndOfPathInstruction.Stop);
                     }
-                    // If at end of path, end movement
                     break;
                 case MovementType.Linear:
-                    throw new NotImplementedException();
+                    PathTime += PathMoveSpeed * PathMoveSpeedMultiplier * DeltaTime;
+                    if ( PathTime >= 1f ) {
+                        transform.position = PathVectors[1];
+                        PathTime = 0f;
+                        MovementType = MovementType.None;
+                        break;
+                    }
+                    else {
+                        transform.position = GetBezierPoint(PathTime, PathVectors[0], PathVectors[1]);
+                    }
+                    break;
                 case MovementType.Quadratic:
                     throw new NotImplementedException();
                 case MovementType.CubicQuadratic:
@@ -581,7 +604,7 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointB">Ending point</param>
         /// <returns>BezierPoint</returns>
         public Vector3 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
-            return pointA + t * ( pointA - pointB );
+            return pointA + t * ( pointB - pointA );
         }
         /// <summary>
         /// Calculates a quadratic bezier point
@@ -613,11 +636,18 @@ namespace Assets.Scripts.Customers {
             return uu * u * pointA + 3 * uu * t * pointB + 3 * u * tt * pointC + tt * t * pointD;
         }
         public bool AtDestination => MovementType == MovementType.None;
+        public Vector2[] PathVectors = new Vector2[0];
         public VertexPath2 Path;
-        public float PathProgress = 0f;
+        /// <summary>0f is the start of the path, 1f is the end of the path.</summary>
+        public float PathTime = 0f;
         public float ApproximatePathLength;
         public float PathLength;
         public float PathMoveSpeed;
+        /// <summary>
+        /// https://www.desmos.com/calculator
+        /// <para>-\left(0.85-\left(x\cdot1.7\right)\right)^{4}+1.1</para>
+        /// </summary>
+        public float PathMoveSpeedMultiplier => -Mathf.Pow(-( 0.8f - ( PathTime * 1.6f ) ), 4) + 1.1f;
 
         /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
         public static float BathroomStartX;
@@ -673,7 +703,7 @@ namespace Assets.Scripts.Customers {
         public CustomerInteractable Occupying;
 
         // Movement
-        public double MoveSpeed;
+        public float MoveSpeed;
         public MovementType MovementType = MovementType.None;
 
         #region Sprites
@@ -967,7 +997,7 @@ namespace Assets.Scripts.Customers {
         // Goes to the doorway queue
         public bool GetInLine(Bathroom bathroom) {
             CanReenterBathroom = false;
-            if (bathroom.TryEnterQueue(this)) {
+            if ( bathroom.TryEnterQueue(this) ) {
                 // Makes customer hold on for a while longer when entering doorway.
                 bladder.ResetLossOfControlTime();
                 return true;
@@ -998,7 +1028,7 @@ namespace Assets.Scripts.Customers {
                 return true;
             }
             else if ( bathroom.SinksLine.HasOpenWaitingSpot() ) {
-                if (bathroom.Sinks.Any(x => x.OccupiedBy.ActionState == Collections.CustomerActionState.WashingHands)) {
+                if ( bathroom.Sinks.Any(x => x.OccupiedBy.ActionState == Collections.CustomerActionState.WashingHands) ) {
                     WaitingSpot spot = bathroom.SinksLine.GetNextWaitingSpot();
                     Occupy(spot);
                     return true;
