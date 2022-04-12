@@ -1967,14 +1967,14 @@ MonoBehaviour:
   DisplayBuildMenuOnFirstNight: 0
   NightMaxTime: 30
   NightMaxCustomerSpawnTime: 20
-  Autoplay: 1
-  RapidSimulation: 1
-  OnlySpawnOneCustomer: 0
+  Autoplay: 0
+  RapidSimulation: 0
+  OnlySpawnOneCustomer: 1
   LogCustomerStates: 0
-  DrawCustomerPaths: 0
+  DrawPaths: 0
   RapidBladderFill: 0
   RapidBladderEmpty: 0
-  RapidCustomerSpawn: 1
+  RapidCustomerSpawn: 0
   CustomersWillUseAnything: 0
   InfiniteFunds: 0
   NoLose: 1
@@ -2158,6 +2158,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Locked: 0
+  AutoPanning: 0
+  PanIntent: {x: 0, y: 0, z: 0}
   FreeLookSensitivity: 500
   ZoomSens: 1000
   ZoomLerp: 100

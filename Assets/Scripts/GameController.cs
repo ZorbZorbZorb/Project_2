@@ -118,13 +118,9 @@ public partial class GameController : MonoBehaviour {
     }
     void Start() {
 
-        var camCenter = new CameraPosition(Freecam.Center, 450);
-        var camBM = new CameraPosition(Bathroom.BathroomM.transform.position, 450);
-        var camBF = new CameraPosition(Bathroom.BathroomF.transform.position, 450);
-        //camCenter.Links = new Dictionary<Orientation, CameraPosition>() {
-        //    { Orientation.West, camBF },
-        //    { Orientation.East, camBM }
-        //};
+        CameraPosition.AddPosition(Freecam.Center, 450);
+        CameraPosition.AddPosition(Bathroom.BathroomM.transform.position, 450);
+        CameraPosition.AddPosition(Bathroom.BathroomF.transform.position, 450);
 
         // Freecam should always be attached to the main camera
         FC = Camera.main.GetComponent<Freecam>();
@@ -258,16 +254,16 @@ public partial class GameController : MonoBehaviour {
 
             // Camera movement hotkeys
             if ( Input.GetKeyDown(KeyCode.D) ) {
-                CameraPosition.Navigate(Orientation.East, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position );
+                CameraPosition.Navigate(Orientation.East, FC.AutoPanning ? FC.PanIntent : FC.transform.position );
             }
             else if ( Input.GetKeyDown(KeyCode.A) ) {
-                CameraPosition.Navigate(Orientation.West, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position);
+                CameraPosition.Navigate(Orientation.West, FC.AutoPanning ? FC.PanIntent : FC.transform.position);
             }
             else if ( Input.GetKeyDown(KeyCode.S) ) {
-                CameraPosition.Navigate(Orientation.South, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position);
+                CameraPosition.Navigate(Orientation.South, FC.AutoPanning ? FC.PanIntent : FC.transform.position);
             }
             else if ( Input.GetKeyDown(KeyCode.W) ) {
-                CameraPosition.Navigate(Orientation.North, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position);
+                CameraPosition.Navigate(Orientation.North, FC.AutoPanning ? FC.PanIntent : FC.transform.position);
             }
 
         }

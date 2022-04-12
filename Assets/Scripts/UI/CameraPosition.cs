@@ -4,26 +4,36 @@ using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.UI {
-    internal class CameraPosition {
-        public static List<CameraPosition> CameraPositions { get; set; } = new List<CameraPosition>();
-        public int Zoom;
-        public Vector2 Pan;
-        public static float MinDistanceToNavigate = 100f;
-        public Dictionary<Orientation, CameraPosition> Links = new Dictionary<Orientation, CameraPosition>();
-        public CameraPosition(Vector2 pan, int zoom) {
-            Zoom = zoom;
-            Pan = pan;
-            CameraPositions.Add(this);
+    public class CameraPosition : MonoBehaviour {
+        private struct Pos {
+            public int Zoom;
+            public Vector2 Pan;
         }
-
+        
+        private void Awake() {
+            var camera = GetComponent<Camera>();
+            AddPosition(camera.transform.position, (int)camera.orthographicSize);
+            if (Debug.isDebugBuild) {
+                gameObject.SetActive(false);
+            }
+            else {
+                Destroy(gameObject);
+            }
+        }
+        public static void AddPosition(Vector2 pan, int zoom) {
+            Pos pos = new Pos() {
+                Zoom = zoom,
+                Pan = pan
+            };
+            CameraPositions.Add(pos);
+        }
         /// <summary>
         /// Trys to navigate the camera to the next closest point in the given <paramref name="orientation"/>
         /// </summary>
-        /// <param name="orientation">WASD Key that was pressed</param>
+        /// <param name="orientation">WASD Key that was pressed, translated into <see cref="Orientation"/></param>
         /// <param name="current">Pass pan intent instead of current pan</param>
-        /// <returns></returns>
         public static void Navigate(Orientation orientation, Vector2 current) {
-            Dictionary<CameraPosition, float> distances = new Dictionary<CameraPosition, float>();
+            Dictionary<Pos, float> distances = new Dictionary<Pos, float>();
             for ( int i = 0; i < CameraPositions.Count; i++ ) {
                 var item = CameraPositions[i];
                 if ( WithinAngle(current, item.Pan, orientation) ) {
@@ -69,5 +79,11 @@ namespace Assets.Scripts.UI {
         public static bool WithinAngle(Vector2 p0, Vector2 p1, Orientation orientation, float tolerance = 60f) {
             return WithinAngle(orientation, Get360Angle(p0, p1), tolerance);
         }
+
+        private static List<Pos> CameraPositions { get; set; } = new List<Pos>();
+        public int Zoom;
+        public Vector2 Pan;
+        public static float MinDistanceToNavigate = 100f;
+
     }
 }
