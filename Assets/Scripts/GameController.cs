@@ -1,8 +1,10 @@
 using Assets.Scripts;
 using Assets.Scripts.Areas;
 using Assets.Scripts.Customers;
+using Assets.Scripts.Objects;
 using Assets.Scripts.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,7 +27,7 @@ public partial class GameController : MonoBehaviour {
     public bool RapidSimulation = false;
     public bool OnlySpawnOneCustomer = false;
     public bool LogCustomerStates = false;
-    public bool DrawCustomerPaths = false;
+    public bool DrawPaths = false;
 
     [Header("Cheats")]
     public bool RapidBladderFill = false;
@@ -105,16 +107,24 @@ public partial class GameController : MonoBehaviour {
     public Text NightStartText;
     public Image NightStartOverlay;
 
-
-
     #endregion
 
-    void Start() {
+    private void Awake() {
         if ( GC != null ) {
             Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
         }
         GC = this;
         Customer.GC = this;
+    }
+    void Start() {
+
+        var camCenter = new CameraPosition(Freecam.Center, 450);
+        var camBM = new CameraPosition(Bathroom.BathroomM.transform.position, 450);
+        var camBF = new CameraPosition(Bathroom.BathroomF.transform.position, 450);
+        //camCenter.Links = new Dictionary<Orientation, CameraPosition>() {
+        //    { Orientation.West, camBF },
+        //    { Orientation.East, camBM }
+        //};
 
         // Freecam should always be attached to the main camera
         FC = Camera.main.GetComponent<Freecam>();
@@ -245,23 +255,21 @@ public partial class GameController : MonoBehaviour {
                     }
                 }
             }
+
             // Camera movement hotkeys
             if ( Input.GetKeyDown(KeyCode.D) ) {
-                FC.PanTo(Bathroom.BathroomF.transform.position);
-                FC.ZoomTo(450);
+                CameraPosition.Navigate(Orientation.East, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position );
             }
-            if ( Input.GetKeyDown(KeyCode.A) ) {
-                FC.PanTo(Bathroom.BathroomM.transform.position);
-                FC.ZoomTo(450);
+            else if ( Input.GetKeyDown(KeyCode.A) ) {
+                CameraPosition.Navigate(Orientation.West, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position);
             }
-            if ( Input.GetKeyDown(KeyCode.S) ) {
-                FC.PanTo(Freecam.Center);
-                FC.ZoomTo(600);
+            else if ( Input.GetKeyDown(KeyCode.S) ) {
+                CameraPosition.Navigate(Orientation.South, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position);
             }
-            if ( Input.GetKeyDown(KeyCode.W) ) {
-                FC.PanTo(Freecam.Center);
-                FC.ZoomTo(600);
+            else if ( Input.GetKeyDown(KeyCode.W) ) {
+                CameraPosition.Navigate(Orientation.North, FC.AutoPanning ? FC.PanIntent : (Vector2)FC.transform.position);
             }
+
         }
     }
     private void StupidIdiotAutoplayThing() {

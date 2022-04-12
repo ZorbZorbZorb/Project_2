@@ -102,11 +102,11 @@ namespace Assets.Scripts.Customers {
                 .ToArray();
 
             // Change the colors just a bit.
-            var colorMultiplier = new Vector3(Random.Range(0.9f, 1.1f), Random.Range(0.9f, 1.1f), Random.Range(1f, 1f));
+            var colorMultiplier = new Vector3(Random.Range(0.75f, 1.15f), Random.Range(0.75f, 1.15f), Random.Range(0.9f, 1.1f));
             femaleColor.r = Math.Min(femaleColor.r * colorMultiplier.x, 1f);
             femaleColor.g = Math.Min(femaleColor.g * colorMultiplier.y, 1f);
             femaleColor.b = Math.Min(femaleColor.b * colorMultiplier.z, 1f);
-            colorMultiplier = new Vector3(Random.Range(1f, 1f), Random.Range(0.9f, 1.1f), Random.Range(0.9f, 1.1f));
+            colorMultiplier = new Vector3(Random.Range(0.9f, 1.1f), Random.Range(0.75f, 1.15f), Random.Range(0.75f, 1.15f));
             maleColor.r = Math.Min(maleColor.r * colorMultiplier.x, 1f);
             maleColor.g = Math.Min(maleColor.g * colorMultiplier.y, 1f);
             maleColor.b = Math.Min(maleColor.b * colorMultiplier.z, 1f);

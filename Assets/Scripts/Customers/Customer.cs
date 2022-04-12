@@ -559,7 +559,7 @@ namespace Assets.Scripts.Customers {
                 PathLength = Path.length;
                 PathMoveSpeed = MoveSpeed / Path.length;
                 MovementType = MovementType.Path;
-                if ( GameController.GC.DrawCustomerPaths ) {
+                if ( GameController.GC.DrawPaths ) {
                     DebugDrawVertexPath(Path, customerAnimator.Color);
                     if ( Path.localPoints.Count() > 300 ) {
                         Debug.Log($"Creating long path (np={Path.localPoints.Length} nv={vectors.Count()})", this);

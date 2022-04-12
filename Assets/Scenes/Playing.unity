@@ -1967,14 +1967,14 @@ MonoBehaviour:
   DisplayBuildMenuOnFirstNight: 0
   NightMaxTime: 30
   NightMaxCustomerSpawnTime: 20
-  Autoplay: 0
-  RapidSimulation: 0
-  OnlySpawnOneCustomer: 1
+  Autoplay: 1
+  RapidSimulation: 1
+  OnlySpawnOneCustomer: 0
   LogCustomerStates: 0
-  DrawCustomerPaths: 1
+  DrawCustomerPaths: 0
   RapidBladderFill: 0
   RapidBladderEmpty: 0
-  RapidCustomerSpawn: 0
+  RapidCustomerSpawn: 1
   CustomersWillUseAnything: 0
   InfiniteFunds: 0
   NoLose: 1
@@ -6707,7 +6707,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 1244.9938, y: -141.07922}
+  m_Offset: {x: 1248.5466, y: -148.698}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -6718,7 +6718,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 4135.8994, y: 1521.6199}
+  m_Size: {x: 4166.888, y: 1567.3328}
   m_EdgeRadius: 0
 --- !u!4 &1822046892
 Transform:

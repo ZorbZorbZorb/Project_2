@@ -12,8 +12,8 @@ namespace Assets.Scripts.UI {
 
         public Camera Camera { get; private set; }
         private bool mousePanning = false;
-        private bool panning = false;
-        private Vector3 panIntent;
+        public bool AutoPanning = false;
+        public Vector3 PanIntent;
         /// <summary>Camera pan speed</summary>
         public float FreeLookSensitivity;
         /// <summary>Amount to zoom the camera when scrolling</summary>
@@ -44,7 +44,7 @@ namespace Assets.Scripts.UI {
             zoomIntent = Camera.orthographicSize;
             zooming = false;
 
-            panIntent = Center;
+            PanIntent = Center;
 
             // Recalculate camera size and overages
             CalculateCameraSize();
@@ -75,7 +75,7 @@ namespace Assets.Scripts.UI {
                 // Are we free-looking?
                 if ( Input.GetKeyDown(KeyCode.Mouse1) ) {
                     // Stop auto-panning
-                    panning = false;  
+                    AutoPanning = false;  
                     StartMousePanning();
                 }
                 else if ( Input.GetKeyUp(KeyCode.Mouse1) ) {
@@ -89,7 +89,7 @@ namespace Assets.Scripts.UI {
             }
 
             // If Auto-panning
-            if ( panning ) {
+            if ( AutoPanning ) {
                 PanCamera();
             }
 
@@ -97,7 +97,7 @@ namespace Assets.Scripts.UI {
             if ( !Locked ) {
                 float axis = Input.GetAxis("Mouse ScrollWheel");
                 if ( axis != 0 ) {
-                    panning = false;
+                    AutoPanning = false;
                     ZoomCamera(axis);
                 }
             }
@@ -127,13 +127,13 @@ namespace Assets.Scripts.UI {
             UpdateCameraPosition(newX, newY);
         }
         private void PanCamera() {
-            float distance = Vector3.Distance(transform.position, panIntent);
+            float distance = Vector3.Distance(transform.position, PanIntent);
             if ( distance < 0.1f ) {
-                panning = false;
+                AutoPanning = false;
             }
             else {
                 float amount = 20f + ( distance * 2f );
-                transform.position = Vector3.MoveTowards(transform.position, panIntent, amount * Time.fixedDeltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, PanIntent, amount * Time.fixedDeltaTime);
             }
         }
         private void ZoomCamera(float axis) {
@@ -202,25 +202,25 @@ namespace Assets.Scripts.UI {
             Camera.transform.position = Center;
         }
         /// <summary>
-        /// Auto-Pans the camera to a vector3.
-        /// <para>Disables mouse panning</para>
-        /// </summary>
-        /// <param name="pan"></param>
-        /// <param name="instant"></param>
-        public void PanTo(Vector3 pan, bool instant = false) {
-            pan.z = transform.position.z;
+            /// Auto-Pans the camera to a vector3.
+            /// <para>Disables mouse panning</para>
+            /// </summary>
+            /// <param name="pan"></param>
+            /// <param name="instant"></param>
+        public void PanTo(Vector2 pan, bool instant = false) {
+            Vector3 destination = new Vector3(pan.x, pan.y, transform.position.z);
 
             if (mousePanning) {
                 StopMousePanning();
             }
 
             if ( instant ) {
-                panning = false;
-                transform.position = pan;
+                AutoPanning = false;
+                transform.position = destination;
             }
             else {
-                panning = true;
-                panIntent = pan;
+                AutoPanning = true;
+                PanIntent = destination;
             }
         }
         /// <summary>
