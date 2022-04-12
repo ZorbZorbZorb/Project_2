@@ -16,11 +16,18 @@ public partial class GameController : MonoBehaviour {
 
     #region Fields
 
+
     [Header("Settings")]
     public bool DisplayNightStartSplash = true;
     public bool DisplayBuildMenuOnFirstNight = false;
     public int NightMaxTime = 30;
     public int NightMaxCustomerSpawnTime = 20;
+    [SerializeField, Range(15f,65f)]
+    public float CameraTolerangeTight = 18f;
+    [SerializeField, Range(30f, 110f)]
+    public float CameraTolerangeMid = 50f;
+    [SerializeField, Range(30f, 110f)]
+    public float CameraTolerangeLoose = 68f;
 
     [Header("Debugging")]
     public bool Autoplay = false;

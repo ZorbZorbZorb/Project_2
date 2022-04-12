@@ -64,26 +64,28 @@ namespace Assets.Scripts.UI {
             float a0, a1;
             switch ( orientation ) {
                 case Orientation.South:
-                    a0 = tolerance / 360f;
-                    a1 = ( 360f - tolerance ) / 360f;
+                    a0 = ( 180f - tolerance );
+                    a1 = ( 180f + tolerance );
                     break;
                 case Orientation.West:
-                    a0 = ( 90 - tolerance ) / 360f;
-                    a1 = ( 90f + tolerance ) / 360f;
+                    a0 = ( 270f - tolerance );
+                    a1 = ( 270f + tolerance );
                     break;
                 case Orientation.North:
-                    a0 = ( 180f - tolerance ) / 360f;
-                    a1 = ( 180f + tolerance ) / 360f;
+                    a0 = ( -tolerance );
+                    a1 = tolerance;
                     break;
                 default:
-                    a0 = ( 270f - tolerance ) / 360f;
-                    a1 = ( 270f + tolerance ) / 360f;
+                    a0 = ( 90 - tolerance );
+                    a1 = ( 90f + tolerance );
                     break;
             }
-            Vector2 p1 = new Vector2(Mathf.Cos(a0), Mathf.Sin(a0));
-            Vector2 p2 = new Vector2(Mathf.Cos(a1), Mathf.Sin(a1));
-            Debug.DrawLine(p0, p1, color, 1f);
-            Debug.DrawLine(p0, p2, color, 1f);
+            a0 = (90f + a0) * PLANE_ANGLE;
+            a1 = (90f + a1) * PLANE_ANGLE;
+            Vector2 p1 = new Vector2(-Mathf.Cos(a0), Mathf.Sin(a0));
+            Vector2 p2 = new Vector2(-Mathf.Cos(a1), Mathf.Sin(a1));
+            Debug.DrawLine(p0, p0 + (p1 * 600f), color, 1f);
+            Debug.DrawLine(p0, p0 + (p2 * 600f), color, 1f);
         }
         public static bool WithinAngle(Vector2 p0, Vector2 p1, Orientation orientation, float tolerance) {
             return WithinAngle(orientation, Get360Angle(p0, p1), tolerance);
@@ -100,36 +102,51 @@ namespace Assets.Scripts.UI {
         public static void Navigate(Orientation orientation, Vector2 current) {
             Dictionary<RelativePosition, byte> positions = new Dictionary<RelativePosition, byte>();
             for ( byte i = 0; i < instructions.Count; i++ ) {
-                positions.Add(new RelativePosition(current, instructions[i].Pan), i);
+                var relativePosition = new RelativePosition(current, instructions[i].Pan);
+                if (relativePosition.Distance < 200f) {
+                    continue;
+                }
+                positions.Add(relativePosition, i);
                 if ( GameController.GC.DrawPaths ) {
                     float angle = Get360Angle(current, instructions[i].Pan);
-                    if ( WithinAngle(orientation, angle, 30f) ) {
-                        Debug.DrawLine(current, instructions[i].Pan, Color.green, 1f);
+                    if ( WithinAngle(orientation, angle, GameController.GC.CameraTolerangeTight) ) {
+                        Debug.DrawLine(current, instructions[i].Pan, Color.green, 2f);
                     }
-                    else if ( WithinAngle(orientation, angle, 50f) ) {
-                        Debug.DrawLine(current, instructions[i].Pan, Color.yellow, 1f);
+                    else if ( WithinAngle(orientation, angle, GameController.GC.CameraTolerangeMid) ) {
+                        Debug.DrawLine(current, instructions[i].Pan, Color.yellow, 2f);
+                    }
+                    else if ( WithinAngle(orientation, angle, GameController.GC.CameraTolerangeLoose) ) {
+                        Debug.DrawLine(current, instructions[i].Pan, Color.red, 2f);
                     }
                     else {
-                        Debug.DrawLine(current, instructions[i].Pan, Color.red, 1f);
+                        Debug.DrawLine(current, instructions[i].Pan, Color.black, 2f);
                     }
                 }
             }
 
             if ( GameController.GC.DrawPaths ) {
-                DrawAngleLines(current, orientation, 30f, Color.blue);
-                DrawAngleLines(current, orientation, 50f, Color.cyan);
+                DrawAngleLines(current, orientation, GameController.GC.CameraTolerangeLoose, new Color(0.8f,0.8f,1f));
+                DrawAngleLines(current, orientation, GameController.GC.CameraTolerangeMid, new Color(0.5f, 0.5f, 1f));
+                DrawAngleLines(current, orientation, GameController.GC.CameraTolerangeTight, new Color(0.2f, 0.2f, 1f));
             }
 
-            var angleTight = positions.Where(x => WithinAngle(orientation, x.Key.Angle, 20f));
+            var angleTight = positions.Where(x => WithinAngle(orientation, x.Key.Angle, GameController.GC.CameraTolerangeTight));
             if ( angleTight.Any() ) {
                 CameraInstruction instruction = GetClosest(angleTight);
                 Navigate(instruction);
             }
             else {
-                var angleLoose = positions.Where(x => WithinAngle(orientation, x.Key.Angle, 50f));
-                if ( angleLoose.Any() ) {
-                    CameraInstruction instruction = GetClosest(angleLoose);
+                var angleMid = positions.Where(x => WithinAngle(orientation, x.Key.Angle, GameController.GC.CameraTolerangeMid));
+                if ( angleMid.Any() ) {
+                    CameraInstruction instruction = GetClosest(angleMid);
                     Navigate(instruction);
+                }
+                else {
+                    var angleLoose = positions.Where(x => WithinAngle(orientation, x.Key.Angle, GameController.GC.CameraTolerangeLoose));
+                    if ( angleLoose.Any() ) {
+                        CameraInstruction instruction = GetClosest(angleLoose);
+                        Navigate(instruction);
+                    }
                 }
             }
 
@@ -145,6 +162,9 @@ namespace Assets.Scripts.UI {
             }
 
         }
+
+        private const float PLANE_ANGLE = Mathf.PI / 180f;
+
         private static void Navigate(CameraInstruction instruction) {
             GameController.FC.PanTo(instruction.Pan);
             GameController.FC.ZoomTo(instruction.Zoom);
