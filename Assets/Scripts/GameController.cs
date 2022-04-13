@@ -139,9 +139,9 @@ public partial class GameController : MonoBehaviour {
     }
     void Start() {
 
-        CameraPosition.AddPosition(Freecam.Center, 450);
-        CameraPosition.AddPosition(Bathroom.BathroomM.transform.position, 450);
-        CameraPosition.AddPosition(Bathroom.BathroomF.transform.position, 450);
+        CameraPosition.AddPosition(Freecam.Center, 600);
+        CameraPosition.AddPosition(Bathroom.BathroomM.transform.position, 500);
+        CameraPosition.AddPosition(Bathroom.BathroomF.transform.position, 500);
 
         // Freecam should always be attached to the main camera
         FC = Camera.main.GetComponent<Freecam>();
