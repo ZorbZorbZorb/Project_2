@@ -15,16 +15,16 @@ public class Sink : Relief {
     public void UseForWash(Customer customer) {
         customer.Occupy(this);
 
-        customer.ActionState = Collections.CustomerActionState.WashingHands;
+        customer.ActionState = CustomerActionState.WashingHands;
 
         customer.NextDelay = 10f;
         customer.Next = () => {
             if (customer.IsWet) {
-                customer.ActionState = Collections.CustomerActionState.None;
+                customer.ActionState = CustomerActionState.None;
                 customer.Leave();
             }
             else {
-                customer.ActionState = Collections.CustomerActionState.None;
+                customer.ActionState = CustomerActionState.None;
                 customer.EnterBar();
             }
         };

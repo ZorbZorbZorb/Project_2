@@ -13,14 +13,27 @@ namespace Assets.Scripts {
         public class Option {
             public double X;
             public double Y;
+            public int Cost;
             public List<InteractableType> Options;
             public InteractableType Current;
             public Orientation Facing;
-            public int Cost;
-        }
-        [Serializable]
-        public class BarOption : Option {
-            public bool isTable;
+            [JsonIgnore]
+            public Alignment Alignment => Facing == Orientation.North || Facing == Orientation.South
+            ? Alignment.Vertical
+            : Alignment.Horizontal;
+
+            /// <summary>
+            /// The <see cref="Area"/> this <see cref="Option"/> is bound to.
+            /// <para>No reference is set until <see cref="Apply"/> is called.</para>
+            /// </summary>
+            [NonSerialized, JsonIgnore]
+            public Area Area;
+            /// <summary>
+            /// The current <see cref="CustomerInteractable"/> instance for this <see cref="Option"/>.
+            /// <para>No reference is set until <see cref="Apply"/> is called.</para>
+            /// </summary>
+            [NonSerialized, JsonIgnore]
+            public CustomerInteractable Interactable;
         }
 
         [HideInInspector]
@@ -28,20 +41,17 @@ namespace Assets.Scripts {
         [HideInInspector]
         public List<Option> Womens;
         [HideInInspector]
-        public List<BarOption> bar;
+        public List<Option> bar;
 
         public int Night;
         public double Funds;
 
         public void Apply() {
-
-            List<CustomerInteractable> instances;
             Bathroom bathroom;
 
             // Set up BathroomM
             bathroom = Bathroom.BathroomM;
-            instances = ApplyToArea(bathroom, Mens);
-            instances.ForEach(x => bathroom.AddInteractable(x));
+            ApplyToArea(bathroom, Mens);
             // Add waiting spots
             AddSpot((3d, 1d), bathroom, WaitingSpotType.Bathroom);
             AddSpot((2d, 1d), bathroom, WaitingSpotType.Bathroom);
@@ -55,8 +65,7 @@ namespace Assets.Scripts {
 
             // Set up BathroomF
             bathroom = Bathroom.BathroomF;
-            instances = ApplyToArea(bathroom, Womens);
-            instances.ForEach(x => bathroom.AddInteractable(x));
+            ApplyToArea(bathroom, Womens);
             // Add waiting spots
             AddSpot((3d, 1d), bathroom, WaitingSpotType.Bathroom);
             AddSpot((2d, 1d), bathroom, WaitingSpotType.Bathroom);
@@ -72,7 +81,7 @@ namespace Assets.Scripts {
             ApplyToArea(Bar.Singleton, bar);
 
             void AddSpot((double, double) position, Bathroom bathroom, WaitingSpotType type) {
-                Vector2 vector = bathroom.Area.GetGridPosition(position);
+                Vector2 vector = bathroom.Bounds.GetGridPosition(position);
                 CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
                 instance.Facing = Orientation.South;
                 switch ( type ) {
@@ -93,66 +102,25 @@ namespace Assets.Scripts {
         static public GameSaveData FromJson(string json) {
             return JsonConvert.DeserializeObject<GameSaveData>(json);
         }
-        static private List<CustomerInteractable> ApplyToArea(Bathroom bathroom, List<Option> options) {
-            List<CustomerInteractable> results = new List<CustomerInteractable>();
+        static private void ApplyToArea<T>(Area area, List<T> options) where T : Option {
             foreach ( Option option in options ) {
-                Area2D area = bathroom.Area;
-                Vector2 vector = area.GetGridPosition(option);
-                CustomerInteractable prefab;
-                if ( option.Current == InteractableType.None ) {
-                    continue;
+                // Set the options area reference
+                option.Area = area;
+
+                if ( option.Current != InteractableType.None ) {
+                    SpawnInteractable(option, option.Current);
                 }
-                switch ( option.Current ) {
-                    case InteractableType.Sink:
-                        prefab = Prefabs.PrefabSink;
-                        break;
-                    case InteractableType.Toilet:
-                        prefab = Prefabs.PrefabToilet;
-                        break;
-                    case InteractableType.Urinal:
-                        prefab = Prefabs.PrefabUrinal;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-                CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
-                instance.Facing = option.Facing;
-                instance.Location = bathroom.Location;
-                results.Add(instance);
             }
-            return results;
         }
-        static private void ApplyToArea(Bar bar, List<BarOption> options) {
-            // Seats handle their own setup code in Seat.Start()
-            foreach ( var option in options ) {
-                Area2D area = bar.Area;
-                Vector2 vector = area.GetGridPosition(option);
-                if ( option.Current == InteractableType.None ) {
-                    continue;
-                }
-                switch ( option.Current ) {
-                    case InteractableType.Seat:
-                        if ( option.isTable ) {
-                            BarTable prefab = Prefabs.PrefabTable;
-                            BarTable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
-                            foreach ( Seat seat in instance.Seats ) {
-                                seat.Facing = option.Facing;
-                                seat.Location = Location.Bar;
-                                seat.SeatType = SeatType.Table;
-                            }
-                        }
-                        else {
-                            Seat prefab = Prefabs.PrefabSeat;
-                            Seat instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
-                            instance.Facing = option.Facing;
-                            instance.Location = Location.Bar;
-                            instance.SeatType = SeatType.Counter;
-                        }
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
+        public static CustomerInteractable SpawnInteractable(Option option, InteractableType type) {
+            option.Current = type;
+            CustomerInteractable prefab = Prefabs.InteractablePrefabs[type];
+            Vector2 vector = option.Area.Bounds.GetGridPosition(option);
+            CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
+            instance.Facing = option.Facing;
+            instance.Location = option.Area.Location;
+            option.Area.AddInteractable(instance);
+            return instance;
         }
         public override string ToString() {
 

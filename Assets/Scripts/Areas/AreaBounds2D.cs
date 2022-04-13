@@ -3,17 +3,22 @@ using UnityEngine;
 
 namespace Assets.Scripts {
     [Serializable]
-    public class Area2D {
+    public class AreaBounds2D {
         [SerializeField]
         public double GridScaleX;
         public double GridScaleY;
-        private Bounds? bounds = null;
-        public Bounds Bounds => bounds.HasValue
-            ? (Bounds)bounds 
-            : throw new InvalidOperationException();
+        public Bounds Bounds;
         private BoxCollider2D collider { get; set; } = null;
         public double LengthX => Bounds.max.x - Bounds.min.x;
         public double LengthY => Bounds.max.y - Bounds.min.y;
+        public Vector2 Center => Bounds.center;
+        public Vector2 Min => Bounds.min;
+        public Vector2 Max => Bounds.max;
+        public double MinX => Bounds.min.x;
+        public double MinY => Bounds.min.y;
+        public double MaxX => Bounds.max.x;
+        public double MaxY => Bounds.max.y;
+
         public int GridPointsX => (int)Math.Floor(LengthX / GridScaleX);
         public int GridPointsY => (int)Math.Floor(LengthY / GridScaleY);
 
@@ -36,7 +41,7 @@ namespace Assets.Scripts {
             var y = Bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);
         }
-        public Area2D(BoxCollider2D collider, int GridScaleX, int GridScaleY) {
+        public AreaBounds2D(BoxCollider2D collider, int GridScaleX, int GridScaleY) {
             this.collider = collider;
             this.GridScaleX = GridScaleX;
             this.GridScaleY = GridScaleY;
@@ -44,7 +49,7 @@ namespace Assets.Scripts {
         }
         public void UpdateArea() {
             collider.enabled = true;
-            bounds = new Bounds(collider.bounds.center, collider.bounds.size);
+            Bounds = new Bounds(collider.bounds.center, collider.bounds.size);
             collider.enabled = false;
         }
         public void SetCollider(BoxCollider2D collider) {

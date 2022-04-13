@@ -32,9 +32,9 @@ namespace Assets.Scripts.Customers {
             newCustomer.Active = true;
             bool enteredDoorway = false;
             if ( newCustomer.WantsToEnterBathroom() &&
-                ( newCustomer.DesperationState == Collections.CustomerDesperationState.State3 ||
-                newCustomer.DesperationState == Collections.CustomerDesperationState.State4 ||
-                newCustomer.DesperationState == Collections.CustomerDesperationState.State5 ) ) {
+                ( newCustomer.DesperationState == CustomerDesperationState.State3 ||
+                newCustomer.DesperationState == CustomerDesperationState.State4 ||
+                newCustomer.DesperationState == CustomerDesperationState.State5 ) ) {
 
                 var bathroom = newCustomer.Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
                 enteredDoorway = newCustomer.GetInLine(bathroom);

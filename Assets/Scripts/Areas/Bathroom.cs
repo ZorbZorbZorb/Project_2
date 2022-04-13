@@ -6,10 +6,9 @@ using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.Areas {
-    public class Bathroom : MonoBehaviour {
+    public class Bathroom : Area {
         public static Bathroom BathroomM;
         public static Bathroom BathroomF;
-        public Area2D Area { get; set; } = null;
 
         public List<Toilet> Toilets;
         public List<Urinal> Urinals;
@@ -20,8 +19,6 @@ namespace Assets.Scripts.Areas {
 
         public DoorwayQueue Line;
         public WaitingRoom waitingRoom;
-
-        public Location Location;
 
         // Several of these are checked once per tick by each customer.
         public bool HasToiletAvailable { get; private set; }
@@ -35,7 +32,8 @@ namespace Assets.Scripts.Areas {
         /// Adds the provided interactable to the room and handles rigging it up for use by customers
         /// </summary>
         /// <param name="interactable">interactable to add to this room</param>
-        public void AddInteractable(CustomerInteractable interactable) {
+        public override void AddInteractable(CustomerInteractable interactable) {
+            interactable.Location = Location;
             switch ( interactable.IType ) {
                 case InteractableType.Sink:
                     Sinks.Add(interactable as Sink);
@@ -49,7 +47,6 @@ namespace Assets.Scripts.Areas {
                 case InteractableType.WaitingSpot:
                     WaitingSpot spot = interactable as WaitingSpot;
                     spot.Bathroom = this;
-                    spot.Location = Location;
                     waitingRoom.WaitingSpots.Add(spot);
                     break;
                 default:
@@ -96,7 +93,8 @@ namespace Assets.Scripts.Areas {
                 return true;
             }
         }
-        void Awake() {
+        public new void Awake() {
+            base.Awake();
             // Set singletons and references
             switch ( Location ) {
                 case Location.BathroomM:
@@ -119,9 +117,6 @@ namespace Assets.Scripts.Areas {
             Line.waitingSpots.ForEach(x => x.Bathroom = this);
             waitingRoom.WaitingSpots.ForEach(x => x.Bathroom = this);
             SinksLine.Items.ForEach(x => x.Bathroom = this);
-
-            // Set area using collider component
-            Area = new Area2D(GetComponent<BoxCollider2D>(), 140, 140);
         }
         void Update() {
             // Update doorway queue

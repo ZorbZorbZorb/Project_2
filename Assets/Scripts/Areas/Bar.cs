@@ -4,12 +4,13 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using Assets.Scripts.Objects;
 using Assets.Scripts;
+using Assets.Scripts.Areas;
+using System;
 
-public class Bar : MonoBehaviour {
+public class Bar : Area {
+
     public static Bar Singleton = null;
-
-    public Area2D Area { get; set; } = null;
-
+    
     [SerializeField]
     public static double DrinkCost;
     [SerializeField]
@@ -22,9 +23,28 @@ public class Bar : MonoBehaviour {
         return x[Random.Range(0, x.Count())];
     }
 
-    private void Awake() {
+    public override void AddInteractable(CustomerInteractable interactable) {
+        if (interactable is Seat seat) {
+            seat.SeatType = SeatType.Counter;
+            Seats.Add(seat);
+        }
+        else if (interactable is BarTable table) {
+            table.Location = Location;
+            foreach ( Seat tableSeat in table.Seats ) {
+                tableSeat.SeatType = SeatType.Table;
+                tableSeat.Facing = table.Facing;
+                tableSeat.Location = table.Location;
+            }
+        }
+        else {
+            throw new NotImplementedException($"Type {interactable.IType} is not supported.");
+        }
+    }
+
+    public new void Awake() {
+        base.Awake();
+        Location = Location.Bar;
         Singleton = this;
-        Area = new Area2D(GetComponent<BoxCollider2D>(), 140, 140);
         DrinkCost = 5d;
         DrinkAmount = 360d;
     }

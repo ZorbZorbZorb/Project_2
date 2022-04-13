@@ -1864,6 +1864,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8de7213a6c3aa8b47bdcb95bbd660174, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Bounds:
+    GridScaleX: 0
+    GridScaleY: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  Location: 0
   Seats: []
 --- !u!61 &348004278
 BoxCollider2D:
@@ -2568,7 +2575,6 @@ GameObject:
   m_Component:
   - component: {fileID: 497241816}
   - component: {fileID: 497241815}
-  - component: {fileID: 497241817}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -2588,7 +2594,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayNightStartSplash: 1
+  DisplayNightStartSplash: 0
   DisplayBuildMenuOnFirstNight: 1
   NightMaxTime: 30
   NightMaxCustomerSpawnTime: 20
@@ -2676,18 +2682,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &497241817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 497241814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f000c831a14bade46b477ecd6efefedc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &515084694
 GameObject:
   m_ObjectHideFlags: 0
@@ -5158,6 +5152,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df10267e7b0b74b94665a88905f460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Bounds:
+    GridScaleX: 0
+    GridScaleY: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  Location: 4
   Toilets: []
   Urinals: []
   Sinks: []
@@ -5171,7 +5172,6 @@ MonoBehaviour:
   waitingRoom:
     Bathroom: {fileID: 0}
     WaitingSpots: []
-  Location: 4
 --- !u!61 &1013489708
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8424,6 +8424,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df10267e7b0b74b94665a88905f460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Bounds:
+    GridScaleX: 0
+    GridScaleY: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  Location: 5
   Toilets: []
   Urinals: []
   Sinks: []
@@ -8437,7 +8444,6 @@ MonoBehaviour:
   waitingRoom:
     Bathroom: {fileID: 0}
     WaitingSpots: []
-  Location: 5
 --- !u!4 &1598575289
 Transform:
   m_ObjectHideFlags: 0

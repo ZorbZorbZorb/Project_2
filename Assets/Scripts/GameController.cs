@@ -4,6 +4,7 @@ using Assets.Scripts.Customers;
 using Assets.Scripts.Objects;
 using Assets.Scripts.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -136,6 +137,19 @@ public partial class GameController : MonoBehaviour {
         SouthButton.onClick.AddListener(() => { CycleCamera(Orientation.South); });
         EastButton.onClick.AddListener(() => { CycleCamera(Orientation.East); });
         WestButton.onClick.AddListener(() => { CycleCamera(Orientation.West); });
+
+        Emote.PeeStrong = new Emote("Sprites/Bubbles/Stream_3");
+        Emote.PeeMedium = new Emote("Sprites/Bubbles/Stream_2");
+        Emote.PeeWeak = new Emote("Sprites/Bubbles/Stream_1");
+        Emote.PantsDown = new Emote("Sprites/Bubbles/bubble_zipper_down");
+        Emote.PantsUp = new Emote("Sprites/Bubbles/bubble_zipper_up");
+        Emote.StruggleStop = new Emote("Sprites/Bubbles/bubble_struggle_stop");
+        Emote.PeeStreamEmotes = new Emote[] { Emote.PeeWeak, Emote.PeeWeak, Emote.PeeWeak, Emote.PeeMedium, Emote.PeeMedium, Emote.PeeStrong, Emote.PeeStrong };
+
+        // Create customer sprite marshals
+        CustomerSpriteController.Controller = new Dictionary<char, CustomerSpriteController>();
+        CustomerSpriteController.NewController('m', "Sprites/People/nm");
+        CustomerSpriteController.NewController('f', "Sprites/People/n");
     }
     void Start() {
         CameraPosition.AddPosition(Freecam.Center, 600);
@@ -151,9 +165,9 @@ public partial class GameController : MonoBehaviour {
 
         // Set the customer's static variables
         Customer.BathroomStartX =
-            Bathroom.BathroomM.Area.Bounds.min.x - ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.x );
+            Bathroom.BathroomM.Bounds.Bounds.min.x - ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.x );
         Customer.BathroomStartY =
-            Bathroom.BathroomM.Area.Bounds.min.y + ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.y );
+            Bathroom.BathroomM.Bounds.Bounds.min.y + ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.y );
 
         // Lock up the camera
         FC.Locked = true;

@@ -116,72 +116,63 @@
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"None",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":2,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":3,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":4,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":5,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":6,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":7,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":8,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"None",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":9,
 		"Y":1,
 		"Options":["Seat"],
 		"Current":"None",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		}
 		
 		
@@ -193,47 +184,41 @@
 		"Y":3,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":2,
 		"Y":3,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 				{
 		"X":3,
 		"Y":3,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":4,
 		"Y":3,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},		{
 		"X":5,
 		"Y":3,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":6,
 		"Y":3,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		
 		{
@@ -241,47 +226,41 @@
 		"Y":4,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":2,
 		"Y":4,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 				{
 		"X":3,
 		"Y":4,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":4,
 		"Y":4,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},		{
 		"X":5,
 		"Y":4,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":6,
 		"Y":4,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		
 		
@@ -290,47 +269,41 @@
 		"Y":5,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":2,
 		"Y":5,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 				{
 		"X":3,
 		"Y":5,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":4,
 		"Y":5,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},		{
 		"X":5,
 		"Y":5,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 		{
 		"X":6,
 		"Y":5,
 		"Options":["Seat"],
 		"Current":"Seat",
-		"Facing":"South",
-		"IsTable":false
+		"Facing":"South"
 		},
 	]
 }

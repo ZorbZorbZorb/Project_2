@@ -6,9 +6,9 @@ namespace Assets.Scripts.Objects {
         None,
         WaitingSpot,
         Seat,
+        Table,
         Toilet,
         Urinal,
-        Ourinal,
         Sink
     };
     public enum ReliefType {
