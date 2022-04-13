@@ -2673,8 +2673,9 @@ MonoBehaviour:
   DisplayBuildMenuOnFirstNight: 0
   NightMaxTime: 30
   NightMaxCustomerSpawnTime: 20
-  CameraTolerangeTight: 25
-  CameraTolerangeLoose: 60
+  CameraTolerangeTight: 22
+  CameraTolerangeMid: 50
+  CameraTolerangeLoose: 68
   Autoplay: 0
   RapidSimulation: 0
   OnlySpawnOneCustomer: 1

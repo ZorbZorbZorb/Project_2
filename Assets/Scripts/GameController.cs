@@ -4,7 +4,6 @@ using Assets.Scripts.Customers;
 using Assets.Scripts.Objects;
 using Assets.Scripts.UI;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,7 +14,6 @@ using Random = UnityEngine.Random;
 public partial class GameController : MonoBehaviour {
 
     #region Fields
-
 
     [Header("Settings")]
     public bool DisplayNightStartSplash = true;
