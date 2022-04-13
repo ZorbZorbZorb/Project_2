@@ -34,9 +34,6 @@ namespace Assets.Scripts {
         public double Funds;
 
         public void Apply() {
-            Bathroom.BathroomM.Area.Area.enabled = true;
-            Bathroom.BathroomF.Area.Area.enabled = true;
-            Bar.Singleton.Area.Area.enabled = true;
 
             List<CustomerInteractable> instances;
             Bathroom bathroom;
@@ -73,10 +70,6 @@ namespace Assets.Scripts {
 
             // Set up bar
             ApplyToArea(Bar.Singleton, bar);
-
-            Bathroom.BathroomM.Area.Area.enabled = false;
-            Bathroom.BathroomF.Area.Area.enabled = false;
-            Bar.Singleton.Area.Area.enabled = false;
 
             void AddSpot((double, double) position, Bathroom bathroom, WaitingSpotType type) {
                 Vector2 vector = bathroom.Area.GetGridPosition(position);

@@ -50,10 +50,6 @@ namespace Assets.Scripts {
             // Destory the clickables we created
             clickables.ForEach(x => UnityEngine.Object.Destroy(x));
 
-            Bathroom.BathroomM.Area.Area.enabled = true;
-            Bathroom.BathroomF.Area.Area.enabled = true;
-            Bar.Singleton.Area.Area.enabled = true;
-
             GameSaveData game = GameController.GC.Game;
             var bathroom = Bathroom.BathroomM;
             foreach ( GameSaveData.Option option in game.Mens ) {
@@ -104,7 +100,7 @@ namespace Assets.Scripts {
                             // Spawn prefab
                             Vector2 vector = bathroom.Area.GetGridPosition(option);
                             CustomerInteractable prefab;
-                            switch ( option.Current ) {
+                            switch ( option.Options.First() ) {
                                 case InteractableType.Sink:
                                     prefab = Prefabs.PrefabSink;
                                     break;
@@ -132,10 +128,6 @@ namespace Assets.Scripts {
                     clickables.Add(clickable);
                 }
             }
-
-            Bathroom.BathroomM.Area.Area.enabled = false;
-            Bathroom.BathroomF.Area.Area.enabled = false;
-            Bar.Singleton.Area.Area.enabled = false;
         }
         public void SetUpButtons() {
             MainMenuButton.onClick.AddListener(GameController.GC.GoToMainMenu);

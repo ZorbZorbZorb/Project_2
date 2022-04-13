@@ -152,14 +152,9 @@ public partial class GameController : MonoBehaviour {
 
         // Set the customer's static variables
         Customer.BathroomStartX =
-            Bathroom.BathroomM.Area.Area.bounds.min.x - ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.x );
+            Bathroom.BathroomM.Area.Bounds.min.x - ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.x );
         Customer.BathroomStartY =
-            Bathroom.BathroomM.Area.Area.bounds.min.y + ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.y );
-
-        // Shut off all of the Area2d colliders
-        Bathroom.BathroomM.Area.Area.enabled = false;
-        Bathroom.BathroomF.Area.Area.enabled = false;
-        Bar.Singleton.Area.Area.enabled = false;
+            Bathroom.BathroomM.Area.Bounds.min.y + ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.y );
 
         // Lock up the camera
         FC.Locked = true;
