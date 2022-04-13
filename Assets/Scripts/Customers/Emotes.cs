@@ -115,7 +115,6 @@ namespace Assets.Scripts.Customers {
         }
 
         public void Start() {
-            Canvas.sortingLayerName = "UI"; 
             BladderDisplay.SetActive(false);
             bladderCircleActive = false;
         }
