@@ -473,6 +473,14 @@ public partial class GameController : MonoBehaviour {
         CanPause = false;
         Time.timeScale = 0;
         BuildMenu.Open();
+
+        // Update build button states
+        var position = FC.AutoPanning ? FC.PanIntent : FC.transform.position;
+        CameraPosition.UpdatePositions(position);
+        NorthButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.North));
+        SouthButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.South));
+        EastButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.East));
+        WestButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.West));
     }
     public void EndBuildMode() {
         InBuildMenu = false;
@@ -480,6 +488,10 @@ public partial class GameController : MonoBehaviour {
         Time.timeScale = 1;
         BuildMenu.Close();
         CM.MaxCustomers = Bar.Singleton.Seats.Count;
+
+        FC.ZoomTo(Freecam.MinZoom);
+        FC.PanTo(Freecam.Center);
+
     }
     void CycleCamera(Orientation orientation) {
         var position = FC.AutoPanning ? FC.PanIntent : FC.transform.position;
@@ -489,10 +501,10 @@ public partial class GameController : MonoBehaviour {
             if ( result != null ) {
                 // Sucessfully moved the camera. Recalculate camera positions to update the buttons.
                 CameraPosition.UpdatePositions(result.Pan);
-                NorthButton.interactable = CameraPosition.HasPosition(Orientation.North);
-                SouthButton.interactable = CameraPosition.HasPosition(Orientation.South);
-                EastButton.interactable = CameraPosition.HasPosition(Orientation.East);
-                WestButton.interactable = CameraPosition.HasPosition(Orientation.West);
+                NorthButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.North));
+                SouthButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.South));
+                EastButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.East));
+                WestButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.West));
             }
         }
         else {
