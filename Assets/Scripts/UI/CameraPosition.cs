@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace Assets.Scripts.UI {
     public class CameraPosition : MonoBehaviour {
-        private struct CameraInstruction {
+        public class CameraInstruction {
             public int Zoom;
             public Vector2 Pan;
-            public CameraInstruction(int zoom, Vector2 pan) {
+            private CameraInstruction(int zoom, Vector2 pan) {
                 Zoom = zoom;
                 Pan = pan;
             }
-            public CameraInstruction(Camera camera) {
+            private CameraInstruction(Camera camera) {
                 Pan = camera.transform.position;
                 Zoom = (int)camera.orthographicSize;
             }
@@ -80,8 +80,8 @@ namespace Assets.Scripts.UI {
                     a1 = ( 90f + tolerance );
                     break;
             }
-            a0 = (90f + a0) * PLANE_ANGLE;
-            a1 = (90f + a1) * PLANE_ANGLE;
+            a0 = (90f + a0) * Mathf.Rad2Deg;
+            a1 = (90f + a1) * Mathf.Rad2Deg;
             Vector2 p1 = new Vector2(-Mathf.Cos(a0), Mathf.Sin(a0));
             Vector2 p2 = new Vector2(-Mathf.Cos(a1), Mathf.Sin(a1));
             Debug.DrawLine(p0, p0 + (p1 * 600f), color, 1f);
@@ -94,20 +94,27 @@ namespace Assets.Scripts.UI {
         public static void AddPosition(Vector2 pan, int zoom) {
             instructions.Add(new CameraInstruction(zoom, pan));
         }
+
+        private static List<(RelativePosition position, byte index)> positions = new List<(RelativePosition position, byte index)>();
+        public static void UpdatePositions(Vector2 current) {
+            positions = new List<(RelativePosition position, byte index)>();
+            for ( byte i = 0; i < instructions.Count; i++ ) {
+                var relativePosition = new RelativePosition(current, instructions[i].Pan);
+                if ( relativePosition.Distance < 200f ) {
+                    continue;
+                }
+                positions.Add((relativePosition, i));
+            }
+        }
         /// <summary>
         /// Trys to navigate the camera to the next closest point in the given <paramref name="orientation"/>
         /// </summary>
         /// <param name="orientation">WASD Key that was pressed, translated into <see cref="Orientation"/></param>
         /// <param name="current">Pass pan intent instead of current pan</param>
-        public static void Navigate(Orientation orientation, Vector2 current) {
-            Dictionary<RelativePosition, byte> positions = new Dictionary<RelativePosition, byte>();
-            for ( byte i = 0; i < instructions.Count; i++ ) {
-                var relativePosition = new RelativePosition(current, instructions[i].Pan);
-                if (relativePosition.Distance < 200f) {
-                    continue;
-                }
-                positions.Add(relativePosition, i);
-                if ( GameController.GC.DrawPaths ) {
+        public static CameraInstruction Navigate(Orientation orientation, Vector2 current) {
+
+            if ( GameController.GC.DrawPaths ) {
+                for ( int i = 0; i < positions.Count; i++ ) {
                     float angle = Get360Angle(current, instructions[i].Pan);
                     if ( WithinAngle(orientation, angle, GameController.GC.CameraTolerangeTight) ) {
                         Debug.DrawLine(current, instructions[i].Pan, Color.green, 2f);
@@ -122,48 +129,50 @@ namespace Assets.Scripts.UI {
                         Debug.DrawLine(current, instructions[i].Pan, Color.black, 2f);
                     }
                 }
-            }
-
-            if ( GameController.GC.DrawPaths ) {
                 DrawAngleLines(current, orientation, GameController.GC.CameraTolerangeLoose, new Color(0.8f,0.8f,1f));
                 DrawAngleLines(current, orientation, GameController.GC.CameraTolerangeMid, new Color(0.5f, 0.5f, 1f));
                 DrawAngleLines(current, orientation, GameController.GC.CameraTolerangeTight, new Color(0.2f, 0.2f, 1f));
             }
 
-            var angleTight = positions.Where(x => WithinAngle(orientation, x.Key.Angle, GameController.GC.CameraTolerangeTight));
+            var angleTight = positions.Where(x => WithinAngle(orientation, x.position.Angle, GameController.GC.CameraTolerangeTight));
             if ( angleTight.Any() ) {
                 CameraInstruction instruction = GetClosest(angleTight);
                 Navigate(instruction);
+                return instruction;
             }
             else {
-                var angleMid = positions.Where(x => WithinAngle(orientation, x.Key.Angle, GameController.GC.CameraTolerangeMid));
+                var angleMid = positions.Where(x => WithinAngle(orientation, x.position.Angle, GameController.GC.CameraTolerangeMid));
                 if ( angleMid.Any() ) {
                     CameraInstruction instruction = GetClosest(angleMid);
                     Navigate(instruction);
+                    return instruction;
                 }
                 else {
-                    var angleLoose = positions.Where(x => WithinAngle(orientation, x.Key.Angle, GameController.GC.CameraTolerangeLoose));
+                    var angleLoose = positions.Where(x => WithinAngle(orientation, x.position.Angle, GameController.GC.CameraTolerangeLoose));
                     if ( angleLoose.Any() ) {
                         CameraInstruction instruction = GetClosest(angleLoose);
                         Navigate(instruction);
+                        return instruction;
                     }
                 }
             }
+            return null;
 
-            static CameraInstruction GetClosest(IEnumerable<KeyValuePair<RelativePosition, byte>> distances) {
+            static CameraInstruction GetClosest(IEnumerable<(RelativePosition position, byte index)> distances) {
                 var lowest = distances.ElementAt(0);
                 for ( int i = 1; i < distances.Count(); i++ ) {
                     var next = distances.ElementAt(i);
-                    if ( lowest.Key.Distance > next.Key.Distance ) {
+                    if ( lowest.position.Distance > next.position.Distance ) {
                         lowest = next;
                     }
                 }
-                return instructions[lowest.Value];
+                return instructions[lowest.index];
             }
 
         }
-
-        private const float PLANE_ANGLE = Mathf.PI / 180f;
+        public static bool HasPosition(Orientation orientation) {
+            return positions.Any(x => WithinAngle(orientation, x.position.Angle, GameController.GC.CameraTolerangeLoose));
+        }
 
         private static void Navigate(CameraInstruction instruction) {
             GameController.FC.PanTo(instruction.Pan);

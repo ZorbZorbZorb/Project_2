@@ -131,6 +131,8 @@ public partial class GameController : MonoBehaviour {
         }
         GC = this;
         Customer.GC = this;
+
+        WestButton.onClick.AddListener(() => {  });
     }
     void Start() {
 
@@ -473,6 +475,12 @@ public partial class GameController : MonoBehaviour {
         Time.timeScale = 1;
         BuildMenu.Close();
         CM.MaxCustomers = Bar.Singleton.Seats.Count;
+    }
+    /// <summary>
+    /// Called when you move the camera using the buttons or wasd keys during buildmode
+    /// </summary>
+    public void BuildMoveNavigate() {
+        CameraPosition.upda
     }
     /// <summary>
     /// Pauses the game.
