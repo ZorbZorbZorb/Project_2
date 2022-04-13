@@ -1864,10 +1864,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8de7213a6c3aa8b47bdcb95bbd660174, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Area:
-    Area: {fileID: 348004278}
-    GridScaleX: 140
-    GridScaleY: 140
   Seats: []
 --- !u!61 &348004278
 BoxCollider2D:
@@ -2603,7 +2599,7 @@ MonoBehaviour:
   RapidSimulation: 0
   OnlySpawnOneCustomer: 1
   LogCustomerStates: 0
-  DrawPaths: 1
+  DrawPaths: 0
   RapidBladderFill: 0
   RapidBladderEmpty: 0
   RapidCustomerSpawn: 0
@@ -5162,10 +5158,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df10267e7b0b74b94665a88905f460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Area:
-    Area: {fileID: 1013489708}
-    GridScaleX: 140
-    GridScaleY: 140
   Toilets: []
   Urinals: []
   Sinks: []
@@ -8432,10 +8424,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df10267e7b0b74b94665a88905f460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Area:
-    Area: {fileID: 1598575287}
-    GridScaleX: 140
-    GridScaleY: 140
   Toilets: []
   Urinals: []
   Sinks: []

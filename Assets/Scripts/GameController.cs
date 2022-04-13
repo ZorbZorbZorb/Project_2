@@ -138,7 +138,6 @@ public partial class GameController : MonoBehaviour {
         WestButton.onClick.AddListener(() => { CycleCamera(Orientation.West); });
     }
     void Start() {
-
         CameraPosition.AddPosition(Freecam.Center, 600);
         CameraPosition.AddPosition(Bathroom.BathroomM.transform.position, 500);
         CameraPosition.AddPosition(Bathroom.BathroomF.transform.position, 500);

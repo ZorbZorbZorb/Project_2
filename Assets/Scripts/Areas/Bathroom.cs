@@ -9,7 +9,7 @@ namespace Assets.Scripts.Areas {
     public class Bathroom : MonoBehaviour {
         public static Bathroom BathroomM;
         public static Bathroom BathroomF;
-        public Area2D Area;
+        public Area2D Area { get; set; } = null;
 
         public List<Toilet> Toilets;
         public List<Urinal> Urinals;
@@ -97,13 +97,7 @@ namespace Assets.Scripts.Areas {
             }
         }
         void Awake() {
-            Area.Area = GetComponent<BoxCollider2D>();
-            // Set doorway queue, waiting room, spawnpoint, and waiting spots bathroom ref
-            Line.Bathroom = this;
-            waitingRoom.Bathroom = this;
-            Line.waitingSpots.ForEach(x => x.Bathroom = this);
-            waitingRoom.WaitingSpots.ForEach(x => x.Bathroom = this);
-            SinksLine.Items.ForEach(x => x.Bathroom = this);
+            // Set singletons and references
             switch ( Location ) {
                 case Location.BathroomM:
                     if ( BathroomM != null ) {
@@ -120,6 +114,14 @@ namespace Assets.Scripts.Areas {
                 default:
                     throw new InvalidOperationException($"Bathroom was set to unexpected location {Location}");
             }
+            Line.Bathroom = this;
+            waitingRoom.Bathroom = this;
+            Line.waitingSpots.ForEach(x => x.Bathroom = this);
+            waitingRoom.WaitingSpots.ForEach(x => x.Bathroom = this);
+            SinksLine.Items.ForEach(x => x.Bathroom = this);
+
+            // Set area using collider component
+            Area = new Area2D(GetComponent<BoxCollider2D>(), 140, 140);
         }
         void Update() {
             // Update doorway queue

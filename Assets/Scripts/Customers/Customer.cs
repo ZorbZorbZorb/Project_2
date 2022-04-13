@@ -469,7 +469,7 @@ namespace Assets.Scripts.Customers {
                         else {
                             vectors = new Vector2[] {
                                 transform.position,
-                                (Vector2)bathroom.transform.position + bathroom.Area.Area.offset,
+                                bathroom.transform.position + bathroom.Area.Bounds.center,
                                 target.GetCustomerPosition(Gender)
                             };
                         }

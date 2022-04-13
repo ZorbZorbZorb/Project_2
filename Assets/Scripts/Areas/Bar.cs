@@ -7,9 +7,8 @@ using Assets.Scripts;
 
 public class Bar : MonoBehaviour {
     public static Bar Singleton = null;
-    
-    [SerializeField]
-    public Area2D Area;
+
+    public Area2D Area { get; set; } = null;
 
     [SerializeField]
     public static double DrinkCost;
@@ -24,9 +23,10 @@ public class Bar : MonoBehaviour {
     }
 
     private void Awake() {
+        Singleton = this;
+        Area = new Area2D(GetComponent<BoxCollider2D>(), 140, 140);
         DrinkCost = 5d;
         DrinkAmount = 360d;
-        Singleton = this;
     }
 
 }

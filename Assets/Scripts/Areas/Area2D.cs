@@ -7,9 +7,11 @@ namespace Assets.Scripts {
         [SerializeField]
         public double GridScaleX;
         public double GridScaleY;
-        private Bounds bounds = new Bounds();
-        public Bounds Bounds => bounds;
-        private BoxCollider2D collider;
+        private Bounds? bounds = null;
+        public Bounds Bounds => bounds.HasValue
+            ? (Bounds)bounds 
+            : throw new InvalidOperationException();
+        private BoxCollider2D collider { get; set; } = null;
         public double LengthX => Bounds.max.x - Bounds.min.x;
         public double LengthY => Bounds.max.y - Bounds.min.y;
         public int GridPointsX => (int)Math.Floor(LengthX / GridScaleX);
@@ -34,18 +36,20 @@ namespace Assets.Scripts {
             var y = Bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);
         }
-        public Area2D(BoxCollider2D collider) {
-            bounds = new Bounds();
+        public Area2D(BoxCollider2D collider, int GridScaleX, int GridScaleY) {
+            this.collider = collider;
+            this.GridScaleX = GridScaleX;
+            this.GridScaleY = GridScaleY;
             UpdateArea();
-            GridScaleX = 1;
-            GridScaleY = 1;
         }
         public void UpdateArea() {
             collider.enabled = true;
-            bounds.min = collider.bounds.min;
-            bounds.max = collider.bounds.max;
-            bounds.center = collider.bounds.center;
+            bounds = new Bounds(collider.bounds.center, collider.bounds.size);
             collider.enabled = false;
+        }
+        public void SetCollider(BoxCollider2D collider) {
+            this.collider = collider;
+            UpdateArea();
         }
     }
 }
