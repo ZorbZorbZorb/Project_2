@@ -47,6 +47,17 @@ public partial class GameController : MonoBehaviour {
     public bool EndNight = false;
     public bool BuildEverything = false;
 
+    [Header("Buttons")]
+    public Button PauseButton;
+    public Button ContinueButton;
+    public Button MenuButton;
+    public Button StartButton;
+    public Button RestartButton;
+    public Button WestButton;
+    public Button NorthButton;
+    public Button EastButton;
+    public Button SouthButton;
+
     // Build menu
     [HideInInspector]
     public bool InBuildMenu;
@@ -247,14 +258,7 @@ public partial class GameController : MonoBehaviour {
         void HandleKeypresses() {
             // Pressing escape will pause the game
             if ( Input.GetKeyDown(KeyCode.Escape) ) {
-                if ( CanPause ) {
-                    if ( GamePaused ) {
-                        ResumeGame();
-                    }
-                    else {
-                        PauseGame();
-                    }
-                }
+                ToggleGamePaused();
             }
 
             // Camera movement hotkeys
@@ -356,6 +360,16 @@ public partial class GameController : MonoBehaviour {
         if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
             if (!FreezeTime) {
                 AdvanceTime();
+            }
+        }
+    }
+    public void ToggleGamePaused() {
+        if ( CanPause ) {
+            if ( GamePaused ) {
+                ResumeGame();
+            }
+            else {
+                PauseGame();
             }
         }
     }
@@ -464,7 +478,7 @@ public partial class GameController : MonoBehaviour {
     /// Pauses the game.
     /// <para>Closes all open menus and enables the game paused canvas</para>
     /// </summary>
-    void PauseGame() {
+    public void PauseGame() {
         Time.timeScale = 0;
         GamePaused = true;
         FC.Locked = true;

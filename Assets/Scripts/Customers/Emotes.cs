@@ -91,7 +91,7 @@ namespace Assets.Scripts.Customers {
                 BladderCircleTransform.localScale = new Vector3((float)x, (float)y);
 
                 // Update text display
-                BladderAmountText.text = $"{Math.Round(Customer.bladder.Amount / 1000d, 1)}L";
+                BladderAmountText.text = $"{Math.Round(Customer.bladder.Amount, 0)}";
             }
         }
         public void ShowBladderCircle(bool value) {
