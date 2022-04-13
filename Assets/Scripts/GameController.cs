@@ -132,7 +132,10 @@ public partial class GameController : MonoBehaviour {
         GC = this;
         Customer.GC = this;
 
-        WestButton.onClick.AddListener(() => {  });
+        NorthButton.onClick.AddListener(() => { CycleCamera(Orientation.North); });
+        SouthButton.onClick.AddListener(() => { CycleCamera(Orientation.South); });
+        EastButton.onClick.AddListener(() => { CycleCamera(Orientation.East); });
+        WestButton.onClick.AddListener(() => { CycleCamera(Orientation.West); });
     }
     void Start() {
 
@@ -193,7 +196,9 @@ public partial class GameController : MonoBehaviour {
         }
     }
     void Update() {
-        HandleKeypresses();
+        if (Input.anyKeyDown) {
+            HandleKeypresses();
+        }
         if ( !ReadyToStartNight ) {
             return;
         }
@@ -265,16 +270,16 @@ public partial class GameController : MonoBehaviour {
 
             // Camera movement hotkeys
             if ( Input.GetKeyDown(KeyCode.D) ) {
-                CameraPosition.Navigate(Orientation.East, FC.AutoPanning ? FC.PanIntent : FC.transform.position );
+                CycleCamera(Orientation.East);
             }
             else if ( Input.GetKeyDown(KeyCode.A) ) {
-                CameraPosition.Navigate(Orientation.West, FC.AutoPanning ? FC.PanIntent : FC.transform.position);
+                CycleCamera(Orientation.West);
             }
             else if ( Input.GetKeyDown(KeyCode.S) ) {
-                CameraPosition.Navigate(Orientation.South, FC.AutoPanning ? FC.PanIntent : FC.transform.position);
+                CycleCamera(Orientation.South);
             }
             else if ( Input.GetKeyDown(KeyCode.W) ) {
-                CameraPosition.Navigate(Orientation.North, FC.AutoPanning ? FC.PanIntent : FC.transform.position);
+                CycleCamera(Orientation.North);
             }
 
         }
@@ -476,11 +481,23 @@ public partial class GameController : MonoBehaviour {
         BuildMenu.Close();
         CM.MaxCustomers = Bar.Singleton.Seats.Count;
     }
-    /// <summary>
-    /// Called when you move the camera using the buttons or wasd keys during buildmode
-    /// </summary>
-    public void BuildMoveNavigate() {
-        CameraPosition.upda
+    void CycleCamera(Orientation orientation) {
+        var position = FC.AutoPanning ? FC.PanIntent : FC.transform.position;
+        CameraPosition.UpdatePositions(position);
+        if ( InBuildMenu ) {
+            var result = CameraPosition.Navigate(orientation, position);
+            if ( result != null ) {
+                // Sucessfully moved the camera. Recalculate camera positions to update the buttons.
+                CameraPosition.UpdatePositions(result.Pan);
+                NorthButton.interactable = CameraPosition.HasPosition(Orientation.North);
+                SouthButton.interactable = CameraPosition.HasPosition(Orientation.South);
+                EastButton.interactable = CameraPosition.HasPosition(Orientation.East);
+                WestButton.interactable = CameraPosition.HasPosition(Orientation.West);
+            }
+        }
+        else {
+            CameraPosition.Navigate(Orientation.North, position);
+        }
     }
     /// <summary>
     /// Pauses the game.

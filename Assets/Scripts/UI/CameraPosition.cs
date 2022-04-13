@@ -8,11 +8,11 @@ namespace Assets.Scripts.UI {
         public class CameraInstruction {
             public int Zoom;
             public Vector2 Pan;
-            private CameraInstruction(int zoom, Vector2 pan) {
+            public CameraInstruction(int zoom, Vector2 pan) {
                 Zoom = zoom;
                 Pan = pan;
             }
-            private CameraInstruction(Camera camera) {
+            public CameraInstruction(Camera camera) {
                 Pan = camera.transform.position;
                 Zoom = (int)camera.orthographicSize;
             }
