@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Objects {
     public enum InteractableType {
+        None,
         WaitingSpot,
         Seat,
         Toilet,

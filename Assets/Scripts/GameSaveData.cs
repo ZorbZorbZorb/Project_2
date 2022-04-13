@@ -14,7 +14,7 @@ namespace Assets.Scripts {
             public double X;
             public double Y;
             public List<InteractableType> Options;
-            public InteractableType? Current;
+            public InteractableType Current;
             public Orientation Facing;
             public int Cost;
         }
@@ -106,7 +106,7 @@ namespace Assets.Scripts {
                 Area2D area = bathroom.Area;
                 Vector2 vector = area.GetGridPosition(option);
                 CustomerInteractable prefab;
-                if ( option.Current == null ) {
+                if ( option.Current == InteractableType.None ) {
                     continue;
                 }
                 switch ( option.Current ) {
@@ -134,7 +134,7 @@ namespace Assets.Scripts {
             foreach ( var option in options ) {
                 Area2D area = bar.Area;
                 Vector2 vector = area.GetGridPosition(option);
-                if ( option.Current == null ) {
+                if ( option.Current == InteractableType.None ) {
                     continue;
                 }
                 switch ( option.Current ) {

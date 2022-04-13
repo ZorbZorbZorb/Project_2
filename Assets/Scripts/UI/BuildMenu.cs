@@ -58,7 +58,7 @@ namespace Assets.Scripts {
             var bathroom = Bathroom.BathroomM;
             foreach ( GameSaveData.Option option in game.Mens ) {
                 // If nothing exists here
-                if ( option.Current == null ) {
+                if ( option.Current == InteractableType.None ) {
                     // Spawn clickable
                     var area = bathroom.Area;
                     var positon = area.GetGridPosition(option);

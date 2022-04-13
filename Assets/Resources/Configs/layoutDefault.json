@@ -13,28 +13,28 @@
 		"X":1,
 		"Y":4,
 		"Options":["Urinal", "Sink"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},
 		{
 		"X":2,
 		"Y":4,
 		"Options":["Toilet", "Urinal", "Sink"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},		
 		{
 		"X":3,
 		"Y":4,
 		"Options":["Toilet", "Urinal"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},
 		{
 		"X":4,
 		"Y":4,
 		"Options":["Toilet", "Urinal"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},
 		{
@@ -71,21 +71,21 @@
 		"X":1,
 		"Y":4,
 		"Options":["Toilet", "Sink"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},
 		{
 		"X":2,
 		"Y":4,
 		"Options":["Toilet", "Sink"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},		
 		{
 		"X":3,
 		"Y":4,
 		"Options":["Toilet"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South"
 		},
 		{
@@ -115,7 +115,7 @@
 		"X":1,
 		"Y":1,
 		"Options":["Seat"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South",
 		"IsTable":false
 		},
@@ -171,7 +171,7 @@
 		"X":8,
 		"Y":1,
 		"Options":["Seat"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South",
 		"IsTable":false
 		},
@@ -179,7 +179,7 @@
 		"X":9,
 		"Y":1,
 		"Options":["Seat"],
-		"Current":null,
+		"Current":"None",
 		"Facing":"South",
 		"IsTable":false
 		}
