@@ -45,6 +45,12 @@ public class Urinal : Relief {
     public override bool ChangesCustomerSprite => true;
     public new void Start() {
         base.Start();
+        if (Alignment == Alignment.Horizontal) {
+            MainSRenderer.sortingLayerName = "BlockingObject";
+        }
+        else {
+            MainSRenderer.sortingLayerName = "Object";
+        }
         switch (Facing) {
             case Orientation.West:
                 transform.position += new Vector3(40, 0, 0);
