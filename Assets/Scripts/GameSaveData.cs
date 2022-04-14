@@ -119,7 +119,7 @@ namespace Assets.Scripts {
 
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-        private static string GetSavePath(int slotNumber) => Path.Combine(Application.persistentDataPath, $"/{slotNumber}.json");
+        private static string GetSavePath(int slotNumber) => $"{Application.persistentDataPath}/{slotNumber}.json";
         public static bool Exists(int slotNumber) => File.Exists(GetSavePath(slotNumber));
         public static GameSaveData ImportDefault() {
             string json = Resources.Load<TextAsset>(@"Configs\layoutDefault").text;
