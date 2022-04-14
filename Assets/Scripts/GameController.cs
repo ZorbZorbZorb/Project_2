@@ -25,6 +25,10 @@ public partial class GameController : MonoBehaviour {
     [Header("Settings")]
     public int NightMaxTime = 30;
     public int NightMaxCustomerSpawnTime = 20;
+    [SerializeField, Range(0, 2)]
+    public float nightStartDelay = 1f;
+
+    [Header("Camera Settings")]
     [SerializeField, Range(15f, 65f)]
     public float CameraTolerangeTight = 18f;
     [SerializeField, Range(30f, 110f)]
@@ -62,6 +66,9 @@ public partial class GameController : MonoBehaviour {
     public Button NorthButton;
     public Button EastButton;
     public Button SouthButton;
+
+    [Header("Manually Set")]
+    public Text NightText;
 
     // Build menu
     [HideInInspector]
@@ -121,7 +128,6 @@ public partial class GameController : MonoBehaviour {
     public bool FadeToBlack = false;
     private bool ReadyToStartNight = false;
 
-    public float nightStartDelay = 2f;
     public Canvas NightStartCanvas;
     public Text NightStartText;
     public Image NightStartOverlay;
@@ -198,6 +204,8 @@ public partial class GameController : MonoBehaviour {
 
         // Construct the play areas
         Game.Apply();
+
+        NightText.text = $"Night {Game.Night}";
 
         // initialize bar time
         barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 0, 0);
