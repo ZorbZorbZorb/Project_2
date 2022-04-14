@@ -140,6 +140,9 @@ public partial class GameController : MonoBehaviour {
     private void Awake() {
         // Reset screen resolution
         Screen.SetResolution(1366, 768, FullScreenMode.Windowed, 60);
+        Application.targetFrameRate = 60;
+        //QualitySettings.antiAliasing = 0;
+        QualitySettings.vSyncCount = 1;
 
         if ( GC != null ) {
             Debug.LogError("GC singleton was already set! May have possible created a second game controller!");

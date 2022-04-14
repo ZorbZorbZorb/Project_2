@@ -117,7 +117,7 @@ namespace Assets.Scripts.UI {
 
         private void MousePanCamera() {
             // How much to pan?
-            var multiplier = FreeLookSensitivity * Time.fixedDeltaTime;
+            var multiplier = FreeLookSensitivity * Time.unscaledDeltaTime;
             // The clamp will prevent the camera from 'snapping' when alt-tabbing and disorienting the player
             var deltaX = -Mathf.Clamp(multiplier * Input.GetAxis("Mouse X"), -50, 50);
             var deltaY = -Mathf.Clamp(multiplier * Input.GetAxis("Mouse Y"), -50, 50);
@@ -136,7 +136,7 @@ namespace Assets.Scripts.UI {
             }
             else {
                 float amount = 20f + ( distance * 2f );
-                transform.position = Vector3.MoveTowards(transform.position, PanIntent, amount * Time.fixedDeltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, PanIntent, amount * Time.unscaledDeltaTime);
             }
         }
         private void ZoomCamera(float axis) {
@@ -149,7 +149,7 @@ namespace Assets.Scripts.UI {
         private void ApproachZoom() {
             // Approach the intended zoom amount
             float difference = ( zoomIntent - zoomCurrent );
-            float zoomAmount = ( difference * Time.fixedDeltaTime ) + 0.1f * Mathf.Sign(difference);
+            float zoomAmount = ( difference * Time.unscaledDeltaTime ) + 0.1f * Mathf.Sign(difference);
             zoomCurrent = Mathf.Clamp(Camera.main.orthographicSize + zoomAmount, MaxZoom, MinZoom);
             Camera.main.orthographicSize = zoomCurrent;
 
