@@ -15,6 +15,10 @@ public class MainMenuController : MonoBehaviour {
 
     [SerializeField] public Text TextContinue;
 
+    private void Awake() {
+        // Reset screen resolution
+        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, 60);
+    }
     void Start() {
         if (GameSaveData.Exists(1)) {
             try {
