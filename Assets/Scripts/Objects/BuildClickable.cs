@@ -34,15 +34,18 @@ namespace Assets.Scripts.Objects {
             if ( Spot.Options.Count == 1 ) {
                 LayoutOption option = Spot.Options[0];
                 AltSRenderer.sprite = spriteLookup[option.Type];
+                AltSRenderer.flipX = option.LayoutSpot.Facing == Orientation.East;
                 Text.text = $"${option.Cost}\r\n{option.Prefab.DisplayName}";
             }
             else {
                 double LowestCost = Spot.Options.Max(x => x.Cost);
                 double highestCost = Spot.Options.Max(x => x.Cost);
                 if (highestCost == LowestCost) {
-
+                    Text.text = $"${LowestCost}\r\nMultiple Options...";
                 }
-                Text.text = $"${Spot.Options.Min(x => x.Cost)}\r\nMultiple Options...";
+                else {
+                    Text.text = $"${highestCost} - {LowestCost}\r\nMultiple Options...";
+                }
             }
             Text.enabled = false;
         }

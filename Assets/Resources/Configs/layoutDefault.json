@@ -8,7 +8,7 @@
 			"Options": [
 				{
 					"Type": "Sink",
-					"Cost": 200
+					"Cost": 50
 				}
 			],
 			"Current": "Sink",
@@ -20,8 +20,8 @@
 			"Options": [
 				{
 					"Type": "Sink",
-					"Cost": 200
-				},
+					"Cost": 100
+				}
 			],
 			"Current": "None",
 			"Facing": "South"
@@ -32,7 +32,7 @@
 			"Options": [
 				{
 					"Type": "Sink",
-					"Cost": 200
+					"Cost": 100
 				},
 				{
 					"Type": "Urinal",
@@ -40,7 +40,7 @@
 				},
 				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
 			"Current": "None",
@@ -51,8 +51,12 @@
 			"Y": 4,
 			"Options": [
 				{
+					"Type": "Sink",
+					"Cost": 100
+				},
+				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				},
 				{
 					"Type": "Urinal",
@@ -68,7 +72,7 @@
 			"Options": [
 				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				},
 				{
 					"Type": "Urinal",
@@ -88,7 +92,7 @@
 				},
 				{
 					"Type": "Urinal",
-					"Cost": 200
+					"Cost": 100
 				}
 			],
 			"Current": "Toilet",
@@ -96,27 +100,27 @@
 		},
 		{
 			"X": 0,
-			"Y": 2,
+			"Y": 1,
 			"Options": [
 				{
 					"Type": "Urinal",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
-			"Current": "Urinal",
+			"Current": "None",
 			"Facing": "East"
 		},
 		{
-			"X": 0,
-			"Y": 0.5,
+			"X": 5,
+			"Y": 1,
 			"Options": [
 				{
 					"Type": "Urinal",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
-			"Current": "Urinal",
-			"Facing": "East"
+			"Current": "None",
+			"Facing": "West"
 		}
 	],
 	"Womens": [
@@ -126,7 +130,7 @@
 			"Options": [
 				{
 					"Type": "Sink",
-					"Cost": 200
+					"Cost": 50
 				}
 			],
 			"Current": "Sink",
@@ -138,11 +142,11 @@
 			"Options": [
 				{
 					"Type": "Sink",
-					"Cost": 200
+					"Cost": 100
 				},
 				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
 			"Current": "None",
@@ -154,11 +158,11 @@
 			"Options": [
 				{
 					"Type": "Sink",
-					"Cost": 200
+					"Cost": 100
 				},
 				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
 			"Current": "None",
@@ -169,8 +173,12 @@
 			"Y": 4,
 			"Options": [
 				{
+					"Type": "Sink",
+					"Cost": 100
+				},
+				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
 			"Current": "None",
@@ -181,11 +189,15 @@
 			"Y": 4,
 			"Options": [
 				{
+					"Type": "Sink",
+					"Cost": 100
+				},
+				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 350
 				}
 			],
-			"Current": "Toilet",
+			"Current": "None",
 			"Facing": "South"
 		},
 		{
@@ -194,7 +206,7 @@
 			"Options": [
 				{
 					"Type": "Toilet",
-					"Cost": 200
+					"Cost": 100
 				}
 			],
 			"Current": "Toilet",
@@ -206,10 +218,22 @@
 			"Options": [
 				{
 					"Type": "Urinal",
-					"Cost": 200
+					"Cost": 1000
 				}
 			],
-			"Current": "Urinal",
+			"Current": "None",
+			"Facing": "East"
+		},
+		{
+			"X": 0,
+			"Y": 1.5,
+			"Options": [
+				{
+					"Type": "Urinal",
+					"Cost": 1000
+				}
+			],
+			"Current": "None",
 			"Facing": "East"
 		}
 	],
@@ -220,10 +244,10 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
-			"Current": "None",
+			"Current": "Seat",
 			"Facing": "South"
 		},
 		{
@@ -232,7 +256,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "Seat",
@@ -244,7 +268,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "Seat",
@@ -256,7 +280,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "Seat",
@@ -268,7 +292,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "Seat",
@@ -280,7 +304,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "Seat",
@@ -292,10 +316,10 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
-			"Current": "Seat",
+			"Current": "None",
 			"Facing": "South"
 		},
 		{
@@ -304,7 +328,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "None",
@@ -316,7 +340,7 @@
 			"Options": [
 				{
 					"Type": "Seat",
-					"Cost": 200
+					"Cost": 20
 				}
 			],
 			"Current": "None",
@@ -324,6 +348,93 @@
 		},
 		{
 			"X": 3,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 200
+				}
+			],
+			"Current": "Table",
+			"Facing": "South"
+		},
+		{
+			"X": 5,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 300
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		{
+			"X": 7,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 400
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		{
+			"X": 9,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 500
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		
+		
+		
+		{
+			"X": 3,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		{
+			"X": 5,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 300
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		{
+			"X": 7,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Table",
+					"Cost": 400
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		{
+			"X": 9,
 			"Y": 5,
 			"Options": [
 				{
@@ -333,18 +444,6 @@
 			],
 			"Current": "None",
 			"Facing": "South"
-		},
-				{
-			"X": 3,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Table",
-					"Cost": 500
-				}
-			],
-			"Current": "Table",
-			"Facing": "South"
-		},
+		}
 	]
 }

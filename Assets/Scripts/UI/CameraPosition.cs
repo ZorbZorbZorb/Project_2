@@ -100,7 +100,7 @@ namespace Assets.Scripts.UI {
             positions = new List<(RelativePosition position, byte index)>();
             for ( byte i = 0; i < instructions.Count; i++ ) {
                 var relativePosition = new RelativePosition(current, instructions[i].Pan);
-                if ( relativePosition.Distance < 200f ) {
+                if ( relativePosition.Distance < 100f ) {
                     continue;
                 }
                 positions.Add((relativePosition, i));
