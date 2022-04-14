@@ -323,220 +323,28 @@
 			"Facing": "South"
 		},
 		{
-			"X": 1,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 2,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 3,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 4,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 5,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 6,
-			"Y": 3,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 1,
-			"Y": 4,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 2,
-			"Y": 4,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 3,
-			"Y": 4,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 4,
-			"Y": 4,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 5,
-			"Y": 4,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 6,
-			"Y": 4,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 1,
-			"Y": 5,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 2,
-			"Y": 5,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
 			"X": 3,
 			"Y": 5,
 			"Options": [
 				{
-					"Type": "Seat",
-					"Cost": 200
+					"Type": "Table",
+					"Cost": 500
 				}
 			],
-			"Current": "Seat",
+			"Current": "None",
 			"Facing": "South"
 		},
-		{
-			"X": 4,
-			"Y": 5,
+				{
+			"X": 3,
+			"Y": 3,
 			"Options": [
 				{
-					"Type": "Seat",
-					"Cost": 200
+					"Type": "Table",
+					"Cost": 500
 				}
 			],
-			"Current": "Seat",
+			"Current": "Table",
 			"Facing": "South"
 		},
-		{
-			"X": 5,
-			"Y": 5,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		},
-		{
-			"X": 6,
-			"Y": 5,
-			"Options": [
-				{
-					"Type": "Seat",
-					"Cost": 200
-				}
-			],
-			"Current": "Seat",
-			"Facing": "South"
-		}
 	]
 }

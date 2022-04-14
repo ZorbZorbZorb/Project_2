@@ -104,13 +104,17 @@ namespace Assets.Scripts {
             ClearClickables();
 
             GameSaveData game = GameController.GC.Game;
-            var bathroom = Bathroom.BathroomM;
-            foreach ( var spot in game.Mens ) {
+            BuildAreaClickables(game.Mens);
+            BuildAreaClickables(game.Womens);
+            BuildAreaClickables(game.bar);
+        }
+        void BuildAreaClickables(IEnumerable<LayoutSpot> spots) {
+            foreach ( var spot in spots ) {
                 // If nothing exists here
                 if ( spot.Current == InteractableType.None ) {
 
                     // Spawn clickable
-                    var positon = bathroom.Bounds.GetGridPosition(spot);
+                    var positon = spot.Area.Bounds.GetGridPosition(spot);
                     BuildClickable clickable = UnityEngine.Object.Instantiate(Prefabs.PrefabClickable, positon, Quaternion.identity);
                     clickable.Spot = spot;
 
