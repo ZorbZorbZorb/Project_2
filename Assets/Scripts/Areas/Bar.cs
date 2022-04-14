@@ -16,9 +16,9 @@ public class Bar : Area {
     [SerializeField]
     public static double DrinkAmount;
 
-    [SerializeField] public List<Seat> Seats;
+    [SerializeField] public List<Seat> Seats = new List<Seat>();
 
-    public Seat GetOpenSeat() {
+    public Seat GetRandomOpenSeat() {
         var x = Seats.Where(x => x.OccupiedBy == null && !x.IsSoiled).ToArray();
         return x[Random.Range(0, x.Count())];
     }
@@ -34,6 +34,7 @@ public class Bar : Area {
                 tableSeat.SeatType = SeatType.Table;
                 tableSeat.Facing = table.Facing;
                 tableSeat.Location = table.Location;
+                Seats.Add(tableSeat);
             }
         }
         else {
@@ -43,6 +44,7 @@ public class Bar : Area {
 
     public new void Awake() {
         base.Awake();
+        Seats = new List<Seat>();
         Location = Location.Bar;
         Singleton = this;
         DrinkCost = 5d;

@@ -394,7 +394,7 @@ namespace Assets.Scripts.Customers {
                 if ( !bladder.Emptying ) {
                     if ( Next == null ) {
                         SetNext(0f, () => {
-                            ActionState = CustomerActionState.Peeing;
+                            ActionState = CustomerActionState.PantsUp;
                             Emotes.Emote(Emote.PantsUp);
                             SetNext((float)RemainingUrinateStopDelay, () => {
                                 EndPeeingWithThing();
@@ -527,12 +527,12 @@ namespace Assets.Scripts.Customers {
                 case 2:
                     PathLength = Vector2.Distance(vectors[0], vectors[1]);
                     break;
-                case 3:
-                    PathLength = EstimatePathLength(vectors[0], vectors[1], vectors[2]);
-                    break;
-                case 4:
-                    PathLength = EstimatePathLength(vectors[0], vectors[1], vectors[2], vectors[3]);
-                    break;
+                //case 3:
+                //    PathLength = EstimatePathLength(vectors[0], vectors[1], vectors[2]);
+                //    break;
+                //case 4:
+                //    PathLength = EstimatePathLength(vectors[0], vectors[1], vectors[2], vectors[3]);
+                //    break;
                 default:
                     SetBezierPath(PathVectors);
                     return;
@@ -844,7 +844,7 @@ namespace Assets.Scripts.Customers {
                 // Handled in UseSink(Bathroom)
             }
             else {
-                Seat seat = Bar.Singleton.GetOpenSeat();
+                Seat seat = Bar.Singleton.GetRandomOpenSeat();
                 Occupy(seat);
             }
             if ( ReliefType == ReliefType.Toilet ) {
@@ -986,7 +986,7 @@ namespace Assets.Scripts.Customers {
         #region MenuActions
         // Sends this customer back to the establishment unrelieved
         public void MenuOptionDismiss() {
-            Seat seat = Bar.Singleton.GetOpenSeat();
+            Seat seat = Bar.Singleton.GetRandomOpenSeat();
             EnterBar(seat);
         }
         // Sends this customer to the waiting room
@@ -1105,7 +1105,7 @@ namespace Assets.Scripts.Customers {
             HasNext = false;
         }
         public void EnterBar() {
-            Seat seat = Bar.Singleton.GetOpenSeat();
+            Seat seat = Bar.Singleton.GetRandomOpenSeat();
             MinTimeAtBarNow = 0f;
             MinTimeBetweenChecksNow = 0f;
             Occupy(seat);
@@ -1119,7 +1119,7 @@ namespace Assets.Scripts.Customers {
             MoveTo(Location.Outside);
             Location = Location.Outside;
             SetNext(0f, () => {
-                GameController.GC.CM.RemoveCustomer(this);
+                GameController.CM.RemoveCustomer(this);
             }, () => AtDestination);
         }
         #endregion

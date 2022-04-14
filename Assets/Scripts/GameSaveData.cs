@@ -8,40 +8,14 @@ using UnityEngine;
 
 namespace Assets.Scripts {
     [Serializable]
-    public class GameSaveData {
-        [Serializable]
-        public class Option {
-            public double X;
-            public double Y;
-            public int Cost;
-            public List<InteractableType> Options;
-            public InteractableType Current;
-            public Orientation Facing;
-            [JsonIgnore]
-            public Alignment Alignment => Facing == Orientation.North || Facing == Orientation.South
-            ? Alignment.Vertical
-            : Alignment.Horizontal;
-
-            /// <summary>
-            /// The <see cref="Area"/> this <see cref="Option"/> is bound to.
-            /// <para>No reference is set until <see cref="Apply"/> is called.</para>
-            /// </summary>
-            [NonSerialized, JsonIgnore]
-            public Area Area;
-            /// <summary>
-            /// The current <see cref="CustomerInteractable"/> instance for this <see cref="Option"/>.
-            /// <para>No reference is set until <see cref="Apply"/> is called.</para>
-            /// </summary>
-            [NonSerialized, JsonIgnore]
-            public CustomerInteractable Interactable;
-        }
+    public partial class GameSaveData {
 
         [HideInInspector]
-        public List<Option> Mens;
+        public List<LayoutSpot> Mens;
         [HideInInspector]
-        public List<Option> Womens;
+        public List<LayoutSpot> Womens;
         [HideInInspector]
-        public List<Option> bar;
+        public List<LayoutSpot> bar;
 
         public int Night;
         public double Funds;
@@ -59,7 +33,7 @@ namespace Assets.Scripts {
             AddSpot((2.25d, -0.5d), bathroom, WaitingSpotType.Line);
             AddSpot((1.25d, -0.5d), bathroom, WaitingSpotType.Line);
             AddSpot((0.25d, -0.5d), bathroom, WaitingSpotType.Line);
-            AddSpot((-0.75d, -0.5d), bathroom, WaitingSpotType.Line);
+            //AddSpot((-0.75d, -0.5d), bathroom, WaitingSpotType.Line);
             // Add sink spot
             AddSpot((1d, 2.5d), bathroom, WaitingSpotType.Sink);
 
@@ -73,7 +47,7 @@ namespace Assets.Scripts {
             AddSpot((2.25d, -0.5d), bathroom, WaitingSpotType.Line);
             AddSpot((1.25d, -0.5d), bathroom, WaitingSpotType.Line);
             AddSpot((0.25d, -0.5d), bathroom, WaitingSpotType.Line);
-            AddSpot((-0.75d, -0.5d), bathroom, WaitingSpotType.Line);
+            //AddSpot((-0.75d, -0.5d), bathroom, WaitingSpotType.Line);
             // Add sink spot
             AddSpot((1d, 2.5d), bathroom, WaitingSpotType.Sink);
 
@@ -102,8 +76,14 @@ namespace Assets.Scripts {
         static public GameSaveData FromJson(string json) {
             return JsonConvert.DeserializeObject<GameSaveData>(json);
         }
-        static private void ApplyToArea<T>(Area area, List<T> options) where T : Option {
-            foreach ( Option option in options ) {
+        /// <summary>
+        /// Called once per save data load to apply the existing layout to the scene.
+        /// </summary>
+        /// <typeparam name="T">Area type. Should be implicit.</typeparam>
+        /// <param name="area">Area to apply these layout options to</param>
+        /// <param name="spots">Layout spots to apply</param>
+        static private void ApplyToArea(Area area, List<LayoutSpot> spots) {
+            foreach ( LayoutSpot option in spots ) {
                 // Set the options area reference
                 option.Area = area;
 
@@ -112,14 +92,14 @@ namespace Assets.Scripts {
                 }
             }
         }
-        public static CustomerInteractable SpawnInteractable(Option option, InteractableType type) {
-            option.Current = type;
+        public static CustomerInteractable SpawnInteractable(LayoutSpot spot, InteractableType type) {
+            spot.Current = type;
             CustomerInteractable prefab = Prefabs.InteractablePrefabs[type];
-            Vector2 vector = option.Area.Bounds.GetGridPosition(option);
+            Vector2 vector = spot.Area.Bounds.GetGridPosition(spot);
             CustomerInteractable instance = UnityEngine.Object.Instantiate(prefab, vector, Quaternion.identity);
-            instance.Facing = option.Facing;
-            instance.Location = option.Area.Location;
-            option.Area.AddInteractable(instance);
+            instance.Facing = spot.Facing;
+            instance.Location = spot.Area.Location;
+            spot.Area.AddInteractable(instance);
             return instance;
         }
         public override string ToString() {

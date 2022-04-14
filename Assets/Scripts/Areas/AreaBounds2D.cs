@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Objects;
+using System;
 using UnityEngine;
 
 namespace Assets.Scripts {
@@ -36,9 +37,9 @@ namespace Assets.Scripts {
             var y = Bounds.min.y + ( position.Item2 * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);
         }
-        public Vector2 GetGridPosition(GameSaveData.Option option) {
-            var x = Bounds.min.x + ( option.X * (float)GridScaleX ) + ( GridScaleX / 2f );
-            var y = Bounds.min.y + ( option.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
+        public Vector2 GetGridPosition(LayoutSpot spot) {
+            var x = Bounds.min.x + ( spot.X * (float)GridScaleX ) + ( GridScaleX / 2f );
+            var y = Bounds.min.y + ( spot.Y * (float)GridScaleY ) + ( GridScaleY / 2f );
             return new Vector2((float)x, (float)y);
         }
         public AreaBounds2D(BoxCollider2D collider, int GridScaleX, int GridScaleY) {

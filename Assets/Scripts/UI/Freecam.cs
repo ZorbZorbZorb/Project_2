@@ -25,6 +25,9 @@ namespace Assets.Scripts.UI {
         public float zoomCurrent;
         public bool zooming;
 
+        public float Zoom => Camera.orthographicSize;
+        public Vector2 Pan => Camera.transform.position;
+
         public BoxCollider2D CameraBounds;
         private float xMin, xMax, yMin, yMax;
         private float halfCamWidth, halfCamHeight;

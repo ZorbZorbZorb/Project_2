@@ -8,14 +8,24 @@ using Random = UnityEngine.Random;
 namespace Assets.Scripts.Customers {
     [Serializable]
     public class CustomerManager {
-        public int MaxCustomers;
-        public List<Customer> Customers = new List<Customer>();
+
+        public int CountSeats => Bar.Singleton.Seats.Count;
+        public int CountWorkingSeats => Bar.Singleton.Seats
+            .Count(x => !x.IsSoiled);
+        public int CountBrokenSeats => Bar.Singleton.Seats
+            .Count(x => x.IsSoiled);
+        public int CountEmptyWorkingSeats => Bar.Singleton.Seats
+            .Count(x => !x.IsSoiled && x.OccupiedBy == null);
+        public int RemainingSpawns => CountWorkingSeats - Customers.Count(x => x.ActionState != CustomerActionState.Leaving);
+
         public IEnumerable<Customer> CustomersInBathroom => Customers
             .Where(x => x.Location == Location.BathroomM || x.Location == Location.BathroomF);
         public IEnumerable<Customer> CustomersInBar => Customers
             .Where(x => x.Location == Location.Bar || x.Location == Location.Hallway);
-        public bool AtCapacity => Customers.Count >= MaxCustomers;
+
+        public List<Customer> Customers = new List<Customer>();
         public GameObject CustomersHolder;
+
         public Customer CreateCustomer(bool desperate) {
             Customer newCustomer = UnityEngine.Object.Instantiate(Prefabs.PrefabCustomer, Navigation.CustomerSpawnpoint, Quaternion.identity);
             newCustomer.transform.SetParent(CustomersHolder.transform, true);
@@ -41,12 +51,16 @@ namespace Assets.Scripts.Customers {
             }
             // Else sit right down at the bar and wait
             if ( !enteredDoorway ) {
-                Seat seat = Bar.Singleton.GetOpenSeat();
+                Seat seat = Bar.Singleton.GetRandomOpenSeat();
                 newCustomer.Occupy(seat);
             }
 
             return newCustomer;
         }
+        public Customer CreateCustomer() {
+            return CreateCustomer(desperate: false);
+        }
+
         public void RemoveCustomer(Customer customer) {
             customer.StopOccupyingAll();
             Customers.Remove(customer);

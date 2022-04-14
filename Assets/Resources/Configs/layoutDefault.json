@@ -1,309 +1,542 @@
 {
-	"Night":1,
-	"Funds":200,
-	"Mens": [	
+	"Night": 1,
+	"Funds": 200,
+	"Mens": [
 		{
-		"X":0,
-		"Y":4,
-		"Options":["Sink" ],
-		"Current":"Sink",
-		"Facing":"South"
+			"X": 0,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Sink",
+					"Cost": 200
+				}
+			],
+			"Current": "Sink",
+			"Facing": "South"
 		},
 		{
-		"X":1,
-		"Y":4,
-		"Options":["Urinal", "Sink"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 1,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Sink",
+					"Cost": 200
+				},
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":2,
-		"Y":4,
-		"Options":["Toilet", "Urinal", "Sink"],
-		"Current":"None",
-		"Facing":"South"
-		},		
-		{
-		"X":3,
-		"Y":4,
-		"Options":["Toilet", "Urinal"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 2,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Sink",
+					"Cost": 200
+				},
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				},
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":4,
-		"Y":4,
-		"Options":["Toilet", "Urinal"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 3,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				},
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":5,
-		"Y":4,
-		"Options":["Toilet", "Urinal"],
-		"Current":"Toilet",
-		"Facing":"South"
+			"X": 4,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				},
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":0,
-		"Y":2,
-		"Options":["Urinal"],
-		"Current":"Urinal",
-		"Facing":"East"
+			"X": 5,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				},
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				}
+			],
+			"Current": "Toilet",
+			"Facing": "South"
 		},
 		{
-		"X":0,
-		"Y":0.5,
-		"Options":["Urinal"],
-		"Current":"Urinal",
-		"Facing":"East"
+			"X": 0,
+			"Y": 2,
+			"Options": [
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				}
+			],
+			"Current": "Urinal",
+			"Facing": "East"
+		},
+		{
+			"X": 0,
+			"Y": 0.5,
+			"Options": [
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				}
+			],
+			"Current": "Urinal",
+			"Facing": "East"
 		}
 	],
 	"Womens": [
 		{
-		"X":0,
-		"Y":4,
-		"Options":["Sink" ],
-		"Current":"Sink",
-		"Facing":"South"
+			"X": 0,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Sink",
+					"Cost": 200
+				}
+			],
+			"Current": "Sink",
+			"Facing": "South"
 		},
 		{
-		"X":1,
-		"Y":4,
-		"Options":["Toilet", "Sink"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 1,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Sink",
+					"Cost": 200
+				},
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":2,
-		"Y":4,
-		"Options":["Toilet", "Sink"],
-		"Current":"None",
-		"Facing":"South"
-		},		
-		{
-		"X":3,
-		"Y":4,
-		"Options":["Toilet"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 2,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Sink",
+					"Cost": 200
+				},
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":4,
-		"Y":4,
-		"Options":["Toilet"],
-		"Current":"Toilet",
-		"Facing":"South"
+			"X": 3,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":5,
-		"Y":4,
-		"Options":["Toilet"],
-		"Current":"Toilet",
-		"Facing":"South"
+			"X": 4,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				}
+			],
+			"Current": "Toilet",
+			"Facing": "South"
 		},
 		{
-		"X":0,
-		"Y":0.5,
-		"Options":["Urinal"],
-		"Current":"Urinal",
-		"Facing":"East"
+			"X": 5,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Toilet",
+					"Cost": 200
+				}
+			],
+			"Current": "Toilet",
+			"Facing": "South"
+		},
+		{
+			"X": 0,
+			"Y": 0.5,
+			"Options": [
+				{
+					"Type": "Urinal",
+					"Cost": 200
+				}
+			],
+			"Current": "Urinal",
+			"Facing": "East"
 		}
 	],
 	"Bar": [
 		{
-		"X":1,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 1,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":2,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
+			"X": 2,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		},
 		{
-		"X":3,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
+			"X": 3,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		},
 		{
-		"X":4,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
+			"X": 4,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		},
 		{
-		"X":5,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
+			"X": 5,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		},
 		{
-		"X":6,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
+			"X": 6,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		},
 		{
-		"X":7,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
+			"X": 7,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		},
 		{
-		"X":8,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 8,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
 		},
 		{
-		"X":9,
-		"Y":1,
-		"Options":["Seat"],
-		"Current":"None",
-		"Facing":"South"
+			"X": 9,
+			"Y": 1,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "None",
+			"Facing": "South"
+		},
+		{
+			"X": 1,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 2,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 3,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 4,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 5,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 6,
+			"Y": 3,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 1,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 2,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 3,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 4,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 5,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 6,
+			"Y": 4,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 1,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 2,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 3,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 4,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 5,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
+		},
+		{
+			"X": 6,
+			"Y": 5,
+			"Options": [
+				{
+					"Type": "Seat",
+					"Cost": 200
+				}
+			],
+			"Current": "Seat",
+			"Facing": "South"
 		}
-		
-		
-		
-		
-		,
-		{
-		"X":1,
-		"Y":3,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":2,
-		"Y":3,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-				{
-		"X":3,
-		"Y":3,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":4,
-		"Y":3,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},		{
-		"X":5,
-		"Y":3,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":6,
-		"Y":3,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		
-		{
-		"X":1,
-		"Y":4,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":2,
-		"Y":4,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-				{
-		"X":3,
-		"Y":4,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":4,
-		"Y":4,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},		{
-		"X":5,
-		"Y":4,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":6,
-		"Y":4,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		
-		
-		{
-		"X":1,
-		"Y":5,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":2,
-		"Y":5,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-				{
-		"X":3,
-		"Y":5,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":4,
-		"Y":5,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},		{
-		"X":5,
-		"Y":5,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
-		{
-		"X":6,
-		"Y":5,
-		"Options":["Seat"],
-		"Current":"Seat",
-		"Facing":"South"
-		},
 	]
 }

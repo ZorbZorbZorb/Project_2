@@ -19,30 +19,22 @@ public class Seat : CustomerInteractable {
     public override ReliefType RType => ReliefType.None;
     public override bool CanBeSoiled => true;
     public override bool ChangesCustomerSprite => true;
-    public SpriteRenderer Renderer;
+    
     public SeatType SeatType;
-    private void Start() {
-        Location = Location.Bar;
-        Renderer = gameObject.GetComponent<SpriteRenderer>();
-        if ( SeatType == SeatType.None ) {
-            throw new InvalidOperationException("Seat was not initiailized correctly");
-        }
-        Bar.Singleton.Seats.Add(this);
-    }
+
     private void Update() {
         if ( OccupiedBy != null && OccupiedBy.AtDestination ) {
-            Renderer.enabled = false;
+            MainSRenderer.enabled = false;
             return;
         }
         else {
-            Renderer.enabled = true;
+            MainSRenderer.enabled = true;
         }
         if ( IsSoiled ) {
-            //transform.Rotate(new Vector3(10, 0));
-            Renderer.sprite = Collections.SpriteStoolWet;
+            MainSRenderer.sprite = Collections.SpriteStoolWet;
         }
         else {
-            Renderer.sprite = Collections.SpriteStoolNormal;
+            MainSRenderer.sprite = Collections.SpriteStoolNormal;
         }
     }
 }

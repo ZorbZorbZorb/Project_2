@@ -92,5 +92,6 @@ public enum CustomerActionState {
     PantsUp,
     Peeing,
     WashingHands,
-    Wetting
+    Wetting,
+    Leaving
 }

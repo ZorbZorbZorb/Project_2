@@ -65,7 +65,9 @@
     <Compile Include="Assets\Scripts\EndOfPathInstruction.cs" />
     <Compile Include="Assets\Scripts\GameSaveData.cs" />
     <Compile Include="Assets\Scripts\Customers\Bladder.cs" />
+    <Compile Include="Assets\Scripts\Objects\LayoutOption.cs" />
     <Compile Include="Assets\Scripts\MathUtility.cs" />
+    <Compile Include="Assets\Scripts\Objects\LayoutSpot.cs" />
     <Compile Include="Assets\Scripts\Objects\Line.cs" />
     <Compile Include="Assets\Scripts\Customers\CustomerSpriteController.cs" />
     <Compile Include="Assets\Scripts\PathSpace.cs" />

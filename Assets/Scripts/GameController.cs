@@ -21,7 +21,7 @@ public partial class GameController : MonoBehaviour {
     public bool DisplayBuildMenuOnFirstNight = false;
     public int NightMaxTime = 30;
     public int NightMaxCustomerSpawnTime = 20;
-    [SerializeField, Range(15f,65f)]
+    [SerializeField, Range(15f, 65f)]
     public float CameraTolerangeTight = 18f;
     [SerializeField, Range(30f, 110f)]
     public float CameraTolerangeMid = 50f;
@@ -38,7 +38,7 @@ public partial class GameController : MonoBehaviour {
     [Header("Cheats")]
     public bool RapidBladderFill = false;
     public bool RapidBladderEmpty = false;
-    public bool RapidCustomerSpawn = false;
+    public bool SpawnEveryTick = false;
     public bool CustomersWillUseAnything = false;
     public bool InfiniteFunds = false;
     public bool NoLose = false;
@@ -89,7 +89,7 @@ public partial class GameController : MonoBehaviour {
 
     /// <summary><see cref="CustomerManager"/> singleton. Tracks custromers and handles spawning.</summary>
     [HideInInspector]
-    public CustomerManager CM;
+    public static CustomerManager CM;
     /// <summary><see cref="GameController"/> singleton</summary>
     [HideInInspector]
     public static GameController GC = null;
@@ -124,6 +124,9 @@ public partial class GameController : MonoBehaviour {
     public Text NightStartText;
     public Image NightStartOverlay;
 
+    public Vector2 LastPan;
+    public float LastZoom;
+
     #endregion
 
     private void Awake() {
@@ -152,9 +155,13 @@ public partial class GameController : MonoBehaviour {
         CustomerSpriteController.NewController('f', "Sprites/People/n");
     }
     void Start() {
+        // Create the auto-camera camera positions
         CameraPosition.AddPosition(Freecam.Center, 600);
         CameraPosition.AddPosition(Bathroom.BathroomM.transform.position, 500);
         CameraPosition.AddPosition(Bathroom.BathroomF.transform.position, 500);
+        // Set the pause/unpause last zoom
+        LastZoom = Freecam.MinZoom;
+        LastPan = Freecam.Center;
 
         // Freecam should always be attached to the main camera
         FC = Camera.main.GetComponent<Freecam>();
@@ -200,11 +207,10 @@ public partial class GameController : MonoBehaviour {
         }
         else {
             ReadyToStartNight = true;
-            CM.MaxCustomers = Bar.Singleton.Seats.Count;
         }
     }
     void Update() {
-        if (Input.anyKeyDown) {
+        if ( Input.anyKeyDown ) {
             HandleKeypresses();
         }
         if ( !ReadyToStartNight ) {
@@ -223,6 +229,7 @@ public partial class GameController : MonoBehaviour {
                 ResumeGame();
                 GameStarted = true;
                 CanPause = true;
+                FC.Locked = false;
                 CM.CreateCustomer(desperate: true);
 
                 // Debugging only
@@ -254,7 +261,7 @@ public partial class GameController : MonoBehaviour {
         }
 
         var deltaTime = Time.deltaTime;
-        if (RapidSimulation) {
+        if ( RapidSimulation ) {
             deltaTime *= 10f;
         }
         runTime += deltaTime;
@@ -263,13 +270,52 @@ public partial class GameController : MonoBehaviour {
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
             Think();
-            if (Autoplay) {
+            if ( Autoplay ) {
                 StupidIdiotAutoplayThing();
+            }
+            if (SpawnEveryTick) {
+                SpawnManyCustomers();
             }
             // Update time and funds display once per second.
             barTimeDisplay.text = barTime.ToString("hh:mm tt");
         }
 
+        void Think() {
+            // End the game if too many seats are soiled
+            if ( CM.CountBrokenSeats > CM.CountWorkingSeats  && !NoLose) {
+                GameEnd = true;
+                GameLost = true;
+                return;
+            }
+
+            // Stop spawning customers when its too late
+            if ( timeTicksElapsed >= NightMaxCustomerSpawnTime ) {
+                SpawningEnabled = false;
+
+                // End game at end time or everyone has left
+                if ( !CM.Customers.Any() || timeTicksElapsed >= NightMaxTime ) {
+                    GameEnd = true;
+                    return;
+                }
+            }
+
+            // Customer spawning
+            if ( SpawningEnabled && CM.RemainingSpawns > 0 ) {
+                ticksSinceLastSpawn++;
+                bool spawnNow = Random.Range(0, 6) == 0;
+                if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
+                    ticksSinceLastSpawn = 0;
+                    CM.CreateCustomer(desperate: false);
+                }
+            }
+
+            // Update the bar time
+            if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
+                if ( !FreezeTime ) {
+                    AdvanceTime();
+                }
+            }
+        }
         void HandleKeypresses() {
             // Pressing escape will pause the game
             if ( Input.GetKeyDown(KeyCode.Escape) ) {
@@ -291,93 +337,50 @@ public partial class GameController : MonoBehaviour {
             }
 
         }
-    }
-    private void StupidIdiotAutoplayThing() {
-        var remaining = CM.MaxCustomers - CM.Customers.Count;
-        if ( RapidCustomerSpawn ) {
-            for ( int i = 0; i < Math.Min(remaining, 4); i++ ) {
-                CM.CreateCustomer(desperate: true);
-            }
-        }
-        foreach ( Customer customer in CM.Customers ) {
-            if ( customer.AtDestination ) {
-                if ( customer.Location == Location.Bar ) {
-                    customer.Leave();
-                    break;
-                }
-                if ( customer.Location == Location.Hallway ) {
-                    var bathroom = customer.GetCurrentBathroom();
-                    if ( bathroom.Line.IsNextInLine(customer) ) {
-                        if ( bathroom.HasToiletAvailable ) {
-                            customer.MenuOptionGotoToilet();
-                            break;
-                        }
-                        else if ( bathroom.HasUrinalAvailable && Customer.WillUseUrinal(customer)) {
-                            customer.MenuOptionGotoUrinal();
-                            break;
-                        }
-                        else if (bathroom.HasSinkForRelief && Customer.WillUseSink(customer) ) {
-                            customer.MenuOptionGotoSink();
-                            break;
-                        }
-                        else if ( bathroom.HasWaitingSpot ) {
-                            customer.MenuOptionGotoWaiting();
-                            break;
+        void StupidIdiotAutoplayThing() {
+            foreach ( Customer customer in CM.Customers ) {
+                if ( customer.AtDestination ) {
+                    if ( customer.Location == Location.Bar ) {
+                        customer.Leave();
+                        break;
+                    }
+                    if ( customer.Location == Location.Hallway ) {
+                        var bathroom = customer.GetCurrentBathroom();
+                        if ( bathroom.Line.IsNextInLine(customer) ) {
+                            if ( bathroom.HasToiletAvailable ) {
+                                customer.MenuOptionGotoToilet();
+                                break;
+                            }
+                            else if ( bathroom.HasUrinalAvailable && Customer.WillUseUrinal(customer) ) {
+                                customer.MenuOptionGotoUrinal();
+                                break;
+                            }
+                            else if ( bathroom.HasSinkForRelief && Customer.WillUseSink(customer) ) {
+                                customer.MenuOptionGotoSink();
+                                break;
+                            }
+                            else if ( bathroom.HasWaitingSpot ) {
+                                customer.MenuOptionGotoWaiting();
+                                break;
+                            }
                         }
                     }
                 }
             }
+            // TODO: Convert this into its own debug toggle
+            foreach ( var seat in Bar.Singleton.Seats ) {
+                if ( seat.OccupiedBy == null && seat.IsSoiled ) {
+                    seat.IsSoiled = false;
+                }
+            }
         }
-        // TODO: Convert this into its own debug toggle
-        foreach(var seat in Bar.Singleton.Seats) {
-            if (seat.OccupiedBy == null && seat.IsSoiled) {
-                seat.IsSoiled = false;
+        void SpawnManyCustomers() {
+            if (CM.RemainingSpawns > 0) {
+                CM.CreateCustomer(true);
             }
         }
     }
-    private void Think() {
-        // Update max seating in bar
-        CM.MaxCustomers = Bar.Singleton.Seats
-            .Where(x => !x.IsSoiled)
-            .Count();
 
-        // End the game if too many seats are soiled
-        if ( CM.MaxCustomers < ( Bar.Singleton.Seats.Count / 2 ) ) {
-            if ( !NoLose ) {
-                GameEnd = true;
-                GameLost = true;
-                return;
-            }
-        }
-
-        // Stop spawning customers when its too late
-        if ( timeTicksElapsed >= NightMaxCustomerSpawnTime ) {
-            SpawningEnabled = false;
-
-            // End game at end time or everyone has left
-            if ( !CM.Customers.Any() || timeTicksElapsed >= NightMaxTime ) {
-                GameEnd = true;
-                return;
-            }
-        }
-
-        // Customer spawning
-        if ( SpawningEnabled && !CM.AtCapacity ) {
-            ticksSinceLastSpawn++;
-            bool spawnNow = Random.Range(0, 6) == 0;
-            if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
-                ticksSinceLastSpawn = 0;
-                Customer customer = CM.CreateCustomer(desperate: false);
-            }
-        }
-
-        // Update the bar time
-        if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
-            if (!FreezeTime) {
-                AdvanceTime();
-            }
-        }
-    }
     public void ToggleGamePaused() {
         if ( CanPause ) {
             if ( GamePaused ) {
@@ -464,7 +467,6 @@ public partial class GameController : MonoBehaviour {
     }
     #endregion
 
-    #region Menus    
     /// <summary>
     /// Returns to the main menu without saving
     /// <para>The main menu scene should always be scene index 0, which opens on game start</para>
@@ -480,7 +482,7 @@ public partial class GameController : MonoBehaviour {
         InBuildMenu = true;
         CanPause = false;
         Time.timeScale = 0;
-        BuildMenu.Open();
+        BuildMenu.Start();
 
         // Update build button states
         var position = FC.AutoPanning ? FC.PanIntent : FC.transform.position;
@@ -494,8 +496,7 @@ public partial class GameController : MonoBehaviour {
         InBuildMenu = false;
         ReadyToStartNight = true;
         Time.timeScale = 1;
-        BuildMenu.Close();
-        CM.MaxCustomers = Bar.Singleton.Seats.Count;
+        BuildMenu.End();
 
         FC.ZoomTo(Freecam.MinZoom);
         FC.PanTo(Freecam.Center);
@@ -507,7 +508,9 @@ public partial class GameController : MonoBehaviour {
         if ( InBuildMenu ) {
             var result = CameraPosition.Navigate(orientation, position);
             if ( result != null ) {
-                // Sucessfully moved the camera. Recalculate camera positions to update the buttons.
+                // Sucessfully moved the camera.
+                BuildMenu.CloseBuildOptionsMenu();
+                // Recalculate camera positions to update the buttons.
                 CameraPosition.UpdatePositions(result.Pan);
                 NorthButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.North));
                 SouthButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.South));
@@ -516,7 +519,7 @@ public partial class GameController : MonoBehaviour {
             }
         }
         else {
-            CameraPosition.Navigate(Orientation.North, position);
+            CameraPosition.Navigate(orientation, position);
         }
     }
     /// <summary>
@@ -528,8 +531,10 @@ public partial class GameController : MonoBehaviour {
         GamePaused = true;
         FC.Locked = true;
         // These two shouldnt be done in production, its just a bandaid. Add a cached last pan last zoom to return to ???
-        FC.ZoomTo(Freecam.MinZoom, instant: true);
-        FC.UnpanCamera();
+        LastZoom = FC.Zoom;
+        LastPan = FC.Pan;
+        FC.ZoomTo(Freecam.MinZoom);
+        FC.PanTo(Freecam.Center);
         // Close all open menus.
         Menu.CloseAllOpenMenus();
         PauseMenu.Open();
@@ -546,10 +551,11 @@ public partial class GameController : MonoBehaviour {
         Time.timeScale = 1;
         GamePaused = false;
         FC.Locked = false;
+        FC.ZoomTo(LastZoom);
+        FC.PanTo(LastPan);
         PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
-    #endregion
 
     /// <summary>
     /// Advances the night forward one time tick.

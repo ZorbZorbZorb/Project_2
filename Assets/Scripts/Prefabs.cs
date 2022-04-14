@@ -13,6 +13,7 @@ namespace Assets.Scripts {
         static public Seat PrefabSeat = Resources.Load<Seat>("Prefabs/Seat");
         static public BarTable PrefabTable = Resources.Load<BarTable>("Prefabs/Table");
         static public BuildClickable PrefabClickable = Resources.Load<BuildClickable>("Prefabs/Clickable");
+        static public GameObject PrefabBuildButton = Resources.Load<GameObject>("Prefabs/BuildButton");
 
         static public Dictionary<InteractableType, CustomerInteractable> InteractablePrefabs = 
             new Dictionary<InteractableType, CustomerInteractable>() {
