@@ -9,22 +9,27 @@ namespace Assets.Scripts.Customers {
         public double AverageMax = 700;
         [SerializeField]
         public Customer customer;
-        public double Stomach;  // The stomach is stored in the bladder
-        public double Amount;
-        public double Max;
-        public double DrainRate;
-        public double DrainRateNow;
+        public float Stomach;  // The stomach is stored in the bladder
+        public float Amount;
+        public float Max;
+        public float DrainRate;
+        public float DrainRateNow;
         public float NormalizedPercentEmptied;
         public float NormalizedPercentEmptiedStart;
-        public double FillRate;
-        public double FeltNeedCurve;  // Changes how badly this customer feels the need to go. multiplier.
-        public double FeltNeed;  // How badly this customer thinks they need to go, 0.0 to 1.0
-        public double ControlRemaining;
-        public double LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
-        public double LossOfControlTimeNow;
+        public float FillRate;
+        public float FeltNeedCurve;  // Changes how badly this customer feels the need to go. multiplier.
+        public float FeltNeed;  // How badly this customer thinks they need to go, 0.0 to 1.0
+        public float ControlRemaining;
+        public float LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
+        public float LossOfControlTimeNow;
         public bool StruggleStopPeeing;
         public bool StruggleStopSpurt = false;
         public bool StruggleStopSpurtNow = false;
+
+        /// <summary>
+        /// Amount to multiply the normal drain rate by, to make the customer pee faster when their bladder is fuller
+        /// </summary>
+        public float DrainMultiplier => Mathf.Min( 0.75f + Mathf.Pow(0.7f * Amount / Max, 2), 2f);
 
         public DateTime LastPeedAt;
         public int DrinksHad;
@@ -37,7 +42,7 @@ namespace Assets.Scripts.Customers {
 
         public bool StartedLosingControlThisFrame;
 
-        public double Percentage => Amount / Max;
+        public float Percentage => Amount / Max;
 
         /// <summary>
         /// Forces bladder to hold on a bit longer by resetting loss of control time.
@@ -52,7 +57,7 @@ namespace Assets.Scripts.Customers {
             ResetFrameStates();
 
             // Set felt need
-            FeltNeed = Math.Min(Math.Pow(Percentage, FeltNeedCurve), 1.0d);
+            FeltNeed = Mathf.Min(Mathf.Pow(Percentage, FeltNeedCurve), 1.0f);
 
             // If Emptying
             if ( Emptying ) {
@@ -71,20 +76,20 @@ namespace Assets.Scripts.Customers {
                     // Struggle to stop peeing
                     else {
                         if ( StruggleStopSpurtNow ) {
-                            if ( DrainRateNow > DrainRate * 1.5d ) {
+                            if ( DrainRateNow > DrainRate * 1.5f ) {
                                 StruggleStopSpurtNow = false;
                             }
                             else {
-                                DrainRateNow += ( 15d * customer.DeltaTime );
+                                DrainRateNow += ( 15f * customer.DeltaTime );
                             }
                         }
                         else {
                             // Guys will be better at interrupting peeing than girls
                             if ( customer.Gender == 'm' ) {
-                                DrainRateNow -= ( 16d * customer.DeltaTime );
+                                DrainRateNow -= ( 16f * customer.DeltaTime );
                             }
                             else {
-                                DrainRateNow -= ( 8d * customer.DeltaTime );
+                                DrainRateNow -= ( 8f * customer.DeltaTime );
                             }
                         }
                         // To make it more interesting heres some naive for spurting when stopping
@@ -103,7 +108,7 @@ namespace Assets.Scripts.Customers {
             // If Losing Control
             else if ( LosingControl ) {
                 DoBladderFill();
-                double timeToSubtract = 1 * customer.DeltaTime;
+                float timeToSubtract = 1 * customer.DeltaTime;
                 LossOfControlTimeNow -= timeToSubtract;
                 if ( LossOfControlTimeNow <= 0 ) {
                     LosingControl = false;
@@ -125,27 +130,27 @@ namespace Assets.Scripts.Customers {
         /// Fill a customers bladder. Called once per update
         /// </summary>
         private void DoBladderFill() {
-            double amountToAdd = FillRate * customer.DeltaTime;
+            float amountToAdd = FillRate * customer.DeltaTime;
             if ( GameController.GC.RapidBladderFill ) {
                 amountToAdd *= 3;
             }
             Amount += amountToAdd;
             if ( Stomach > 0 ) {
-                amountToAdd = customer.DeltaTime * ( 2 + ( Stomach / 200 ) );
+                amountToAdd = customer.DeltaTime * ( 2f + ( Stomach / 200f ) );
                 Stomach -= amountToAdd;
                 Amount += amountToAdd;
             }
-            double percentFull = Percentage;
-            if ( percentFull > 0.8d && percentFull < 1.0d ) {
-                ControlRemaining -= 0.5 * customer.DeltaTime;
-                if ( ControlRemaining < 0 ) {
-                    ControlRemaining = 0;
+            float percentFull = Percentage;
+            if ( percentFull > 0.8f && percentFull < 1.0f ) {
+                ControlRemaining -= 0.5f * customer.DeltaTime;
+                if ( ControlRemaining < 0f ) {
+                    ControlRemaining = 0f;
                 }
             }
-            else if ( percentFull > 1.0d ) {
-                ControlRemaining -= 5 * customer.DeltaTime;
-                if ( ControlRemaining < 0 ) {
-                    ControlRemaining = 0;
+            else if ( percentFull > 1.0f ) {
+                ControlRemaining -= 5f * customer.DeltaTime;
+                if ( ControlRemaining < 0f ) {
+                    ControlRemaining = 0f;
                 }
             }
         }
@@ -153,22 +158,25 @@ namespace Assets.Scripts.Customers {
         /// Empty a customers bladder. Called once per update
         /// </summary>
         private void DoBladderEmpty() {
-            double amountToRemove = Math.Min(DrainRateNow * customer.DeltaTime, Amount);
+            float amountToRemove = DrainRateNow * DrainMultiplier * customer.DeltaTime;
+            
             if ( GameController.GC.RapidBladderEmpty ) {
-                amountToRemove *= 3;
+                amountToRemove *= 3f;
             }
+
             Amount -= amountToRemove;
-            if ( Percentage < 0.9d ) {
+            if ( Percentage < 0.9f ) {
                 LosingControl = false;
             }
-            if ( Amount < 1d ) {
+            if ( Amount < 1f ) {
+                Amount = 0f;
                 Emptying = false;
                 Wetting = false;
                 ShouldWetNow = false;
                 DrainRateNow = DrainRate;
                 LastPeedAt = DateTime.Now;
-                if ( ControlRemaining < 1d ) {
-                    ControlRemaining = 1d;
+                if ( ControlRemaining < 1f ) {
+                    ControlRemaining = 1f;
                 }
             }
         }
@@ -181,23 +189,23 @@ namespace Assets.Scripts.Customers {
         public void SetupBladder(Customer customer, int min, int max) {
             // Make guys able to hold on longer than girls can after they start losing control
             if ( customer.Gender == 'm' ) {
-                LossOfControlTime = 20d;
+                LossOfControlTime = 20f;
                 LossOfControlTimeNow = LossOfControlTime;
             }
             else {
 
-                LossOfControlTime = 10d;
+                LossOfControlTime = 10f;
                 LossOfControlTimeNow = LossOfControlTime;
             }
 
             // Randomly give maximum bladder size from 550 to 1500
             Max = Random.Range(400, 1000);
             // Randomly give fullness of min% to max%
-            double fullness = 0.01d * Random.Range(min, max);
+            float fullness = 0.01f * Random.Range(min, max);
             Amount = fullness * Max;
             // Subtract some control depending on how full they already are
-            if ( fullness > 0.8d ) {
-                ControlRemaining -= fullness * 100;
+            if ( fullness > 0.8f ) {
+                ControlRemaining -= fullness * 100f;
             }
 
             //https://www.desmos.com/calculator/ehsasufatr
@@ -205,18 +213,18 @@ namespace Assets.Scripts.Customers {
             // 0.5 resistance results in them getting desperate fast but staying that way for a long time
             // 2.0 resistance results in them showing almost nothing until bursting to go
             FeltNeedCurve = Random.Range(0.5f, 2f);
-            FeltNeed = Math.Min(Math.Pow(Percentage, FeltNeedCurve), 1.0d);
+            FeltNeed = Mathf.Min(Mathf.Pow(Percentage, FeltNeedCurve), 1.0f);
 
             // Now guess how many drinks they've had since last goingto be this desperate
             DrinksHad = (int)Math.Round(1 + Math.Pow(( Percentage + 1 ), 2.6));
 
-            double secondsSincePastPee = ( Amount / FillRate ) + ( ( ( Max * 0.4d ) / FillRate ) * FeltNeedCurve );
+            double secondsSincePastPee = ( Amount / FillRate ) + ( ( ( Max * 0.4f ) / FillRate ) * FeltNeedCurve );
             secondsSincePastPee *= 3.5d;
             LastPeedAt = DateTime.Now.AddSeconds(-Math.Round(secondsSincePastPee));
         }
 
-        public Bladder(double stomach = 0, double amount = 0, double max = 650, double drainRate = 30, double fillRate = 0.8d, double controlRemaining = 130,
-            double lossOfControlTime = 10) {
+        public Bladder(float stomach = 0f, float amount = 0f, float max = 650f, float drainRate = 30f, float fillRate = 0.8f, float controlRemaining = 130f,
+            float lossOfControlTime = 10f) {
 
             Stomach = stomach;
             Amount = amount;

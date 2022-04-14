@@ -299,7 +299,7 @@ namespace Assets.Scripts.Customers {
         public void BuyDrink() {
             //Debug.Log($"Customer {UID} bought a drink");
             LastDrinkAt = TotalTimeAtBar;
-            bladder.Stomach += Bar.DrinkAmount;
+            bladder.Stomach += (float)Bar.DrinkAmount;
             //Funds -= Bar.DrinkCost;
             //GameController.AddFunds(Bar.DrinkCost);
         }
@@ -809,7 +809,7 @@ namespace Assets.Scripts.Customers {
             Emotes.ShowBladderCircle(true);
 
             // Make them pee slower if they don't need to go badly to incentivize making them hold it longer
-            bladder.DrainRateNow = bladder.DrainRate * 0.75;
+            bladder.DrainRateNow = bladder.DrainRate * 0.75f;
             // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
             RemainingUrinateStopDelay = UrinateStopDelay;
             if ( bladder.LosingControl ) {

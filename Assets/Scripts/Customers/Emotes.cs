@@ -53,7 +53,7 @@ namespace Assets.Scripts.Customers {
         void EmoteUpdate() {
             // Update emotes
             if ( currentEmote != null ) {
-                // Abort if emote is permanent
+                // Abort if emote is permanen-t
                 if ( remaining == null ) {
                     return;
                 }
