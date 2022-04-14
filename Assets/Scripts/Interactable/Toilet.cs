@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Toilet : Relief {
     public override InteractableType IType => InteractableType.Toilet;
-    public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 0, z = 1 };
+    public override Vector3 CustomerPositionF => transform.position + new Vector3() { x = 0, y = 9, z = 1 };
     public override Vector3 CustomerPositionM => transform.position + new Vector3() { x = 0, y = -15, z = 1 };
     public override ReliefType RType => ReliefType.Toilet;
     public override bool HidesCustomer => true;

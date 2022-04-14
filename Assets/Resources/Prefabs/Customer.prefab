@@ -1268,11 +1268,13 @@ MonoBehaviour:
   Location: 0
   Occupying: {fileID: 0}
   Emotes:
-    BladderCircleTransform: {fileID: 1102209947407415471}
     EmoteSpriteRenderer: {fileID: 1102209945827594975}
-    BladderAmountText: {fileID: 1102209947233977430}
-    Canvas: {fileID: 2162051570226625202}
     BladderDisplay: {fileID: 1102209946176724241}
+    Canvas: {fileID: 2162051570226625202}
+    BladderAmountText: {fileID: 1102209947233977430}
+    SpriteBladderTop: {fileID: 1102209947407415470}
+    SpriteBladderBottom: {fileID: 1102209947147953870}
+    BladderCircleTransform: {fileID: 1102209947407415471}
     Customer: {fileID: 1102209946964943228}
   BathroomMenu:
     Enabled: 0

@@ -5,19 +5,21 @@ using UnityEngine.UI;
 namespace Assets.Scripts.Customers {
     [Serializable]
     public class Emotes {
-        // https://i.imgur.com/Zul9DoY_d.webp?maxwidth=760&fidelity=grand
-        [SerializeField]
-        public RectTransform BladderCircleTransform;
-        [SerializeField]
         public SpriteRenderer EmoteSpriteRenderer;
-        [SerializeField]
-        public Text BladderAmountText;
-        public Canvas Canvas;
+
         public GameObject BladderDisplay;
+        public Canvas Canvas;
+        public Text BladderAmountText;
+        public SpriteRenderer SpriteBladderTop;
+        public SpriteRenderer SpriteBladderBottom;
+        public RectTransform BladderCircleTransform;
+
         const double bladderWidthCalculationFactor1 = -0.6d;
         const double bladderWidthCalculationFactor2 = 1.2d;
         const double bladderWidthCalculationFactor3 = 1.8d;
         const double bladderHeightCalculationFactor1 = 0.2;
+
+        private Color bladderColorNormal;
 
         public Emote currentEmote = null;
         public float? remaining = null;
@@ -30,12 +32,12 @@ namespace Assets.Scripts.Customers {
             // Update bladder display
             BladderDisplayUpdate();
             // Flip emotes if need be
-            if (Customer.Occupying?.Facing == Objects.Orientation.East) {
-                if (!flipped) {
+            if ( Customer.Occupying?.Facing == Objects.Orientation.East ) {
+                if ( !flipped ) {
                     FlipEmoteX();
                 }
             }
-            else if (flipped) {
+            else if ( flipped ) {
                 FlipEmoteX();
             }
 
@@ -67,35 +69,56 @@ namespace Assets.Scripts.Customers {
         }
         void BladderDisplayUpdate() {
             // Update bladder display
-            if (bladderCircleActive) {
+            if ( bladderCircleActive ) {
                 double width;
                 double height;
                 double value;
                 double factor;
-                double multiplier;
-                double scaleX = 80f;
-                double scaleY = 80f;
+                double scaleX = 160f;
+                double scaleY = 160f;
 
                 // Note, Code breaks down at bladder sizes over AverageMax * 2.
                 factor = Customer.bladder.Max / Customer.bladder.AverageMax;
-                multiplier = ( ( (factor / 2) * Math.PI ) - Math.PI / 2 ) * 0.5;
-                multiplier = Math.Max(0.5, Math.Min(1.5, factor));
+                double multiplier = ( ( ( factor / 2 ) * Math.PI ) - Math.PI / 2 ) * 0.5;
+                multiplier = Math.Max(0.5, Math.Min(1.5, multiplier));
 
                 value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
-                width = ( Math.Sin(( (value * 1.2d )+ bladderWidthCalculationFactor1 ) * 2.5) + bladderWidthCalculationFactor2 ) / bladderWidthCalculationFactor3;
+                width = ( Math.Sin(( ( value * 1.2d ) + bladderWidthCalculationFactor1 ) * 2.5) + bladderWidthCalculationFactor2 ) / bladderWidthCalculationFactor3;
                 height = Math.Max(0.15, Customer.bladder.Percentage / 1.1 + bladderHeightCalculationFactor1);
 
+                // Update the size
                 double x = height * multiplier * scaleX;
                 double y = width * multiplier * scaleY;
-
                 BladderCircleTransform.localScale = new Vector3((float)x, (float)y);
 
                 // Update text display
                 BladderAmountText.text = $"{Math.Round(Customer.bladder.Amount, 0)}";
+
+                // Fade the display if too low amount
+                if ( Customer.bladder.Amount < 250 ) {
+                    Color colorText = new Color(1f, 1f, 1f, 0f);
+                    Color color = new Color(SpriteBladderTop.color.r, SpriteBladderTop.color.g, SpriteBladderTop.color.g, 0f);
+                    BladderAmountText.color = colorText;
+                    SpriteBladderTop.color = color;
+                    SpriteBladderBottom.color = color;
+                }
+                else if ( Customer.bladder.Amount < 500 ) {
+                    float a = ( (float)Customer.bladder.Amount - 450f ) / 50f;
+                    Color colorText = new Color(0f, 0f, 0f, Mathf.Clamp(a, 0f, 1f));
+                    Color color = bladderColorNormal * new Vector4(1f, 1f, 1f, Mathf.Clamp(a, 0f, 1f));
+                    BladderAmountText.color = colorText;
+                    SpriteBladderTop.color = color;
+                    SpriteBladderBottom.color = color;
+                }
+                else {
+                    SpriteBladderTop.color = bladderColorNormal;
+                    SpriteBladderBottom.color = bladderColorNormal;
+                    BladderAmountText.color = new Color(0f, 0f, 0f, 1f);
+                }
             }
         }
         public void ShowBladderCircle(bool value) {
-            if (bladderCircleActive != value) {
+            if ( bladderCircleActive != value ) {
                 bladderCircleActive = value;
                 BladderDisplay.SetActive(value);
             }
@@ -115,6 +138,7 @@ namespace Assets.Scripts.Customers {
         }
 
         public void Start() {
+            bladderColorNormal = SpriteBladderTop.color;
             BladderDisplay.SetActive(false);
             bladderCircleActive = false;
             Canvas.sortingLayerName = "AboveBlockSight";
