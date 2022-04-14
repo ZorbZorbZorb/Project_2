@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,13 +16,19 @@ public class MainMenuController : MonoBehaviour {
     [SerializeField] public Text TextContinue;
 
     void Start() {
-        if (GameSaveData.Exists(0)) {
-            GameSaveData data = GameSaveData.Import(1);
-            TextContinue.text = $"Continue (Night {data.Night})";
-            ButtonContinue.interactable = true;
+        if (GameSaveData.Exists(1)) {
+            try {
+                GameSaveData data = GameSaveData.Import(1);
+                TextContinue.text = $"Continue (Night {data.Night})";
+                ButtonContinue.interactable = true;
+                ButtonContinue.onClick.AddListener(ContinueGame);
+            }
+            catch {
+                Debug.LogError("Save data load failed");
+                TextContinue.text = $"Save data load failed";
+            }
         }
 
-        ButtonContinue.onClick.AddListener(ContinueGame);
         ButtonNewGame.onClick.AddListener(NewGame);
         ButtonQuit.onClick.AddListener(Quit);
     }
