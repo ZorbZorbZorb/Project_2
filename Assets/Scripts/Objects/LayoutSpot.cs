@@ -11,6 +11,9 @@ namespace Assets.Scripts.Objects {
         public List<LayoutOption> Options;
         public Orientation Facing;
 
+        // Here is where I could put a "Depends-On-Spot", where you can't build here
+        //   until you build a nearby or dependent spot first! That could be cool.
+
         [JsonIgnore]
         public Alignment Alignment => Facing == Orientation.North || Facing == Orientation.South
         ? Alignment.Vertical

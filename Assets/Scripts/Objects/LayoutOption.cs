@@ -11,5 +11,11 @@ namespace Assets.Scripts.Objects {
         //public Action SpawnAction => () => { BuildClickable.HandleSpawn(spot, option); };
         // Condition for build, such as achievmenet should be in this class?
 
+        [JsonIgnore, NonSerialized]
+        public LayoutSpot LayoutSpot;
+        [JsonIgnore]
+        public CustomerInteractable Prefab => Type != InteractableType.None  
+            ? Prefabs.InteractablePrefabs[Type]
+            : null;
     }
 }

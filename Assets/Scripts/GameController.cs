@@ -157,8 +157,6 @@ public partial class GameController : MonoBehaviour {
     void Start() {
         // Create the auto-camera camera positions
         CameraPosition.AddPosition(Freecam.Center, 600);
-        CameraPosition.AddPosition(Bathroom.BathroomM.transform.position, 500);
-        CameraPosition.AddPosition(Bathroom.BathroomF.transform.position, 500);
         // Set the pause/unpause last zoom
         LastZoom = Freecam.MinZoom;
         LastPan = Freecam.Center;

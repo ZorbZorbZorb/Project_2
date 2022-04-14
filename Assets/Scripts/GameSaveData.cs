@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts {
@@ -16,6 +17,9 @@ namespace Assets.Scripts {
         public List<LayoutSpot> Womens;
         [HideInInspector]
         public List<LayoutSpot> bar;
+
+        [JsonIgnore]
+        public IEnumerable<LayoutSpot> All => Mens.Union(Womens).Union(bar);
 
         public int Night;
         public double Funds;
@@ -74,7 +78,16 @@ namespace Assets.Scripts {
             }
         }
         static public GameSaveData FromJson(string json) {
-            return JsonConvert.DeserializeObject<GameSaveData>(json);
+            var result = JsonConvert.DeserializeObject<GameSaveData>(json);
+
+            // Set layout spot references
+            foreach ( LayoutSpot spot in result.All ) {
+                foreach ( LayoutOption option in spot.Options) {
+                    option.LayoutSpot = spot;
+                }
+            }
+
+            return result;
         }
         /// <summary>
         /// Called once per save data load to apply the existing layout to the scene.

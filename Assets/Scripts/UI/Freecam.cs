@@ -156,7 +156,7 @@ namespace Assets.Scripts.UI {
             // Stop zooming if finished approaching
             if ( Mathf.Abs(zoomCurrent - zoomIntent) < 0.2f ) {
                 zooming = false;
-                zoomIntent = zoomCurrent;
+                zoomCurrent = zoomIntent;
             }
 
             // Recalculate the camera size and overages because the camera size has changed

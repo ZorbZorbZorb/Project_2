@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Areas;
 using Assets.Scripts.Objects;
+using Assets.Scripts.UI;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -35,7 +36,7 @@ namespace Assets.Scripts {
 
         private List<BuildClickable> clickables = new List<BuildClickable>();
 
-        private List<Button> BuildPanelButtons = new List<Button>();
+        private List<BuildButton> BuildPanelButtons = new List<BuildButton>();
 
         public void Start() {
             enabled = true;
@@ -76,27 +77,27 @@ namespace Assets.Scripts {
                     throw new NotImplementedException();
             }
 
-            GameObject CreateButton(LayoutOption option, double x, double y) {
+            BuildButton CreateButton(LayoutOption option, double x, double y) {
                 // Abandon all hope ye who enter this function
                 Vector2 vector = BuildOptionsArea.GetGridPosition((x, y));
-                GameObject instance = UnityEngine.Object.Instantiate(Prefabs.PrefabBuildButton, vector, Quaternion.identity, BuildOptionsPanel.transform);
-                Button button = instance.GetComponent<Button>();
+                BuildButton button = UnityEngine.Object.Instantiate(Prefabs.PrefabBuildButton, vector, Quaternion.identity, BuildOptionsPanel.transform);
                 button.transform.localScale *= 2;
-                button.image.sprite = spot.Alignment == Alignment.Horizontal
+                button.Image.sprite = spot.Alignment == Alignment.Horizontal
                     ? Collections.HorizontalInteractableSprites[option.Type]
                     : Collections.VerticalInteractableSprites[option.Type];
                 button.GetComponentInChildren<TMP_Text>().text = $"${option.Cost}";
-                button.onClick.AddListener(() => {
+                button.Button.onClick.AddListener(() => {
                     BuildClickable.HandleSpawn(spot, option);
                 });
                 BuildPanelButtons.Add(button);
-                return instance;
+                return button;
             }
         }
         public void CloseBuildOptionsMenu() {
             BuildPanelButtons.ForEach(x => UnityEngine.Object.Destroy(x.gameObject));
             BuildPanelButtons.Clear();
             BuildOptionsPanel.SetActive(false);
+            RebuildClickables();
         }
 
         public void RebuildClickables() {

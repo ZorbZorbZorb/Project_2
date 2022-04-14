@@ -117,6 +117,7 @@ namespace Assets.Scripts.Customers {
         public void Start() {
             BladderDisplay.SetActive(false);
             bladderCircleActive = false;
+            Canvas.sortingLayerName = "AboveBlockSight";
         }
     }
 }

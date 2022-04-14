@@ -31,21 +31,36 @@ namespace Assets.Scripts.Objects {
             //}
 
             // If only one option, show graphic
-            if (Spot.Options.Count == 1) {
-                AltSRenderer.sprite = spriteLookup[Spot.Options[0].Type];
-                Text.text = $"${Spot.Options[0].Cost}";
+            if ( Spot.Options.Count == 1 ) {
+                LayoutOption option = Spot.Options[0];
+                AltSRenderer.sprite = spriteLookup[option.Type];
+                Text.text = $"${option.Cost}\r\n{option.Prefab.DisplayName}";
             }
             else {
-                Text.enabled = false;
+                double LowestCost = Spot.Options.Max(x => x.Cost);
+                double highestCost = Spot.Options.Max(x => x.Cost);
+                if (highestCost == LowestCost) {
+
+                }
+                Text.text = $"${Spot.Options.Min(x => x.Cost)}\r\nMultiple Options...";
             }
+            Text.enabled = false;
         }
         private void OnMouseDown() {
-            if (Spot.Options.Count > 1) {
+            if ( Spot.Options.Count > 1 ) {
                 GameController.GC.BuildMenu.OpenBuildOptionsMenu(Spot);
             }
             else {
                 HandleSpawn(Spot, Spot.Options[0]);
             }
+        }
+
+        // On hover, text should display describing the spot
+        private void OnMouseEnter() {
+            Text.enabled = true;
+        }
+        private void OnMouseExit() {
+            Text.enabled = false;
         }
 
         public static void HandleSpawn(LayoutSpot spot, LayoutOption option) {

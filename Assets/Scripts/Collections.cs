@@ -47,7 +47,7 @@ public static class Collections {
     public static readonly Dictionary<InteractableType, Sprite> VerticalInteractableSprites =
         new Dictionary<InteractableType, Sprite>() {
             { InteractableType.Sink, spriteSink },
-            { InteractableType.Toilet, spriteStallClosed },
+            { InteractableType.Toilet, spriteToiletClosed },
             { InteractableType.Seat, SpriteStoolNormal },
             { InteractableType.Urinal, spriteUrinal },
             { InteractableType.Table, spriteTable }
