@@ -44,13 +44,14 @@ namespace Assets.Scripts {
         }
         public AreaBounds2D(BoxCollider2D collider, int GridScaleX, int GridScaleY) {
             this.collider = collider;
+            Debug.Log(collider.bounds.center);
             this.GridScaleX = GridScaleX;
             this.GridScaleY = GridScaleY;
             UpdateArea();
         }
         public void UpdateArea() {
             collider.enabled = true;
-            Bounds = new Bounds(collider.bounds.center, collider.bounds.size);
+            Bounds = new Bounds(collider.bounds.center, collider.size);
             collider.enabled = false;
         }
         public void SetCollider(BoxCollider2D collider) {

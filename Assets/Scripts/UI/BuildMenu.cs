@@ -37,17 +37,15 @@ namespace Assets.Scripts {
 
         private List<Button> BuildPanelButtons = new List<Button>();
 
-        [Range(0.8f, 1.2f)]
-        public float DebugHellSliderX = 1f;
         [Range(1.5f, 2f)]
         public float DebugHellSliderScale = 1f;
 
-        public Transform P1;
-        public Transform P2;
-        public Transform P3;
-        public Transform P4;
-        public Transform P5;
-        public Transform P6;
+        //public Transform P1;
+        //public Transform P2;
+        //public Transform P3;
+        //public Transform P4;
+        //public Transform P5;
+        //public Transform P6;
 
         public void Start() {
             enabled = true;
@@ -68,48 +66,42 @@ namespace Assets.Scripts {
             BuildPanelButtons.Clear();
             BuildOptionsPanel.SetActive(true);
             // Calculate the build options panel's grid
-            BuildOptionsArea = new AreaBounds2D(BuildOptionsPanel.GetComponent<BoxCollider2D>(), 70, 70);
+            BuildOptionsArea = new AreaBounds2D(BuildOptionsPanel.GetComponent<BoxCollider2D>(), 50, 50);
 
+            for ( int i = 0; i < BuildOptionsArea.GridPointsX; i++ ) {
+                CreateButton(spot.Options[0], i, 2);
+            }
+            return;
             double y = 2d;
             switch ( spot.Options.Count ) {
                 case 1:
-                    CreateButton(spot.Options[0], ( P3.transform.position + P4.transform.position ) / 2);
+                    CreateButton(spot.Options[0], 3.5, 2);
+                    //CreateButton(spot.Options[0], (( P3.transform.position + P4.transform.position ) / 2).x, 2);
                     break;
                 case 2:
-                    CreateButton(spot.Options[0], P2.transform.position);
-                    CreateButton(spot.Options[1], P5.transform.position);
+                    CreateButton(spot.Options[0], 2, 2);
+                    CreateButton(spot.Options[1], 4, 2);
+                    //CreateButton(spot.Options[0], (P2.transform.position).x, 2);
+                    //CreateButton(spot.Options[1], (P5.transform.position).x, 2);
                     break;
                 case 3:
-                    CreateButton(spot.Options[0], P1.transform.position);
-                    CreateButton(spot.Options[1], (P3.transform.position + P4.transform.position) / 2);
-                    CreateButton(spot.Options[2], P6.transform.position);
+                    CreateButton(spot.Options[0], 1, 2);
+                    CreateButton(spot.Options[1], 3.5, 2);
+                    CreateButton(spot.Options[2], 6, 2);
+                    //CreateButton(spot.Options[0], (P1.transform.position).x, 2);
+                    //CreateButton(spot.Options[1], ((P3.transform.position + P4.transform.position) / 2).x, 2);
+                    //CreateButton(spot.Options[2], (P6.transform.position).x, 2);
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
-            //void CreateButton(LayoutOption option, double x, double y) {
-            //    // Abandon all hope ye who enter this function
-            //    Vector2 vector = BuildOptionsArea.GetGridPosition((x, y));
-            //    GameObject instance = UnityEngine.Object.Instantiate(Prefabs.PrefabBuildButton, vector, Quaternion.identity, BuildOptionsPanel.transform);
-            //    Button button = instance.GetComponent<Button>();
-            //    button.transform.localScale = new Vector3(1f / 50f, 1f / 50f, 1f / 50f);
-            //    button.image.sprite = spot.Alignment == Alignment.Horizontal
-            //        ? Collections.HorizontalInteractableSprites[option.Type]
-            //        : Collections.VerticalInteractableSprites[option.Type];
-            //    button.GetComponentInChildren<TMP_Text>().text = $"${option.Cost}";
-            //    button.onClick.AddListener(() => {
-            //        BuildClickable.HandleSpawn(spot, option);
-            //    });
-            //    BuildPanelButtons.Add(button);
-            //}
-            void CreateButton(LayoutOption option, Vector2 vector) {
-                //vector *= new Vector2(DebugHellSliderX, 1f);
-                vector *= new Vector2(0.99f, 1f);
+            void CreateButton(LayoutOption option, double x, double y) {
+                // Abandon all hope ye who enter this function
+                Vector2 vector = BuildOptionsArea.GetGridPosition((x, y));
                 GameObject instance = UnityEngine.Object.Instantiate(Prefabs.PrefabBuildButton, vector, Quaternion.identity, BuildOptionsPanel.transform);
                 Button button = instance.GetComponent<Button>();
-              //button.transform.localScale = new Vector3(1f,1f,1f) * DebugHellSliderScale;
-                //button.transform.localScale = new Vector3(1f, 1f, 1f) * 1.75f;
+                button.transform.localScale *= DebugHellSliderScale;
                 button.image.sprite = spot.Alignment == Alignment.Horizontal
                     ? Collections.HorizontalInteractableSprites[option.Type]
                     : Collections.VerticalInteractableSprites[option.Type];
@@ -119,6 +111,22 @@ namespace Assets.Scripts {
                 });
                 BuildPanelButtons.Add(button);
             }
+            //void CreateButton(LayoutOption option, Vector2 vector) {
+            //    //vector *= new Vector2(DebugHellSliderX, 1f);
+            //    vector *= new Vector2(0.99f, 1f);
+            //    GameObject instance = UnityEngine.Object.Instantiate(Prefabs.PrefabBuildButton, vector, Quaternion.identity, BuildOptionsPanel.transform);
+            //    Button button = instance.GetComponent<Button>();
+            //  //button.transform.localScale = new Vector3(1f,1f,1f) * DebugHellSliderScale;
+            //    //button.transform.localScale = new Vector3(1f, 1f, 1f) * 1.75f;
+            //    button.image.sprite = spot.Alignment == Alignment.Horizontal
+            //        ? Collections.HorizontalInteractableSprites[option.Type]
+            //        : Collections.VerticalInteractableSprites[option.Type];
+            //    button.GetComponentInChildren<TMP_Text>().text = $"${option.Cost}";
+            //    button.onClick.AddListener(() => {
+            //        BuildClickable.HandleSpawn(spot, option);
+            //    });
+            //    BuildPanelButtons.Add(button);
+            //}
         }
         public void CloseBuildOptionsMenu() {
             BuildPanelButtons.ForEach(x => UnityEngine.Object.Destroy(x.gameObject));
