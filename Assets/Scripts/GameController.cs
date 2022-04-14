@@ -271,7 +271,7 @@ public partial class GameController : MonoBehaviour {
             if ( Autoplay ) {
                 StupidIdiotAutoplayThing();
             }
-            if (SpawnEveryTick) {
+            if ( SpawnEveryTick ) {
                 SpawnManyCustomers();
             }
             // Update time and funds display once per second.
@@ -280,7 +280,7 @@ public partial class GameController : MonoBehaviour {
 
         void Think() {
             // End the game if too many seats are soiled
-            if ( CM.CountBrokenSeats > CM.CountWorkingSeats  && !NoLose) {
+            if ( CM.CountBrokenSeats > CM.CountWorkingSeats && !NoLose ) {
                 GameEnd = true;
                 GameLost = true;
                 return;
@@ -299,11 +299,11 @@ public partial class GameController : MonoBehaviour {
 
             // Customer spawning
             if ( SpawningEnabled && CM.RemainingSpawns > 0 ) {
-                ticksSinceLastSpawn++;
-                bool spawnNow = Random.Range(0, 6) == 0;
-                if ( ( spawnNow && ticksSinceLastSpawn > 1 ) || ticksSinceLastSpawn > 6 ) {
+                if (ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
+                    for ( int i = 0; i < NumberToSpawn(CM.RemainingSpawns); i++ ) {
+                        CM.CreateCustomer(desperate: false);
+                    }
                     ticksSinceLastSpawn = 0;
-                    CM.CreateCustomer(desperate: false);
                 }
             }
 
@@ -311,6 +311,29 @@ public partial class GameController : MonoBehaviour {
             if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
                 if ( !FreezeTime ) {
                     AdvanceTime();
+                }
+            }
+
+            bool ShouldSpawnCustomerNow(int ticks, int remainingSpawns) {
+                if ( remainingSpawns > 15 ) {
+                    return ticks > 4 || Random.Range(0, 5) == 0;
+                }
+                else if ( remainingSpawns > 10 ) {
+                    return ticks > 5 || Random.Range(0, 6) == 0;
+                }
+                else {
+                    return ticks > 5 || Random.Range(0, 6) == 0;
+                }
+            }
+            int NumberToSpawn(int remainingSpawns) {
+                if ( remainingSpawns > 15 ) {
+                    return Random.Range(1, 3);
+                }
+                else if ( remainingSpawns > 10 ) {
+                    return Random.Range(0, 5) == 0 ? 2: 1;
+                }
+                else {
+                    return 1;
                 }
             }
         }
@@ -373,7 +396,7 @@ public partial class GameController : MonoBehaviour {
             }
         }
         void SpawnManyCustomers() {
-            if (CM.RemainingSpawns > 0) {
+            if ( CM.RemainingSpawns > 0 ) {
                 CM.CreateCustomer(true);
             }
         }
