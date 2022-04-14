@@ -3486,8 +3486,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayNightStartSplash: 0
-  DisplayBuildMenuOnFirstNight: 0
+  DisplayNightStartSplash: 1
+  DisplayBuildMenuOnFirstNight: 1
   NightMaxTime: 30
   NightMaxCustomerSpawnTime: 20
   CameraTolerangeTight: 22
@@ -3558,7 +3558,7 @@ MonoBehaviour:
   GameLost: 0
   GameEnd: 0
   FadeToBlack: 0
-  nightStartDelay: 4
+  nightStartDelay: 2
   NightStartCanvas: {fileID: 801821831}
   NightStartText: {fileID: 936202726}
   NightStartOverlay: {fileID: 1001133877}

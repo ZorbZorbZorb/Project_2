@@ -93,8 +93,8 @@ namespace Assets.Scripts.Customers {
             MenuButton MenuButtonWaitingRoom = new MenuButton(this, BathroomMenu, ButtonWaitingRoom, () => { MenuOptionGotoWaiting(); });
             MenuButton MenuButtonDecline = new MenuButton(this, BathroomMenu, ButtonDecline, () => { MenuOptionDismiss(); });
             MenuButton MenuButtonToilet = new MenuButton(this, BathroomMenu, ButtonToilet, () => { MenuOptionGotoToilet(); });
-            MenuButton MenuButtonUrinal = new MenuButton(this, BathroomMenu, ButtonUrinal, () => { MenuOptionGotoUrinal(); }, WillUseUrinal);
-            MenuButton MenuButtonSink = new MenuButton(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); }, WillUseSink);
+            MenuButton MenuButtonUrinal = new MenuButton(this, BathroomMenu, ButtonUrinal, () => { MenuOptionGotoUrinal(); }, WillUseUrinal, CanUseUrinal);
+            MenuButton MenuButtonSink = new MenuButton(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); }, WillUseSink, CanUseSink);
 
             MenuButton MenuButtonReliefStop = new MenuButton(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
 
@@ -789,17 +789,36 @@ namespace Assets.Scripts.Customers {
             }
             throw new NotImplementedException();
         }
+        public static bool CanUseUrinal(Customer customer) {
+            Bathroom bathroom = customer.GetCurrentBathroom();
+            return bathroom == null ? false : bathroom.Urinals.Any(x => x.OccupiedBy == null);
+        }
         // Current willingness to use a sink for relief
         public static bool WillUseSink(Customer customer) {
-            // It's just a weird urinal you wash your hands in, right?
-            if ( customer.Gender == 'm' ) {
-                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93d;
+            if (GC.CustomersWillUseAnything) {
+                return true;
             }
-            // Girls will only use the sink if they're wetting themselves
-            if ( customer.Gender == 'f' ) {
-                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.99d;
+
+            switch (customer.Gender) {
+                case 'm':
+                    // It's just a weird urinal you wash your hands in, right?
+                    return customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93d;
+                case 'f':
+                    // Girls will only use the sink if they're wetting themselves
+                    return customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.99d;
+                default:
+                    throw new NotImplementedException();
             }
-            throw new NotImplementedException();
+        }
+        public static bool CanUseSink(Customer customer) {
+            Bathroom bathroom = customer.GetCurrentBathroom();
+            if ( bathroom == null ) {
+                return false;
+            }
+            bool hasUnoccupiedSink = bathroom.Sinks.Any(x => x.OccupiedBy == null);
+            bool sinksLineEmpty = bathroom.SinksLine.Items[0].OccupiedBy == null;
+
+            return sinksLineEmpty && hasUnoccupiedSink;
         }
         private ReliefType ReliefType => Occupying?.RType ?? ReliefType.None;
 
@@ -969,6 +988,9 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         /// <returns></returns>
         public bool CanDisplayBathroomMenu() {
+            if (!AtDestination) {
+                return false;
+            }
             bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
             bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.Line.IsNextInLine(this);
             bool wet = IsWet || IsWetting;

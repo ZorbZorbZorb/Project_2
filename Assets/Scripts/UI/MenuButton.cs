@@ -12,32 +12,65 @@ namespace Assets.Scripts {
     [Serializable]
     public class MenuButton {
         public Customer Customer;
+        [NonSerialized]
         public Menu Menu;
         public Button Button;
-        public delegate bool Interactable(Customer customer);
-        public Interactable interactable;
+        public Func<Customer, bool> Enabled;
+        public Func<Customer, bool> Interactable;
+
+        private Color black = new Color(75, 20, 10, 70);
+        private Color red = new Color(255f, 75f, 40f, 130);
+        public ColorBlock Colors;
+
         public void Update() {
-            if ( interactable != null) {
-                try {
-                    Button.interactable = interactable(Customer);
-                }
-                catch {
-                    Debug.LogError(Button == null ? "Button for customer was null" : "Customer was null for button");
-                }
+            if (Customer == null) {
+                Debug.LogError("Customer was null for button press.");
+                return;
             }
+
+            bool enabled = Enabled == null ? false : Enabled(Customer);
+            bool interactable = Interactable == null ? true : Interactable(Customer);
+            //Colors.disabledColor = enabled ? red : black;
+            //Button.colors = Colors;
+            Button.interactable = enabled && interactable;
         }
         /// <summary>
         /// Creates a new button for a menu.
         /// <para>Automatically adds the button to the menu.</para>
         /// </summary>
-        /// <param name="menu"></param>
-        /// <param name="onClick"></param>
-        /// <param name="interactable"></param>
-        public MenuButton(Customer customer, Menu menu, Button button, UnityAction onClick, Interactable _interactable = null) {
+        public MenuButton(Customer customer, Menu menu, Button button, UnityAction onClick) {
             Customer = customer;
             Button = button;
             Button.onClick.AddListener(onClick);
-            interactable = _interactable;
+            Interactable = null;
+            Enabled = null;
+            Colors = button.colors;
+            menu.AddButton(this);
+        }
+        /// <summary>
+        /// Creates a new button for a menu.
+        /// <para>Automatically adds the button to the menu.</para>
+        /// </summary>
+        public MenuButton(Customer customer, Menu menu, Button button, UnityAction onClick, Func<Customer, bool> interactable ) {
+            Customer = customer;
+            Button = button;
+            Button.onClick.AddListener(onClick);
+            Interactable = interactable;
+            Enabled = null;
+            Colors = button.colors;
+            menu.AddButton(this);
+        }
+        /// <summary>
+        /// Creates a new button for a menu.
+        /// <para>Automatically adds the button to the menu.</para>
+        /// </summary>
+        public MenuButton(Customer customer, Menu menu, Button button, UnityAction onClick, Func<Customer, bool> interactable, Func<Customer, bool> enabled) {
+            Customer = customer;
+            Button = button;
+            Button.onClick.AddListener(onClick);
+            Interactable = interactable;
+            Enabled = enabled;
+            Colors = button.colors;
             menu.AddButton(this);
         }
     }

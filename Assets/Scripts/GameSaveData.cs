@@ -60,17 +60,19 @@ namespace Assets.Scripts {
 
             void AddSpot((double, double) position, Bathroom bathroom, WaitingSpotType type) {
                 Vector2 vector = bathroom.Bounds.GetGridPosition(position);
-                CustomerInteractable instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
+                WaitingSpot instance = UnityEngine.Object.Instantiate(Prefabs.PrefabSpot, vector, Quaternion.identity);
                 instance.Facing = Orientation.South;
+                instance.Bathroom = bathroom;
+                instance.WaitingSpotType = type;
                 switch ( type ) {
                     case WaitingSpotType.Line:
-                        bathroom.AddLineSpot(instance as WaitingSpot);
+                        bathroom.AddLineSpot(instance);
                         break;
                     case WaitingSpotType.Bathroom:
                         bathroom.AddInteractable(instance);
                         break;
                     case WaitingSpotType.Sink:
-                        bathroom.AddSinkLineSpot(instance as WaitingSpot);
+                        bathroom.AddSinkLineSpot(instance);
                         break;
                     default:
                         throw new NotImplementedException("Waiting spot not initialized correctly");
@@ -82,7 +84,7 @@ namespace Assets.Scripts {
 
             // Set layout spot references
             foreach ( LayoutSpot spot in result.All ) {
-                foreach ( LayoutOption option in spot.Options) {
+                foreach ( LayoutOption option in spot.Options ) {
                     option.LayoutSpot = spot;
                 }
             }

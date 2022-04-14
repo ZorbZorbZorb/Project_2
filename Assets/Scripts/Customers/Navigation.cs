@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace Assets.Scripts.Customers {
     static public class Navigation {
-        static private Dictionary<Location, List<NavigationNode>> nodes = new Dictionary<Location, List<NavigationNode>>();
-        static public Vector3 CustomerSpawnpoint => nodes[Location.Outside]
+        static public Dictionary<Location, List<NavigationNode>> Nodes = new Dictionary<Location, List<NavigationNode>>();
+        static public Vector3 CustomerSpawnpoint => Nodes[Location.Outside]
             .First(x => x.GetOther(Location.Outside).Location == Location.Bar)
             .GetOther(Location.Bar);
         static private List<Location> getReachableLocations(Location location) {
             List<Location> result = new List<Location>();
-            foreach ( NavigationNode node in nodes[location] ) {
+            foreach ( NavigationNode node in Nodes[location] ) {
                 Location other = node.GetOther(location);
                 if ( !result.Contains(other) ) {
                     result.Add(other);
@@ -42,7 +42,7 @@ namespace Assets.Scripts.Customers {
                 if ( unexploredOptions.Any() ) {
                     // Explore a reachable unexplored location
                     Location location = unexploredOptions.First();
-                    NavigationNode node = nodes[location].First(x => x.GetOther(location) == current);
+                    NavigationNode node = Nodes[location].First(x => x.GetOther(location) == current);
                     explored.Add(location);
                     path.Add(node);
                     current = location;
@@ -107,17 +107,17 @@ namespace Assets.Scripts.Customers {
             }
         }
         static public void Add(NavigationNode node) {
-            if ( nodes.ContainsKey(node.Point1.Location) ) {
-                nodes[node.Point1.Location].Add(node);
+            if ( Nodes.ContainsKey(node.Point1.Location) ) {
+                Nodes[node.Point1.Location].Add(node);
             }
             else {
-                nodes.Add(node.Point1.Location, new List<NavigationNode>() { node });
+                Nodes.Add(node.Point1.Location, new List<NavigationNode>() { node });
             }
-            if ( nodes.ContainsKey(node.Point2.Location) ) {
-                nodes[node.Point2.Location].Add(node);
+            if ( Nodes.ContainsKey(node.Point2.Location) ) {
+                Nodes[node.Point2.Location].Add(node);
             }
             else {
-                nodes.Add(node.Point2.Location, new List<NavigationNode>() { node });
+                Nodes.Add(node.Point2.Location, new List<NavigationNode>() { node });
             }
         }
     }

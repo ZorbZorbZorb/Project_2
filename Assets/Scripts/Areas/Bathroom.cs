@@ -67,6 +67,7 @@ namespace Assets.Scripts.Areas {
                 Line.PhantomEntrySpot.MainSRenderer.enabled = false;
                 Line.PhantomEntrySpot.Location = Location.Hallway;
                 Line.PhantomEntrySpot.WaitingSpotType = WaitingSpotType.Line;
+                Line.PhantomEntrySpot.Bathroom = this;
             }
         }
         public void AddSinkLineSpot(WaitingSpot spot) {

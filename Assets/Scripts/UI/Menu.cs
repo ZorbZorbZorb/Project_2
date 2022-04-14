@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Customers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,8 @@ namespace Assets.Scripts {
         /// <summary>
         /// List containing all buttons for this menu that change interactability or in some way update.
         /// </summary>
-        public static List<MenuButton> UpdatingButtons = new List<MenuButton>();
+        public List<MenuButton> UpdatingButtons = new List<MenuButton>();
+        public static List<MenuButton> AllUpdatingButtons = new List<MenuButton>();
         /// <summary>
         /// Closes all opened menus and clears the opened menus list.
         /// </summary>
@@ -90,20 +92,21 @@ namespace Assets.Scripts {
         }
         public void AddButton(MenuButton button) {
             Buttons.Add(button);
-            if (button.interactable != null) {
+            if (button.Enabled != null || button.Interactable != null || button.Enabled != null) {
                 UpdatingButtons.Add(button);
             }
         }
         public static void ClearForSceneReload() {
             OpenMenus.Clear();
             Buttons.Clear();
-            UpdatingButtons.Clear();
+            AllUpdatingButtons.Clear();
         }
         public Menu(Canvas _canvas) {
             canvas = _canvas;
             canvas.sortingLayerName = "UI";
             canOpenNow = () => { return true; };
-            Enabled = canvas.gameObject.activeSelf;
+            Enabled = false;
+            canvas.gameObject.SetActive(false);
         }
     }
 }

@@ -83,7 +83,7 @@ public partial class GameController : MonoBehaviour {
     [HideInInspector]
     public bool CanPause = true;
     [HideInInspector]
-    public static bool CreateNewSaveData = true;  // Hey, turn this off on build
+    public static bool CreateNewSaveData = false;  // Hey, turn this off on build
     [HideInInspector]
     public bool DisplayedNightStartSplashScreen = false;
 
@@ -478,6 +478,7 @@ public partial class GameController : MonoBehaviour {
     public void ResetStaticMembers() {
         uid = 0;
         GamePaused = false;
+        Assets.Scripts.Customers.Navigation.Nodes = new Dictionary<Location, List<NavigationNode>>();
     }
     void EndGame() {
         PauseGame();
