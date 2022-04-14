@@ -16,9 +16,13 @@ public partial class GameController : MonoBehaviour {
 
     #region Fields
 
-    [Header("Settings")]
+    public static bool CreateNewSaveData = true;
+
+    [Header("Important")]
     public bool DisplayNightStartSplash = true;
     public bool DisplayBuildMenuOnFirstNight = false;
+
+    [Header("Settings")]
     public int NightMaxTime = 30;
     public int NightMaxCustomerSpawnTime = 20;
     [SerializeField, Range(15f, 65f)]
@@ -82,8 +86,6 @@ public partial class GameController : MonoBehaviour {
     public bool SpawningEnabled = true;
     [HideInInspector]
     public bool CanPause = true;
-    [HideInInspector]
-    public static bool CreateNewSaveData = false;  // Hey, turn this off on build
     [HideInInspector]
     public bool DisplayedNightStartSplashScreen = false;
 
@@ -187,9 +189,10 @@ public partial class GameController : MonoBehaviour {
         // Load or create game data
         if ( CreateNewSaveData ) {
             Game = GameSaveData.ImportDefault();
+            CreateNewSaveData = false;
         }
         else {
-            Game = GameSaveData.Import(0);
+            Game = GameSaveData.Import(1);
         }
         UpdateFundsDisplay();
 
@@ -467,7 +470,7 @@ public partial class GameController : MonoBehaviour {
     public void ContinueToNextNight() {
         PauseMenu.Close();
         Game.Night++;
-        Game.Export(0);
+        Game.Export(1);
         ResetStaticMembers();
         // Reload scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

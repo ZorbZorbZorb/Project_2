@@ -16,7 +16,7 @@ public class MainMenuController : MonoBehaviour {
 
     void Start() {
         if (GameSaveData.Exists(0)) {
-            GameSaveData data = GameSaveData.Import(0);
+            GameSaveData data = GameSaveData.Import(1);
             TextContinue.text = $"Continue (Night {data.Night})";
             ButtonContinue.interactable = true;
         }
