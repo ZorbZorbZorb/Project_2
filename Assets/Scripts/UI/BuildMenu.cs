@@ -37,10 +37,10 @@ namespace Assets.Scripts {
 
         private List<Button> BuildPanelButtons = new List<Button>();
 
-        //[Range(0.8f, 1.2f)]
-        //public float DebugHellSliderX = 1f;
-        //[Range(1.5f, 2f)]
-        //public float DebugHellSliderScale = 1f;
+        [Range(0.8f, 1.2f)]
+        public float DebugHellSliderX = 1f;
+        [Range(1.5f, 2f)]
+        public float DebugHellSliderScale = 1f;
 
         public Transform P1;
         public Transform P2;
@@ -108,8 +108,8 @@ namespace Assets.Scripts {
                 vector *= new Vector2(0.99f, 1f);
                 GameObject instance = UnityEngine.Object.Instantiate(Prefabs.PrefabBuildButton, vector, Quaternion.identity, BuildOptionsPanel.transform);
                 Button button = instance.GetComponent<Button>();
-                //button.transform.localScale = new Vector3(1f,1f,1f) * DebugHellSliderScale;
-                button.transform.localScale = new Vector3(1f, 1f, 1f) * 1.75f;
+              //button.transform.localScale = new Vector3(1f,1f,1f) * DebugHellSliderScale;
+                //button.transform.localScale = new Vector3(1f, 1f, 1f) * 1.75f;
                 button.image.sprite = spot.Alignment == Alignment.Horizontal
                     ? Collections.HorizontalInteractableSprites[option.Type]
                     : Collections.VerticalInteractableSprites[option.Type];
