@@ -3,6 +3,7 @@ using Assets.Scripts.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Assets.Scripts;
 
 public static class Collections {
     public static Sprite spriteToilet = Resources.Load<Sprite>("Sprites/Entities/Toilet");
@@ -70,28 +71,4 @@ public static class Collections {
 
         return null;
     }
-}
-public enum BladderControlState {
-    Normal,
-    LosingControl,
-    Wetting,
-    Emptying,
-}
-public enum CustomerDesperationState {
-    State0,  // No desperation
-    State1,  // Desperation1
-    State2,  // Desperation2
-    State3,  // Desperation3
-    State4,  // Losing Control
-    State5,  // Wetting
-    State6,  // Wet
-}
-public enum CustomerActionState {
-    None,
-    PantsDown,
-    PantsUp,
-    Peeing,
-    WashingHands,
-    Wetting,
-    Leaving
 }

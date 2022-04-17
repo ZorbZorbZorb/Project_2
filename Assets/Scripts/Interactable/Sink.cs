@@ -2,6 +2,7 @@ using Assets.Scripts.Customers;
 using Assets.Scripts.Objects;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.Scripts;
 
 public class Sink : Relief {
     public override InteractableType IType => InteractableType.Sink;

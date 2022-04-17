@@ -106,6 +106,8 @@
     <Compile Include="Assets\Scripts\Areas\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\UI\BuildMenu.cs" />
     <Compile Include="Assets\Scripts\Areas\Area.cs" />
+    <Compile Include="Assets\Scripts\CustomerDesperationState.cs" />
+    <Compile Include="Assets\Scripts\CustomerActionState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Notes\Bathroom Layout Ideas.txt" />

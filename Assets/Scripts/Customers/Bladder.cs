@@ -6,8 +6,9 @@ namespace Assets.Scripts.Customers {
     // Pee is stored in the balls
     [Serializable]
     public class Bladder {
-        [SerializeField]
-        public Customer customer;
+        [NonSerialized]
+        public Customer Customer;
+        public BladderSize BladderSize;  // Internal for keeping track of values and debugging
         public float Stomach;  // The stomach is stored in the bladder
         public float Amount;
         public float Max;
@@ -16,8 +17,6 @@ namespace Assets.Scripts.Customers {
         public float NormalizedPercentEmptied;
         public float NormalizedPercentEmptiedStart;
         public float FillRate;
-        public float FeltNeedCurve;  // Changes how badly this customer feels the need to go. multiplier.
-        public float FeltNeed;  // How badly this customer thinks they need to go, 0.0 to 1.0
         public float ControlRemaining;
         public float LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
         public float LossOfControlTimeNow;
@@ -28,10 +27,7 @@ namespace Assets.Scripts.Customers {
         /// <summary>
         /// Amount to multiply the normal drain rate by, to make the customer pee faster when their bladder is fuller
         /// </summary>
-        public float DrainMultiplier => Mathf.Min( 0.75f + Mathf.Pow(0.7f * Amount / Max, 2), 2f);
-
-        public DateTime LastPeedAt;
-        public int DrinksHad;
+        public float DrainMultiplier => Mathf.Min(0.75f + Mathf.Pow(0.7f * Amount / Max, 2), 2f);
 
         // Leak amount?
         public bool Emptying = false;  // Flag to set if emptying or filling
@@ -55,9 +51,6 @@ namespace Assets.Scripts.Customers {
             // Set all started/stopped x this frame bools to false
             ResetFrameStates();
 
-            // Set felt need
-            FeltNeed = Mathf.Min(Mathf.Pow(Percentage, FeltNeedCurve), 1.0f);
-
             // If Emptying
             if ( Emptying ) {
                 // Calculate the normalized amount emptied. It's okay to do it this way for now, because it only matters
@@ -79,16 +72,16 @@ namespace Assets.Scripts.Customers {
                                 StruggleStopSpurtNow = false;
                             }
                             else {
-                                DrainRateNow += ( 15f * customer.DeltaTime );
+                                DrainRateNow += ( 15f * Customer.DeltaTime );
                             }
                         }
                         else {
                             // Guys will be better at interrupting peeing than girls
-                            if ( customer.Gender == 'm' ) {
-                                DrainRateNow -= ( 16f * customer.DeltaTime );
+                            if ( Customer.Gender == 'm' ) {
+                                DrainRateNow -= ( 16f * Customer.DeltaTime );
                             }
                             else {
-                                DrainRateNow -= ( 8f * customer.DeltaTime );
+                                DrainRateNow -= ( 8f * Customer.DeltaTime );
                             }
                         }
                         // To make it more interesting heres some naive for spurting when stopping
@@ -107,7 +100,7 @@ namespace Assets.Scripts.Customers {
             // If Losing Control
             else if ( LosingControl ) {
                 DoBladderFill();
-                float timeToSubtract = 1 * customer.DeltaTime;
+                float timeToSubtract = 1 * Customer.DeltaTime;
                 LossOfControlTimeNow -= timeToSubtract;
                 if ( LossOfControlTimeNow <= 0 ) {
                     LosingControl = false;
@@ -129,25 +122,25 @@ namespace Assets.Scripts.Customers {
         /// Fill a customers bladder. Called once per update
         /// </summary>
         private void DoBladderFill() {
-            float amountToAdd = FillRate * customer.DeltaTime;
+            float amountToAdd = FillRate * Customer.DeltaTime;
             if ( GameController.GC.RapidBladderFill ) {
                 amountToAdd *= 3;
             }
             Amount += amountToAdd;
             if ( Stomach > 0 ) {
-                amountToAdd = customer.DeltaTime * ( 2f + ( Stomach / 200f ) );
+                amountToAdd = Customer.DeltaTime * ( 2f + ( Stomach / 200f ) );
                 Stomach -= amountToAdd;
                 Amount += amountToAdd;
             }
             float percentFull = Percentage;
             if ( percentFull > 0.8f && percentFull < 1.0f ) {
-                ControlRemaining -= 0.5f * customer.DeltaTime;
+                ControlRemaining -= 0.5f * Customer.DeltaTime;
                 if ( ControlRemaining < 0f ) {
                     ControlRemaining = 0f;
                 }
             }
             else if ( percentFull > 1.0f ) {
-                ControlRemaining -= 5f * customer.DeltaTime;
+                ControlRemaining -= 5f * Customer.DeltaTime;
                 if ( ControlRemaining < 0f ) {
                     ControlRemaining = 0f;
                 }
@@ -157,8 +150,8 @@ namespace Assets.Scripts.Customers {
         /// Empty a customers bladder. Called once per update
         /// </summary>
         private void DoBladderEmpty() {
-            float amountToRemove = DrainRateNow * DrainMultiplier * customer.DeltaTime;
-            
+            float amountToRemove = DrainRateNow * DrainMultiplier * Customer.DeltaTime;
+
             if ( GameController.GC.RapidBladderEmpty ) {
                 amountToRemove *= 3f;
             }
@@ -173,7 +166,6 @@ namespace Assets.Scripts.Customers {
                 Wetting = false;
                 ShouldWetNow = false;
                 DrainRateNow = DrainRate;
-                LastPeedAt = DateTime.Now;
                 if ( ControlRemaining < 1f ) {
                     ControlRemaining = 1f;
                 }
@@ -185,60 +177,103 @@ namespace Assets.Scripts.Customers {
         public void StopPeeingEarly() {
             StruggleStopPeeing = true;
         }
-        public void SetupBladder(Customer customer, int min, int max) {
-            // Make guys able to hold on longer than girls can after they start losing control
-            if ( customer.Gender == 'm' ) {
-                LossOfControlTime = 20f;
-                LossOfControlTimeNow = LossOfControlTime;
-            }
-            else {
+        /// <summary>
+        /// </summary>
+        /// <param name="size">The size this bladder should be.
+        /// <param name="startFull">Should this bladder start full?</param>
+        public Bladder(Customer customer, BladderSize size, bool startFull) {
+            var settings = GameSettings.Current.BladderSettings;
+            Customer = customer;
 
-                LossOfControlTime = 10f;
-                LossOfControlTimeNow = LossOfControlTime;
-            }
+            // Set the maximum amount the bladder can expand to hold
+            BladderSize = size;
+            Max = GetRandomBladderMax(size);
 
-            // Randomly give maximum bladder size from 550 to 1500
-            Max = Random.Range(400, 1000);
-            // Randomly give fullness of min% to max%
-            float fullness = 0.01f * Random.Range(min, max);
-            Amount = fullness * Max;
-            // Subtract some control depending on how full they already are
-            if ( fullness > 0.8f ) {
-                ControlRemaining -= fullness * 100f;
-            }
+            // Determine the starting fullness
+            Amount = GetBladderStartingFullness(Max, Random.Range(0f, 1f), startFull);
 
-            //https://www.desmos.com/calculator/ehsasufatr
-            // Randomly give them a neediness multiplier from 0.5x to 2x
-            // 0.5 resistance results in them getting desperate fast but staying that way for a long time
-            // 2.0 resistance results in them showing almost nothing until bursting to go
-            FeltNeedCurve = Random.Range(0.5f, 2f);
-            FeltNeed = Mathf.Min(Mathf.Pow(Percentage, FeltNeedCurve), 1.0f);
+            ControlRemaining = settings.DefaultControlRemaining;
+            LossOfControlTime = customer.Gender == 'm' ? settings.DefaultLossOfControlTimeM : settings.DefaultLossOfControlTimeF;
+            LossOfControlTimeNow = LossOfControlTime;
+            ControlRemaining = settings.DefaultControlRemaining;
 
-            // Now guess how many drinks they've had since last goingto be this desperate
-            DrinksHad = (int)Math.Round(1 + Math.Pow(( Percentage + 1 ), 2.6));
-
-            double secondsSincePastPee = ( Amount / FillRate ) + ( ( ( Max * 0.4f ) / FillRate ) * FeltNeedCurve );
-            secondsSincePastPee *= 3.5d;
-            LastPeedAt = DateTime.Now.AddSeconds(-Math.Round(secondsSincePastPee));
-        }
-
-        # warning this was hardcoded :(
-        public Bladder(float stomach = 0f, float amount = 0f, float max = 650f, float drainRate = 30f, float fillRate = 0.8f, float controlRemaining = 130f,
-            float lossOfControlTime = 10f) {
-
-            Stomach = stomach;
-            Amount = amount;
-            Max = max;
-            DrainRate = drainRate;
-            DrainRateNow = DrainRate;
-            // 1d seems good.
-            FillRate = fillRate;
-            ControlRemaining = controlRemaining;
-            LossOfControlTime = lossOfControlTime;
-            LossOfControlTimeNow = lossOfControlTime;
-            LastPeedAt = DateTime.Now;
+            FillRate = settings.DefaultFillRate;
+            DrainRate = settings.DefaultDrainRate;
+            DrainRateNow = settings.DefaultDrainRate;
+            Stomach = 0f;
 
             ResetFrameStates();
         }
+        /// <summary>
+        /// </summary>
+        /// <param name="startFull">Should this bladder start full?</param>
+        public Bladder(Customer customer, bool startFull) : this(customer, GetRandomBladderSize(), startFull) { }
+
+        #region Internal Methods
+
+        /// <summary>
+        /// Decides a bladder size at random using the weighted distribution table in <see cref="GameSettings.BladderSettings"/>
+        /// </summary>
+        /// <returns>Bladder size</returns>
+        private static BladderSize GetRandomBladderSize() {
+            var settings = GameSettings.Current.BladderSettings;
+            int x = Random.Range(0, settings.ChanceTotal);
+            if ( x < settings.ChanceSmall ) {
+                return BladderSize.Small;
+            }
+            else if ( x < settings.ChanceMedium + settings.ChanceSmall ) {
+                return BladderSize.Medium;
+            }
+            else if ( x < settings.ChanceLarge + settings.ChanceMedium + settings.ChanceSmall ) {
+                return BladderSize.Large;
+            }
+            else {
+                return BladderSize.Massive;
+            }
+        }
+        /// <summary>
+        /// Returns a random <see cref="Max"/> size
+        /// </summary>
+        /// <returns>
+        /// Dependent on <paramref name="size"/>. See <see cref="GameSettings.Bladder"/>
+        /// </returns>
+        private static float GetRandomBladderMax(BladderSize size) {
+            var settings = GameSettings.Current.BladderSettings;
+            switch ( size ) {
+                case BladderSize.Small:
+                    return Random.Range(settings.SizeMinSmall, settings.SizeMaxSmall);
+                case BladderSize.Medium:
+                    return Random.Range(settings.SizeMinMedium, settings.SizeMaxMedium);
+                case BladderSize.Large:
+                    return Random.Range(settings.SizeMinLarge, settings.SizeMaxLarge);
+                case BladderSize.Massive:
+                    return Random.Range(settings.SizeMinMassive, settings.SizeMaxMassive);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        /// <summary>
+        /// Returns a starting <see cref="Amount"/> depending on the value of <paramref name="t"/>, the customers 
+        /// <paramref name="max"/> and if the customer should <paramref name="startFull"/>
+        /// <para>https://www.desmos.com/calculator/nw8zdk2krx</para>
+        /// </summary>
+        /// <param name="max"></param>
+        /// <param name="t">0 &#8804; <paramref name="t"/> &#8804; 1</param>
+        /// <param name="startFull"></param>
+        /// <returns>(<paramref name="max"/> * 0.1)~ &#8804; x &#8804; (<paramref name="max"/> * 0.9) </returns>
+        private static float GetBladderStartingFullness(float max, float t, bool startFull) {
+            float percent = MathF.Pow(-( ( t * 1.5f ) - 0.75f ), 2f) / 2f;
+            percent += startFull ? 0.95f : 0.4f;
+            return percent * max;
+        }
+
+        #endregion
     }
+}
+
+public enum BladderSize {
+    Small,
+    Medium,
+    Large,
+    Massive
 }

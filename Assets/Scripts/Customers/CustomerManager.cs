@@ -32,12 +32,7 @@ namespace Assets.Scripts.Customers {
             newCustomer.Location = Location.Outside;
             newCustomer.Gender = Random.Range(0, 2) == 0 ? 'm' : 'f';
             Customers.Add(newCustomer);
-            if ( desperate ) {
-                newCustomer.SetupCustomer(90, 100);
-            }
-            else {
-                newCustomer.SetupCustomer(30, 90);
-            }
+            newCustomer.SetupCustomer(desperate);
             //Debug.Log($"Created | state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}", newCustomer);
             newCustomer.Active = true;
             bool enteredDoorway = false;

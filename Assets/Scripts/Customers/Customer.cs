@@ -67,7 +67,7 @@ namespace Assets.Scripts.Customers {
 
         }
 
-        public void SetupCustomer(int minBladderPercent, int maxBladderPercent) {
+        public void SetupCustomer(bool startFull) {
             marshal = CustomerSpriteController.Controller[Gender];
 
             // Set up the customers animator
@@ -100,9 +100,7 @@ namespace Assets.Scripts.Customers {
 
             Funds = Random.Range(20f, 100f);
 
-            bladder = new Bladder();
-            bladder.SetupBladder(this, minBladderPercent, maxBladderPercent);
-            bladder.customer = this;
+            bladder = new Bladder(this, startFull);
 
             UrinateStartDelay = 4d;
             UrinateStopDelay = 6d;
@@ -162,13 +160,13 @@ namespace Assets.Scripts.Customers {
             else if ( IsWet ) {
                 return CustomerDesperationState.State6;
             }
-            else if ( bladder.LosingControl || bladder.FeltNeed > 0.90d ) {
+            else if ( bladder.LosingControl || bladder.Percentage > 0.90d ) {
                 return CustomerDesperationState.State4;
             }
-            else if ( bladder.FeltNeed > 0.80d ) {
+            else if ( bladder.Percentage > 0.80d ) {
                 return CustomerDesperationState.State3;
             }
-            else if ( bladder.FeltNeed > 0.55d ) {
+            else if ( bladder.Percentage > 0.55d ) {
                 return CustomerDesperationState.State2;
             }
             else if ( WantsToEnterBathroom() ) {
@@ -306,7 +304,7 @@ namespace Assets.Scripts.Customers {
 
         #region Wants to X...
         public bool WantsToEnterBathroom() {
-            return bladder.FeltNeed > 0.40d;
+            return bladder.Percentage > 0.40d;
         }
         public bool WantsToLeaveBar() {
             CustomerDesperationState[] tooDesperateStates;
@@ -361,7 +359,6 @@ namespace Assets.Scripts.Customers {
             string logString = "";
             logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(bladder.Amount)} / {bladder.Max} ({Math.Round(bladder.Percentage, 2)}%)";
             logString += $"Control: {Math.Round(bladder.ControlRemaining)}";
-            logString += $"Need: {Math.Round(bladder.FeltNeed, 2)} Curve: {Math.Round(bladder.FeltNeedCurve, 2)}";
             Debug.Log(logString);
         }
 
@@ -753,7 +750,6 @@ namespace Assets.Scripts.Customers {
         public CustomerDesperationState DesperationState = CustomerDesperationState.State0;
         private CustomerDesperationState LastDesperationState = CustomerDesperationState.State0;
         public bool DesperationStateChangeThisUpdate = false;
-        public BladderControlState CustomerState = BladderControlState.Normal;
         public Bladder bladder;
 
         // Times
@@ -785,7 +781,7 @@ namespace Assets.Scripts.Customers {
             }
             // Only if they're about to lose it
             if ( customer.Gender == 'f' ) {
-                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93;
+                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.Percentage > 0.93;
             }
             throw new NotImplementedException();
         }
@@ -802,10 +798,10 @@ namespace Assets.Scripts.Customers {
             switch (customer.Gender) {
                 case 'm':
                     // It's just a weird urinal you wash your hands in, right?
-                    return customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.93d;
+                    return customer.bladder.LosingControl || customer.bladder.Percentage > 0.93d;
                 case 'f':
                     // Girls will only use the sink if they're wetting themselves
-                    return customer.bladder.LosingControl || customer.bladder.FeltNeed > 0.99d;
+                    return customer.bladder.LosingControl || customer.bladder.Percentage > 0.99d;
                 default:
                     throw new NotImplementedException();
             }
