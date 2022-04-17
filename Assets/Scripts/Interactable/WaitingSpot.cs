@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum WaitingSpotType {
     None,
+    LineGhost,
     Line,
     Bathroom,
     Sink

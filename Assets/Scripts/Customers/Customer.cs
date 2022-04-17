@@ -993,8 +993,8 @@ namespace Assets.Scripts.Customers {
             }
             bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
             bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.Line.IsNextInLine(this);
-            bool wet = IsWet || IsWetting;
-            return AtDestination && !wet && ( inBathroom || firstInLine );
+            bool acting = ActionState != CustomerActionState.None;
+            return AtDestination && !IsWet && !acting && ( inBathroom || firstInLine );
         }
         /// <summary>
         /// Code for if relief menu can be displayed
