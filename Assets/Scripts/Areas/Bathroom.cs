@@ -66,13 +66,14 @@ namespace Assets.Scripts.Areas {
                 Line.PhantomEntrySpot = Instantiate(Prefabs.PrefabSpot);
                 Line.PhantomEntrySpot.MainSRenderer.enabled = false;
                 Line.PhantomEntrySpot.Location = Location.Hallway;
-                Line.PhantomEntrySpot.WaitingSpotType = WaitingSpotType.Line;
+                Line.PhantomEntrySpot.WaitingSpotType = WaitingSpotType.LineGhost;
                 Line.PhantomEntrySpot.Bathroom = this;
             }
         }
         public void AddSinkLineSpot(WaitingSpot spot) {
             spot.Bathroom = this;
             spot.Location = Location;
+            spot.WaitingSpotType = WaitingSpotType.Sink;
             SinksLine.Items.Add(spot);
         }
         public Toilet GetToilet() {
