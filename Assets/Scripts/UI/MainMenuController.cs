@@ -17,7 +17,8 @@ public class MainMenuController : MonoBehaviour {
 
     private void Awake() {
         // Reset screen resolution
-        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, 60);
+        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, GameController.TargetFramerate);
+        Application.targetFrameRate = GameController.TargetFramerate;
     }
     void Start() {
         if (GameSaveData.Exists(1)) {

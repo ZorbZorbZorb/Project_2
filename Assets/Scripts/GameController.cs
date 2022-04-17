@@ -17,6 +17,7 @@ public partial class GameController : MonoBehaviour {
     #region Fields
 
     public static bool CreateNewSaveData = true;
+    public static int TargetFramerate = 70;
 
     [Header("Important")]
     public bool DisplayNightStartSplash = true;
@@ -139,10 +140,8 @@ public partial class GameController : MonoBehaviour {
 
     private void Awake() {
         // Reset screen resolution
-        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, 60);
-        Application.targetFrameRate = 60;
-        //QualitySettings.antiAliasing = 0;
-        QualitySettings.vSyncCount = 1;
+        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, TargetFramerate);
+        Application.targetFrameRate = TargetFramerate;
 
         if ( GC != null ) {
             Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
@@ -223,8 +222,12 @@ public partial class GameController : MonoBehaviour {
         else {
             ReadyToStartNight = true;
         }
+
+        // Reset frame rate just incase Unity didnt take it in Awake();
+        Application.targetFrameRate = TargetFramerate;
     }
     void Update() {
+
         if ( Input.anyKeyDown ) {
             HandleKeypresses();
         }
@@ -316,7 +319,7 @@ public partial class GameController : MonoBehaviour {
 
             // Customer spawning
             if ( SpawningEnabled && CM.RemainingSpawns > 0 ) {
-                if (ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
+                if ( ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
                     for ( int i = 0; i < NumberToSpawn(CM.RemainingSpawns); i++ ) {
                         CM.CreateCustomer(desperate: false);
                     }
@@ -347,7 +350,7 @@ public partial class GameController : MonoBehaviour {
                     return Random.Range(1, 3);
                 }
                 else if ( remainingSpawns > 10 ) {
-                    return Random.Range(0, 5) == 0 ? 2: 1;
+                    return Random.Range(0, 5) == 0 ? 2 : 1;
                 }
                 else {
                     return 1;
