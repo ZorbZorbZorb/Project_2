@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Assets.Scripts {
     [Serializable]
-    public partial class GameSaveData {
+    public class GameSaveData {
 
         [HideInInspector]
         public List<LayoutSpot> Mens;
