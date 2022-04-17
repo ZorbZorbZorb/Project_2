@@ -14,6 +14,9 @@ namespace Assets.Scripts.Customers {
         public SpriteRenderer SpriteBladderBottom;
         public RectTransform BladderCircleTransform;
 
+        // Used to make the bladder display larger or smaller.
+        public double AverageMax = 700;
+
         const double bladderWidthCalculationFactor1 = -0.6d;
         const double bladderWidthCalculationFactor2 = 1.2d;
         const double bladderWidthCalculationFactor3 = 1.8d;
@@ -78,7 +81,7 @@ namespace Assets.Scripts.Customers {
                 double scaleY = 160f;
 
                 // Note, Code breaks down at bladder sizes over AverageMax * 2.
-                factor = Customer.bladder.Max / Customer.bladder.AverageMax;
+                factor = Customer.bladder.Max / AverageMax;
                 double multiplier = ( ( ( factor / 2 ) * Math.PI ) - Math.PI / 2 ) * 0.5;
                 multiplier = Math.Max(0.5, Math.Min(1.5, multiplier));
 

@@ -6,7 +6,6 @@ namespace Assets.Scripts.Customers {
     // Pee is stored in the balls
     [Serializable]
     public class Bladder {
-        public double AverageMax = 700;
         [SerializeField]
         public Customer customer;
         public float Stomach;  // The stomach is stored in the bladder
@@ -223,6 +222,7 @@ namespace Assets.Scripts.Customers {
             LastPeedAt = DateTime.Now.AddSeconds(-Math.Round(secondsSincePastPee));
         }
 
+        # warning this was hardcoded :(
         public Bladder(float stomach = 0f, float amount = 0f, float max = 650f, float drainRate = 30f, float fillRate = 0.8f, float controlRemaining = 130f,
             float lossOfControlTime = 10f) {
 
