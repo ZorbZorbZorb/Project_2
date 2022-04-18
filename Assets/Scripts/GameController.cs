@@ -110,10 +110,6 @@ public partial class GameController : MonoBehaviour {
     // Save data
     public GameSaveData Game;
 
-    // Unique Id System
-    private static int uid = 0;
-    public static int GetUid() => uid++;
-
     public int timeTicksElapsed = 0;
     public DateTime barTime;
     public Text barTimeDisplay;
@@ -138,7 +134,7 @@ public partial class GameController : MonoBehaviour {
 
     #endregion
 
-    private void Awake() {
+    void Awake() {
         // Reset screen resolution
         Screen.SetResolution(1366, 768, FullScreenMode.Windowed, TargetFramerate);
         Application.targetFrameRate = TargetFramerate;
@@ -422,6 +418,8 @@ public partial class GameController : MonoBehaviour {
         }
     }
 
+    #region External Methods
+
     public void ToggleGamePaused() {
         if ( CanPause ) {
             if ( GamePaused ) {
@@ -432,13 +430,58 @@ public partial class GameController : MonoBehaviour {
             }
         }
     }
+    public void RestartCurrentNight() {
+        ResetStaticMembers();
+        // Reload scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    /// <summary>
+    /// Restarts the current night in progress.
+    /// Just reloads the scene to reload the current saved data, because the
+    /// scene in play is unsaved.
+    /// </summary>
+    public void ContinueToNextNight() {
+        PauseMenu.Close();
+        Game.Night++;
+        Game.Export(1);
+        ResetStaticMembers();
+        // Reload scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    /// <summary>
+    /// Returns to the main menu without saving
+    /// <para>The main menu scene should always be scene index 0, which opens on game start</para>
+    /// </summary>
+    public void GoToMainMenu() {
+        // Timescale and static vars are preserved between scenes!
+        Time.timeScale = 1;
+        ResetStaticMembers();
+        // Load menu scene
+        SceneManager.LoadScene(0);
+    }
+    public void EndBuildMode() {
+        InBuildMenu = false;
+        ReadyToStartNight = true;
+        Time.timeScale = 1;
+        BuildMenu.End();
 
-    #region Nights, Game state, and Startup
+        FC.ZoomTo(Freecam.MinZoom);
+        FC.PanTo(Freecam.Center);
+
+    }
+    public void UpdateFundsDisplay() {
+        fundsDisplay.text = $"${Math.Round(Game.Funds, 0)}";
+    }
+
+    #endregion
+
+    #region Internal Methods
+
     /// <summary>
     /// Fades away the night start screen and eventually disables it.
     /// </summary>
     /// <returns>Returns false if still fading. Returns true when finished fading.</returns>
-    public bool FadeOutNightStartScreen() {
+    private bool FadeOutNightStartScreen() {
         // If the canvas isn't enabled, dont perform any action
         if ( !NightStartCanvas.gameObject.activeSelf ) {
             return true;
@@ -475,52 +518,20 @@ public partial class GameController : MonoBehaviour {
         }
     }
     /// <summary>
-    /// Restarts the current night in progress.
-    /// Just reloads the scene to reload the current saved data, because the
-    /// scene in play is unsaved.
-    /// </summary>
-    public void RestartCurrentNight() {
-        ResetStaticMembers();
-        // Reload scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-    public void ContinueToNextNight() {
-        PauseMenu.Close();
-        Game.Night++;
-        Game.Export(1);
-        ResetStaticMembers();
-        // Reload scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-    /// <summary>
     /// Resets static properties between scene reloads
     /// </summary>
-    public void ResetStaticMembers() {
-        uid = 0;
+    private void ResetStaticMembers() {
         GamePaused = false;
         Assets.Scripts.Customers.Navigation.Nodes = new Dictionary<Location, List<NavigationNode>>();
     }
-    void EndGame() {
+    private void EndGame() {
         PauseGame();
         PauseMenu.SwitchToBoldTextDisplay();
         PauseMenu.SetBoldTextDisplay($"End of night {Game.Night}\r\n\r\nYou made ${Game.Funds - nightStartFunds}.");
         PauseMenu.EnableContinueButton(true);
         FadeToBlack = true;
     }
-    #endregion
-
-    /// <summary>
-    /// Returns to the main menu without saving
-    /// <para>The main menu scene should always be scene index 0, which opens on game start</para>
-    /// </summary>
-    public void GoToMainMenu() {
-        // Timescale and static vars are preserved between scenes!
-        Time.timeScale = 1;
-        ResetStaticMembers();
-        // Load menu scene
-        SceneManager.LoadScene(0);
-    }
-    public void StartBuildMode() {
+    private void StartBuildMode() {
         InBuildMenu = true;
         CanPause = false;
         Time.timeScale = 0;
@@ -534,17 +545,7 @@ public partial class GameController : MonoBehaviour {
         EastButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.East));
         WestButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.West));
     }
-    public void EndBuildMode() {
-        InBuildMenu = false;
-        ReadyToStartNight = true;
-        Time.timeScale = 1;
-        BuildMenu.End();
-
-        FC.ZoomTo(Freecam.MinZoom);
-        FC.PanTo(Freecam.Center);
-
-    }
-    void CycleCamera(Orientation orientation) {
+    private void CycleCamera(Orientation orientation) {
         var position = FC.AutoPanning ? FC.PanIntent : FC.transform.position;
         CameraPosition.UpdatePositions(position);
         if ( InBuildMenu ) {
@@ -568,7 +569,7 @@ public partial class GameController : MonoBehaviour {
     /// Pauses the game.
     /// <para>Closes all open menus and enables the game paused canvas</para>
     /// </summary>
-    public void PauseGame() {
+    private void PauseGame() {
         Time.timeScale = 0;
         GamePaused = true;
         FC.Locked = true;
@@ -585,7 +586,7 @@ public partial class GameController : MonoBehaviour {
     /// <summary>
     /// Resumes the game, only if the game isnt ended.
     /// </summary>
-    void ResumeGame() {
+    private void ResumeGame() {
         if ( GameEnd ) {
             Debug.LogWarning("Trying to unpause game but game has ended.");
             return;
@@ -598,7 +599,6 @@ public partial class GameController : MonoBehaviour {
         PauseMenu.Close();
         Debug.Log("Game resumed.");
     }
-
     /// <summary>
     /// Advances the night forward one time tick.
     /// <para>Adds funds for each customer in the bar</para>
@@ -616,7 +616,7 @@ public partial class GameController : MonoBehaviour {
         barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
         barTimeDisplay.text = barTime.ToString("hh:mm tt");
     }
-    public void UpdateFundsDisplay() {
-        fundsDisplay.text = $"${Math.Round(Game.Funds, 0)}";
-    }
+
+    #endregion
+
 }

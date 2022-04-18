@@ -51,8 +51,6 @@ namespace Assets.Scripts.Objects {
         public abstract bool CanWetHere { get; }
         public abstract bool CanBeSoiled { get; }
         public bool IsSoiled { get; set; }
-        public int UID { get => uid; }
-        private readonly int uid = GameController.GetUid();
         public abstract string DisplayName { get; }
         public bool Unoccupied => OccupiedBy == null;
 

@@ -14,9 +14,6 @@ namespace Assets.Scripts {
             AdvanceQueue();
         }
 
-        public int UID => _uid;
-        private readonly int _uid = GameController.GetUid();
-
         public bool HasAnyoneInLine() {
             return Items.Any(x => x.OccupiedBy != null);
         }

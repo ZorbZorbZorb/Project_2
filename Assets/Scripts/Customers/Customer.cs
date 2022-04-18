@@ -48,7 +48,6 @@ namespace Assets.Scripts.Customers {
         public Text EmotesBladderAmountText;
 
         public bool Active = false;
-        public int UID = GameController.GetUid();
         public CustomerDesperationState lastState;
 
         // Enum for behavior types
@@ -111,7 +110,6 @@ namespace Assets.Scripts.Customers {
         #endregion
 
         private void Awake() {
-            UID = GameController.GetUid();
             // Cache sorting layer id
             SRenderer.sortingLayerName = "AboveOverlay";
             sortingLayerIdAboveOverlay = SRenderer.sortingLayerID;
@@ -130,11 +128,16 @@ namespace Assets.Scripts.Customers {
                 DeltaTime *= 10f;
             }
 
+            // Update all of the time accumulators
             TotalTimeAtBar += DeltaTime;
-            MinTimeAtBarNow += DeltaTime;
             MinTimeBetweenChecksNow += DeltaTime;
             NextDelay -= DeltaTime;
-            CustomerThinkTicker += DeltaTime;
+            if (Location == Location.Bar) {
+                MinTimeAtBarNow += DeltaTime;
+            }
+            else {
+                MinTimeAtBarNow = 0f;
+            }
 
             Bladder.Update(CurrentAction);
             UpdateDesperationState();
@@ -145,11 +148,12 @@ namespace Assets.Scripts.Customers {
             }
             else if (AtDestination) {
                 PeeLogicUpdate();
-            }
-            if (CustomerThinkTicker >= 1f) {
-                CustomerThinkTicker -= 1f;
-                if (Next != null) {
+                if ( CustomerThinkTicker >= 1f ) {
+                    CustomerThinkTicker -= 1f;
                     Think();
+                }
+                else {
+                    CustomerThinkTicker += DeltaTime;
                 }
             }
 
@@ -481,10 +485,6 @@ namespace Assets.Scripts.Customers {
 
         }
         private void PeeLogicUpdate() {
-            // Get occupying relief type
-            ReliefType reliefType = Occupying?.RType ?? ReliefType.None;
-            Relief relief = reliefType == ReliefType.None ? null : (Relief)Occupying;
-
             switch ( CurrentAction ) {
                 case CustomerAction.Wetting:
                     if ( Bladder.IsEmpty ) {
@@ -506,7 +506,7 @@ namespace Assets.Scripts.Customers {
                     }
                     break;
                 case CustomerAction.None:
-                    if ( reliefType == ReliefType.None ) {
+                    if ( ReliefType == ReliefType.None ) {
                         if ( Bladder.Strength == 0f ) {
                             BeginPeeingSelf();
                         }
@@ -554,7 +554,7 @@ namespace Assets.Scripts.Customers {
             }
             if ( LastActionState != CurrentAction ) {
                 LastActionState = CurrentAction;
-                Debug.Log($"Customer {UID} new action: {CurrentAction}");
+                Debug.Log($"Action change | {LastActionState} \u2192 {CurrentAction}", this);
             }
 
             // Desperation State Logging
@@ -562,9 +562,9 @@ namespace Assets.Scripts.Customers {
                 lastState = DesperationState;
 
                 string logString = "";
-                logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(Bladder.Amount)} / {Bladder.Max} ({Math.Round(Bladder.Fullness, 2)}%)";
+                logString += $"State change | {lastState} \u2192 {DesperationState} @ Bladder: {Math.Round(Bladder.Amount)} / {Bladder.Max} ({Math.Round(Bladder.Fullness, 2)}%)";
                 logString += $"Control: {Math.Round(Bladder.HoldingPower)}";
-                Debug.Log(logString);
+                Debug.Log(logString, this);
             }
         }
 
