@@ -211,39 +211,31 @@ namespace Assets.Scripts.Customers {
         public void SetWillingnessToGoLookup() {
             WillingnessToGoLookup = new Dictionary<BladderSize, Dictionary<CustomerDesperationState, int>>() {
                 { BladderSize.Small, new Dictionary<CustomerDesperationState, int>() {
-                    { CustomerDesperationState.State0, 0 },
                     { CustomerDesperationState.State1, GameSettings.Current.SmallUsesBathroomStage1 },
                     { CustomerDesperationState.State2, GameSettings.Current.SmallUsesBathroomStage2 },
                     { CustomerDesperationState.State3, GameSettings.Current.SmallUsesBathroomStage3 },
-                    { CustomerDesperationState.State4, 1 },
-                    { CustomerDesperationState.State5, 0 }
+                    { CustomerDesperationState.State4, 1 }
                 }
             },
             { BladderSize.Medium, new Dictionary<CustomerDesperationState, int>() {
-                    { CustomerDesperationState.State0, 0 },
                     { CustomerDesperationState.State1, GameSettings.Current.MediumUsesBathroomStage1 },
                     { CustomerDesperationState.State2, GameSettings.Current.MediumUsesBathroomStage2 },
                     { CustomerDesperationState.State3, GameSettings.Current.MediumUsesBathroomStage3 },
-                    { CustomerDesperationState.State4, 1 },
-                    { CustomerDesperationState.State5, 0 }
+                    { CustomerDesperationState.State4, 1 }
                 }
             },
             { BladderSize.Large, new Dictionary<CustomerDesperationState, int>() {
-                    { CustomerDesperationState.State0, 0 },
                     { CustomerDesperationState.State1, GameSettings.Current.LargeUsesBathroomStage1 },
                     { CustomerDesperationState.State2, GameSettings.Current.LargeUsesBathroomStage2 },
                     { CustomerDesperationState.State3, GameSettings.Current.LargeUsesBathroomStage3 },
-                    { CustomerDesperationState.State4, 1 },
-                    { CustomerDesperationState.State5, 0 }
+                    { CustomerDesperationState.State4, 1 }
                 }
             },
             { BladderSize.Massive, new Dictionary<CustomerDesperationState, int>() {
-                    { CustomerDesperationState.State0, 0 },
                     { CustomerDesperationState.State1, GameSettings.Current.MassiveUsesBathroomStage1 },
                     { CustomerDesperationState.State2, GameSettings.Current.MassiveUsesBathroomStage2 },
                     { CustomerDesperationState.State3, GameSettings.Current.MassiveUsesBathroomStage3 },
-                    { CustomerDesperationState.State4, 1 },
-                    { CustomerDesperationState.State5, 0 }
+                    { CustomerDesperationState.State4, 1 }
                 }
             }};
         }
@@ -284,9 +276,39 @@ namespace Assets.Scripts.Customers {
             }
         }
 
+        /// <summary>
+        /// Returns a bathroom the customer is willing to, and able to enter
+        /// </summary>
+        /// <returns>Bathroom or null</returns>
         public Bathroom GetBathroomWillingToEnter() {
             if ( DesperationState == CustomerDesperationState.State0
                 || DesperationState == CustomerDesperationState.State5 ) {
+                return null;
+            }
+
+            // If losing control
+            if (DesperationState == CustomerDesperationState.State4) {
+                if ( Gender == 'f') {
+                    // Will girl use guys restroom
+                    if (GenderCorrectBathroom.CustomersInLine >= 2 && GenderIncorrectBathroom.CustomersInLine < GenderCorrectBathroom.CustomersInLine ) {
+                        return GenderIncorrectBathroom;
+                    }
+                    // Use correct bathroom
+                    else if ( !GenderCorrectBathroom.LineIsFull ) {
+                        return GenderCorrectBathroom;
+                    }
+                }
+                else {
+                    // Will guy use girls restroom
+                    if (GenderCorrectBathroom.CustomersInLine >= 2 && GenderIncorrectBathroom.LineIsEmpty) {
+                        return GenderIncorrectBathroom;
+                    }
+                    // Use correct bathroom
+                    else if (!GenderCorrectBathroom.LineIsFull) {
+                        return GenderCorrectBathroom;
+                    }
+                }
+                // Both lines are full? You monster.
                 return null;
             }
 
@@ -304,7 +326,6 @@ namespace Assets.Scripts.Customers {
                             }
                             return null;
                         case CustomerDesperationState.State3:
-                        case CustomerDesperationState.State4:
                             return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
                         default:
                             throw new NotImplementedException();
@@ -312,9 +333,9 @@ namespace Assets.Scripts.Customers {
                 case BladderSize.Medium:
                     switch ( DesperationState ) {
                         case CustomerDesperationState.State1:
-                            if ( GenderCorrectBathroom.CustomersWaiting == 0 ) {
-                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
-                            }
+                            //if ( GenderCorrectBathroom.CustomersWaiting == 0 ) {
+                            //    return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            //}
                             return null;
                         case CustomerDesperationState.State2:
                             if ( GenderCorrectBathroom.CustomersWaiting <= 2 ) {
@@ -326,8 +347,6 @@ namespace Assets.Scripts.Customers {
                                 return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
                             }
                             return null;
-                        case CustomerDesperationState.State4:
-                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
                         default:
                             throw new NotImplementedException();
                     }
@@ -337,16 +356,14 @@ namespace Assets.Scripts.Customers {
                             return null;
                         case CustomerDesperationState.State2:
                             if ( GenderCorrectBathroom.CustomersWaiting == 0 ) {
-                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                                return GenderCorrectBathroom;
                             }
                             return null;
                         case CustomerDesperationState.State3:
-                            if ( GenderCorrectBathroom.CustomersWaiting <= 3 ) {
-                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 3 && RandomUseChance(Bladder.BladderSize, DesperationState) ) {
+                                return GenderCorrectBathroom;
                             }
                             return null;
-                        case CustomerDesperationState.State4:
-                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
                         default:
                             throw new NotImplementedException();
                     }
@@ -356,12 +373,10 @@ namespace Assets.Scripts.Customers {
                         case CustomerDesperationState.State2:
                             return null;
                         case CustomerDesperationState.State3:
-                            if ( GenderCorrectBathroom.CustomersWaiting <= 2 ) {
-                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 2 && RandomUseChance(Bladder.BladderSize, DesperationState) ) {
+                                return GenderCorrectBathroom;
                             }
                             return null;
-                        case CustomerDesperationState.State4:
-                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
                         default:
                             throw new NotImplementedException();
                     }
@@ -375,6 +390,9 @@ namespace Assets.Scripts.Customers {
                 }
                 int chance = WillingnessToGoLookup[size][state];
                 int rng = Random.Range(0, chance);
+                string debugMessage = (chance > 0 && rng == 0 ? "T" : "F") +
+                    $" {Gender} {size} {state} ({Mathf.RoundToInt(Bladder.Fullness)}%) use c=({chance})";
+                Debug.Log(debugMessage, this);
                 return chance > 0 && rng == 0;
             }
         }

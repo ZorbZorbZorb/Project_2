@@ -17,10 +17,12 @@ namespace Assets.Scripts.Areas {
         // Change to single waiting spot, shared among all sinks
         public Line SinksLine;
 
+        public WaitingRoom waitingRoom;
         public DoorwayQueue Line;
         public int CustomersInLine => Line.CustomerCount;
         public int CustomersWaiting => Line.CustomerCount + waitingRoom.CustomerCount;
-        public WaitingRoom waitingRoom;
+        public bool LineIsFull => !Line.HasOpenWaitingSpot();
+        public bool LineIsEmpty => Line.CustomerCount == 0;
 
         // Several of these are checked once per tick by each customer.
         public bool HasToiletAvailable { get; private set; }
