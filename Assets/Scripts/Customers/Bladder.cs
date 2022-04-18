@@ -151,10 +151,10 @@ namespace Assets.Scripts.Customers {
         #region Instance Internal Methods
 
         private void IncreaseHoldingPower( float powerPerSecond ) {
-            HoldingPower = Math.Min(0f, HoldingPower + powerPerSecond * Customer.DeltaTime);
+            HoldingPower = Mathf.Max(MaxHoldingPower, HoldingPower + (powerPerSecond * Customer.DeltaTime));
         }
         private void DecreaseHoldingPower( float powerPerSecond ) {
-            HoldingPower = Math.Max(0f, HoldingPower - powerPerSecond * Customer.DeltaTime);
+            HoldingPower = Mathf.Max(0f, HoldingPower - (powerPerSecond * Customer.DeltaTime));
         }
 
         #endregion
