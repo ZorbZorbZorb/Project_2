@@ -8,7 +8,7 @@ namespace Assets.Scripts {
     [Serializable]
     public class Line {
         [SerializeField]
-        public List<WaitingSpot> Items = new List<WaitingSpot>();
+        public List<WaitingSpot> Items = new();
 
         public void Update() {
             AdvanceQueue();

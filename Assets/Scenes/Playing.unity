@@ -1000,6 +1000,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: -1005482833
   m_SortingOrder: 3
   m_TargetDisplay: 0
@@ -3486,8 +3487,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayNightStartSplash: 1
-  DisplayBuildMenuOnFirstNight: 1
+  DisplayNightStartSplash: 0
+  DisplayBuildMenuOnFirstNight: 0
   NightMaxTime: 30
   NightMaxCustomerSpawnTime: 20
   nightStartDelay: 2
@@ -4489,6 +4490,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 401320327
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -4968,6 +4970,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: -1005482833
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -12593,6 +12596,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: -1005482833
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -12838,6 +12842,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: -1005482833
   m_SortingOrder: 0
   m_TargetDisplay: 0

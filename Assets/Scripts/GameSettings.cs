@@ -13,7 +13,7 @@ namespace Assets.Scripts {
 
         public const string GAME_SETTINGS_PATH = @"Configs\gameSettings";
 
-        public Bladder BladderSettings = new Bladder();
+        public Bladder BladderSettings = new();
         [Serializable]
         public class Bladder {
             // This is the weighted distribution table for spawning customers. Think about it as if it was a bag 

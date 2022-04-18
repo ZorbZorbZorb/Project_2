@@ -16,6 +16,11 @@ public partial class GameController : MonoBehaviour {
 
     #region Fields
 
+    [Range(0.05f, 0.5f)]
+    public float DebugSliderShakeState3 = 0.25f;
+    [Range(0.05f, 0.5f)]
+    public float DebugSliderShakeState4 = 0.1f;
+
     public static bool CreateNewSaveData = true;
     public static int TargetFramerate = 70;
 
@@ -26,15 +31,15 @@ public partial class GameController : MonoBehaviour {
     [Header("Settings")]
     public int NightMaxTime = 30;
     public int NightMaxCustomerSpawnTime = 20;
-    [SerializeField, Range(0, 2)]
+    [Range(0, 2)]
     public float nightStartDelay = 1f;
 
     [Header("Camera Settings")]
-    [SerializeField, Range(15f, 65f)]
+    [Range(15f, 65f)]
     public float CameraTolerangeTight = 18f;
-    [SerializeField, Range(30f, 110f)]
+    [Range(30f, 110f)]
     public float CameraTolerangeMid = 50f;
-    [SerializeField, Range(30f, 110f)]
+    [Range(30f, 110f)]
     public float CameraTolerangeLoose = 68f;
 
     [Header("Debugging")]
@@ -134,7 +139,7 @@ public partial class GameController : MonoBehaviour {
 
     #endregion
 
-    void Awake() {
+    private void Awake() {
         // Reset screen resolution
         Screen.SetResolution(1366, 768, FullScreenMode.Windowed, TargetFramerate);
         Application.targetFrameRate = TargetFramerate;
@@ -163,7 +168,8 @@ public partial class GameController : MonoBehaviour {
         CustomerSpriteController.NewController('m', "Sprites/People/nm");
         CustomerSpriteController.NewController('f', "Sprites/People/n");
     }
-    void Start() {
+
+    private void Start() {
         // Create the auto-camera camera positions
         CameraPosition.AddPosition(Freecam.Center, 600);
         // Set the pause/unpause last zoom
@@ -179,9 +185,9 @@ public partial class GameController : MonoBehaviour {
 
         // Set the customer's static variables
         Customer.BathroomStartX =
-            Bathroom.BathroomM.Bounds.Bounds.min.x - ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.x );
+            Bathroom.BathroomM.Bounds.Bounds.min.x - (Prefabs.PrefabCustomer.SRenderer.transform.localScale.x);
         Customer.BathroomStartY =
-            Bathroom.BathroomM.Bounds.Bounds.min.y + ( Prefabs.PrefabCustomer.SRenderer.transform.localScale.y );
+            Bathroom.BathroomM.Bounds.Bounds.min.y + (Prefabs.PrefabCustomer.SRenderer.transform.localScale.y);
 
         // Lock up the camera
         FC.Locked = true;
@@ -222,7 +228,8 @@ public partial class GameController : MonoBehaviour {
         // Reset frame rate just incase Unity didnt take it in Awake();
         Application.targetFrameRate = TargetFramerate;
     }
-    void Update() {
+
+    private void Update() {
 
         if ( Input.anyKeyDown ) {
             HandleKeypresses();
@@ -330,7 +337,7 @@ public partial class GameController : MonoBehaviour {
                 }
             }
 
-            bool ShouldSpawnCustomerNow(int ticks, int remainingSpawns) {
+            bool ShouldSpawnCustomerNow( int ticks, int remainingSpawns ) {
                 if ( remainingSpawns > 15 ) {
                     return ticks > 4 || Random.Range(0, 5) == 0;
                 }
@@ -341,7 +348,7 @@ public partial class GameController : MonoBehaviour {
                     return ticks > 5 || Random.Range(0, 6) == 0;
                 }
             }
-            int NumberToSpawn(int remainingSpawns) {
+            int NumberToSpawn( int remainingSpawns ) {
                 if ( remainingSpawns > 15 ) {
                     return Random.Range(1, 3);
                 }
@@ -545,7 +552,7 @@ public partial class GameController : MonoBehaviour {
         EastButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.East));
         WestButton.gameObject.SetActive(CameraPosition.HasPosition(Orientation.West));
     }
-    private void CycleCamera(Orientation orientation) {
+    private void CycleCamera( Orientation orientation ) {
         var position = FC.AutoPanning ? FC.PanIntent : FC.transform.position;
         CameraPosition.UpdatePositions(position);
         if ( InBuildMenu ) {

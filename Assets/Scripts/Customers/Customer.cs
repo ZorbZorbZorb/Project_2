@@ -97,7 +97,7 @@ namespace Assets.Scripts.Customers {
         /// <para>-\left(0.85-\left(x\cdot1.7\right)\right)^{4}+1.1</para>
         /// </summary>
         [HideInInspector]
-        private float PathMoveSpeedMultiplier => -Mathf.Pow(-( 0.8f - ( PathTime * 1.6f ) ), 4) + 1.1f;
+        private float PathMoveSpeedMultiplier => -Mathf.Pow(-(0.8f - (PathTime * 1.6f)), 4) + 1.1f;
         public char Gender { get; set; }
         public ReliefType ReliefType => Occupying != null ? Occupying.RType : ReliefType.None;
 
@@ -108,10 +108,12 @@ namespace Assets.Scripts.Customers {
             SRenderer.sortingLayerName = "AboveOverlay";
             sortingLayerIdAboveOverlay = SRenderer.sortingLayerID;
         }
-        void Start() {
+
+        private void Start() {
             Emotes.Start();
         }
-        void Update() {
+
+        private void Update() {
             // Fastest possible exit
             if ( !Active ) {
                 return;
@@ -163,7 +165,7 @@ namespace Assets.Scripts.Customers {
             }
 
         }
-        public void SetupCustomer(bool startFull) {
+        public void SetupCustomer( bool startFull ) {
             marshal = CustomerSpriteController.Controller[Gender];
 
             // Set up the customers animator
@@ -254,7 +256,8 @@ namespace Assets.Scripts.Customers {
         public float NextDelay = 0f;
         /// <summary>Next will wait to trigger until this function returns true</summary>
         public Func<bool> NextWhenTrue = null;
-        void SetNext(float delay, NextAction d, Func<bool> whenTrue = null) {
+
+        private void SetNext( float delay, NextAction d, Func<bool> whenTrue = null ) {
             HasNext = true;
             NextDelay = delay;
             NextWhenTrue = whenTrue;
@@ -366,7 +369,7 @@ namespace Assets.Scripts.Customers {
                     throw new NotImplementedException();
             }
 
-            bool RandomUseChance(BladderSize size, CustomerDesperationState state) {
+            bool RandomUseChance( BladderSize size, CustomerDesperationState state ) {
                 if ( WillingnessToGoLookup == null || !WillingnessToGoLookup.Any() ) {
                     SetWillingnessToGoLookup();
                 }
@@ -379,7 +382,7 @@ namespace Assets.Scripts.Customers {
         public Bathroom GenderCorrectBathroom => Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
         public Bathroom GenderIncorrectBathroom => Gender == 'm' ? Bathroom.BathroomF : Bathroom.BathroomM;
 
-        void NextActionHandler() {
+        private void NextActionHandler() {
             if ( NextDelay > 0f ) {
                 return;
             }
@@ -572,7 +575,7 @@ namespace Assets.Scripts.Customers {
         /// Interactable destination to move to. Respects male / female
         /// position properties if available
         /// </param>
-        public void MoveTo(CustomerInteractable target) {
+        public void MoveTo( CustomerInteractable target ) {
             Vector2[] vectors;
             // Are we in the same location as the target?
             if ( Location == target.Location ) {
@@ -625,7 +628,7 @@ namespace Assets.Scripts.Customers {
         /// Interactable destination to move to. Respects male / female
         /// position properties if available
         /// </param>
-        public void MoveTo(Location location) {
+        public void MoveTo( Location location ) {
             List<Vector2> vectors = Navigation.Navigate(Location, location);
             if ( vectors.Any() ) {
                 vectors.Insert(0, transform.position);
@@ -641,7 +644,7 @@ namespace Assets.Scripts.Customers {
         /// function to set the customer to move in <see cref="MoveUpdate"/>.
         /// </summary>
         /// <param name="vectors"></param>
-        private void MoveTo(Vector2[] vectors) {
+        private void MoveTo( Vector2[] vectors ) {
             PathTime = 0f;
             PathVectors = vectors.ToArray();
             switch ( vectors.Length ) {
@@ -661,7 +664,7 @@ namespace Assets.Scripts.Customers {
             PathMoveSpeed = MoveSpeed / PathLength;
             MovementType = MovementType.Manual;
 
-            void SetBezierPath(Vector2[] vectors) {
+            void SetBezierPath( Vector2[] vectors ) {
                 if ( VertexPath2.PathCache.ContainsKey(vectors) ) {
                     Path = VertexPath2.PathCache[vectors];
                 }
@@ -684,7 +687,7 @@ namespace Assets.Scripts.Customers {
                 }
             }
         }
-        private static void DebugDrawVertexPath(VertexPath2 vertexPath, Color color, float time = 3f) {
+        private static void DebugDrawVertexPath( VertexPath2 vertexPath, Color color, float time = 3f ) {
             for ( int i = 1; i < vertexPath.localPoints.Length; i++ ) {
                 var p0 = vertexPath.localPoints[i - 1];
                 var p1 = vertexPath.localPoints[i];
@@ -751,8 +754,8 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointA">Starting point</param>
         /// <param name="pointB">Ending point</param>
         /// <returns>BezierPoint</returns>
-        private static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
-            return pointA + t * ( pointB - pointA );
+        private static Vector2 GetBezierPoint( float t, Vector2 pointA, Vector2 pointB ) {
+            return pointA + t * (pointB - pointA);
         }
         /// <summary>
         /// Calculates a quadratic bezier point
@@ -762,11 +765,11 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointB">Approached point</param>
         /// <param name="pointC">Ending point</param>
         /// <returns>BezierPoint</returns>
-        private static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC) {
+        private static Vector2 GetBezierPoint( float t, Vector2 pointA, Vector2 pointB, Vector2 pointC ) {
             float u = 1f - t;
             float uu = u * u;
             float tt = t * t;
-            return ( uu * pointA ) + ( 2f * u * t * pointB ) + ( tt * pointC );
+            return (uu * pointA) + (2f * u * t * pointB) + (tt * pointC);
         }
         /// <summary>
         /// Calculates a cubic quadratic bezier point
@@ -777,13 +780,13 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointC">Approached point 2</param>
         /// <param name="pointD">Ending point</param>
         /// <returns>BezierPoint</returns>
-        private static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+        private static Vector2 GetBezierPoint( float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD ) {
             var tt = t * t;
             var u = 1 - t;
             var uu = u * u;
             return uu * u * pointA + 3 * uu * t * pointB + 3 * u * tt * pointC + tt * t * pointD;
         }
-        private static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
+        private static float EstimatePathLength( Vector2 pointA, Vector2 pointB, Vector2 pointC ) {
             float l = 0f;
             float t = 0.1f;
             Vector2 last = pointA;
@@ -796,7 +799,7 @@ namespace Assets.Scripts.Customers {
             while ( t < 1f );
             return l + Vector2.Distance(last, pointC);
         }
-        private static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+        private static float EstimatePathLength( Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD ) {
             float l = 0f;
             float t = 0.1f;
             Vector2 last = pointA;
@@ -814,7 +817,7 @@ namespace Assets.Scripts.Customers {
 
         #region Desperation/Wetting/Peeing
         // Current willingness to use a urinal for relief
-        public static bool WillUseUrinal(Customer customer) {
+        public static bool WillUseUrinal( Customer customer ) {
             // Yup
             if ( customer.Gender == 'm' ) {
                 return true;
@@ -825,12 +828,12 @@ namespace Assets.Scripts.Customers {
             }
             throw new NotImplementedException();
         }
-        public static bool CanUseUrinal(Customer customer) {
+        public static bool CanUseUrinal( Customer customer ) {
             Bathroom bathroom = customer.GetCurrentBathroom();
             return bathroom != null && bathroom.Urinals.Any(x => x.OccupiedBy == null);
         }
         // Current willingness to use a sink for relief
-        public static bool WillUseSink(Customer customer) {
+        public static bool WillUseSink( Customer customer ) {
             if ( GC.CustomersWillUseAnything ) {
                 return true;
             }
@@ -846,7 +849,7 @@ namespace Assets.Scripts.Customers {
                     throw new NotImplementedException();
             }
         }
-        public static bool CanUseSink(Customer customer) {
+        public static bool CanUseSink( Customer customer ) {
             Bathroom bathroom = customer.GetCurrentBathroom();
             if ( bathroom == null ) {
                 return false;
@@ -899,7 +902,7 @@ namespace Assets.Scripts.Customers {
                 Occupy(seat);
             }
             if ( ReliefType == ReliefType.Toilet ) {
-                ( (Toilet)Occupying ).AltSRenderer.sprite = Collections.spriteStallOpened;
+                ((Toilet)Occupying).AltSRenderer.sprite = Collections.spriteStallOpened;
             }
         }
         public void BeginPeeingSelf() {
@@ -934,7 +937,7 @@ namespace Assets.Scripts.Customers {
                 Occupying = null;
             }
         }
-        public void Occupy(CustomerInteractable thing) {
+        public void Occupy( CustomerInteractable thing ) {
             if ( Occupying != thing ) {
                 Unoccupy();
                 MoveTo(thing);
@@ -1007,10 +1010,10 @@ namespace Assets.Scripts.Customers {
         private Button ButtonSink;
         private Button ButtonReliefStop;
         /// <summary>This menu is available when the customer is the restroom</summary>
-        [SerializeField] public Menu BathroomMenu;
+        public Menu BathroomMenu;
         private Canvas BathroomMenuCanvas;
         /// <summary>This menu is only available when the customer is relieving themselves</summary>
-        [SerializeField] public Menu ReliefMenu;
+        public Menu ReliefMenu;
         private Canvas ReliefMenuCanvas;
 
         /// <summary>
@@ -1024,7 +1027,7 @@ namespace Assets.Scripts.Customers {
             bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
             bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.Line.IsNextInLine(this);
             bool acting = CurrentAction != CustomerAction.None;
-            return AtDestination && !IsWet && !acting && ( inBathroom || firstInLine );
+            return AtDestination && !IsWet && !acting && (inBathroom || firstInLine);
         }
         /// <summary>
         /// Code for if relief menu can be displayed
@@ -1032,7 +1035,7 @@ namespace Assets.Scripts.Customers {
         /// <returns></returns>
         public bool CanDisplayReliefMenu() {
             return CurrentAction == CustomerAction.Peeing && Bladder.Fullness > 0.2d
-                && ( ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink );
+                && (ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink);
         }
         #endregion
 
@@ -1107,7 +1110,7 @@ namespace Assets.Scripts.Customers {
 
         #region CustomerPhysicalActions
         // Goes to the doorway queue
-        public bool GetInLine(Bathroom bathroom) {
+        public bool GetInLine( Bathroom bathroom ) {
             CanReenterBathroom = false;
             if ( bathroom.TryEnterQueue(this) ) {
                 // Makes customer hold on for a while longer when entering doorway.
@@ -1123,7 +1126,7 @@ namespace Assets.Scripts.Customers {
         ///   isnt available, the customer will not get in line.
         /// </summary>
         /// <returns>True if customer can use sink or get in line, false if they cannot</returns>
-        public bool UseSink(Bathroom bathroom) {
+        public bool UseSink( Bathroom bathroom ) {
             // If the customer was already occupying a sink don't use a sink
             if ( Occupying != null ) {
                 if ( Occupying.IType == InteractableType.Sink ) {
@@ -1149,7 +1152,7 @@ namespace Assets.Scripts.Customers {
             return false;
         }
         // Goes back to the bar
-        public void EnterBar(Seat seat) {
+        public void EnterBar( Seat seat ) {
             MinTimeAtBarNow = 0f;
             Occupy(seat);
             HasNext = false;

@@ -7,7 +7,7 @@ namespace Assets.Scripts.Customers {
     [Serializable]
     public class CustomerSpriteController {
 
-        public static Dictionary<char, CustomerSpriteController> Controller = new Dictionary<char, CustomerSpriteController>();
+        public static Dictionary<char, CustomerSpriteController> Controller = new();
 
         public readonly string Root;
 
@@ -18,13 +18,13 @@ namespace Assets.Scripts.Customers {
         private readonly Dictionary<InteractableType, Dictionary<CustomerAction, Sprite>> ActionStateSpriteLookup;
         private readonly Dictionary<InteractableType, Dictionary<CustomerAction, Sprite>> ActionStateSidewaysSpriteLookup;
 
-        public Sprite GetSprite<T>(CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite)
+        public Sprite GetSprite<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
             where T : CustomerInteractable {
 
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
                 // The only time action state can be none while interacting with something where you aren't forcing standing is seated
                 //   on a stool so do we only need one of these checks in the below if?
-                return interactable.IType == InteractableType.Seat && ( actionState == CustomerAction.None || actionState == CustomerAction.Wetting )
+                return interactable.IType == InteractableType.Seat && (actionState == CustomerAction.None || actionState == CustomerAction.Wetting)
                     ? DesperationSeatSpriteLookup[desperationState]
                     : GetActionSprite(actionState, interactable);
             }
@@ -32,7 +32,7 @@ namespace Assets.Scripts.Customers {
                 return DesperationSpriteLookup[desperationState];
             }
         }
-        private Sprite GetActionSprite<T>(CustomerAction state, T interactable) where T : CustomerInteractable {
+        private Sprite GetActionSprite<T>( CustomerAction state, T interactable ) where T : CustomerInteractable {
             Dictionary<CustomerAction, Sprite> lookup;
             switch ( state ) {
                 case CustomerAction.PantsDown:
@@ -51,20 +51,20 @@ namespace Assets.Scripts.Customers {
             return lookup[state];
         }
 
-        public static void NewController(char id, string root) {
+        public static void NewController( char id, string root ) {
             if ( Controller.ContainsKey(id) ) {
                 Debug.LogError($"Marshal '{id}' already exists!");
                 return;
             }
             try {
-                CustomerSpriteController marshal = new CustomerSpriteController(root);
+                CustomerSpriteController marshal = new(root);
                 Controller.Add(id, marshal);
             }
             catch ( Exception e ) {
                 Debug.LogError($"Exception creating customer sprite marshal '{id}': '{e.Message}'");
             }
         }
-        private CustomerSpriteController(string root) {
+        private CustomerSpriteController( string root ) {
             Root = root;
 
             DesperationSpriteLookup = new Dictionary<CustomerDesperationState, Sprite>() {
