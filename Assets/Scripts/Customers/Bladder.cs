@@ -9,7 +9,7 @@ namespace Assets.Scripts.Customers {
         #region Fields
 
         [NonSerialized]
-        private Customer Customer;
+        private readonly Customer Customer;
         public BladderSize BladderSize;  // Internal for keeping track of values and debugging
         public float Amount;
         public float Max;

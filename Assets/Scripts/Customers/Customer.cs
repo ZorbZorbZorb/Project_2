@@ -26,7 +26,6 @@ namespace Assets.Scripts.Customers {
         public VertexPath2 Path;
         /// <summary>0f is the start of the path, 1f is the end of the path.</summary>
         private float PathTime = 0f;
-        private float ApproximatePathLength;
         private float PathLength;
         private float PathMoveSpeed;
 
@@ -44,7 +43,6 @@ namespace Assets.Scripts.Customers {
         public string animatorStateName;
         public string lastAnimatorStateName;
 
-        [SerializeField]
         public Text EmotesBladderAmountText;
 
         public bool Active = false;
@@ -55,7 +53,6 @@ namespace Assets.Scripts.Customers {
         public float CanReenterBathroomIn = 0f;
         public bool IsRelievingSelf = false;
         public bool IsFinishedPeeing;
-        [SerializeField]
         public bool IsWetting = false;
         public bool IsWet = false;
         public CustomerDesperationState DesperationState = CustomerDesperationState.State0;
@@ -66,14 +63,11 @@ namespace Assets.Scripts.Customers {
         // Times
         public double UrinateStartDelay;
         public double UrinateStopDelay;
-        private double RemainingUrinateStartDelay;
         private double RemainingUrinateStopDelay;
         public float WetSelfLeaveBathroomDelay = 6f;
         public float TotalTimeAtBar = 0f;
         public float MinTimeAtBar = 60f;
         public float MinTimeAtBarNow = 0f;
-        public float MinTimeBetweenChecks = 8f;
-        public float MinTimeBetweenChecksNow = 0f;
         /// <summary>
         /// Accumulates 1f to make customers think once a second
         /// </summary>
@@ -104,8 +98,8 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         [HideInInspector]
         private float PathMoveSpeedMultiplier => -Mathf.Pow(-( 0.8f - ( PathTime * 1.6f ) ), 4) + 1.1f;
-        [SerializeField] public char Gender { get; set; }
-        public ReliefType ReliefType => Occupying?.RType ?? ReliefType.None;
+        public char Gender { get; set; }
+        public ReliefType ReliefType => Occupying != null ? Occupying.RType : ReliefType.None;
 
         #endregion
 
@@ -130,9 +124,8 @@ namespace Assets.Scripts.Customers {
 
             // Update all of the time accumulators
             TotalTimeAtBar += DeltaTime;
-            MinTimeBetweenChecksNow += DeltaTime;
             NextDelay -= DeltaTime;
-            if (Location == Location.Bar) {
+            if ( Location == Location.Bar ) {
                 MinTimeAtBarNow += DeltaTime;
             }
             else {
@@ -146,7 +139,7 @@ namespace Assets.Scripts.Customers {
             if ( Next != null ) {
                 NextActionHandler();
             }
-            else if (AtDestination) {
+            else if ( AtDestination ) {
                 PeeLogicUpdate();
                 if ( CustomerThinkTicker >= 1f ) {
                     CustomerThinkTicker -= 1f;
@@ -191,15 +184,13 @@ namespace Assets.Scripts.Customers {
             ButtonReliefStop = gameObject.transform.Find("ReliefMenuCanvas/ButtonReliefStop").GetComponent<Button>();
 
             // Set up the buttons for the menus
-            MenuButton MenuButtonWaitingRoom = new MenuButton(this, BathroomMenu, ButtonWaitingRoom, () => { MenuOptionGotoWaiting(); });
-            MenuButton MenuButtonDecline = new MenuButton(this, BathroomMenu, ButtonDecline, () => { MenuOptionDismiss(); });
-            MenuButton MenuButtonToilet = new MenuButton(this, BathroomMenu, ButtonToilet, () => { MenuOptionGotoToilet(); });
-            MenuButton MenuButtonUrinal = new MenuButton(this, BathroomMenu, ButtonUrinal, () => { MenuOptionGotoUrinal(); }, WillUseUrinal, CanUseUrinal);
-            MenuButton MenuButtonSink = new MenuButton(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); }, WillUseSink, CanUseSink);
+            MenuButton MenuButtonWaitingRoom = new(this, BathroomMenu, ButtonWaitingRoom, () => { MenuOptionGotoWaiting(); });
+            MenuButton MenuButtonDecline = new(this, BathroomMenu, ButtonDecline, () => { MenuOptionDismiss(); });
+            MenuButton MenuButtonToilet = new(this, BathroomMenu, ButtonToilet, () => { MenuOptionGotoToilet(); });
+            MenuButton MenuButtonUrinal = new(this, BathroomMenu, ButtonUrinal, () => { MenuOptionGotoUrinal(); }, WillUseUrinal, CanUseUrinal);
+            MenuButton MenuButtonSink = new(this, BathroomMenu, ButtonSink, () => { MenuOptionGotoSink(); }, WillUseSink, CanUseSink);
 
-            MenuButton MenuButtonReliefStop = new MenuButton(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
-
-            Funds = Random.Range(20f, 100f);
+            MenuButton MenuButtonReliefStop = new(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
 
             Bladder = new Bladder(this, startFull);
 
@@ -296,7 +287,6 @@ namespace Assets.Scripts.Customers {
                 return null;
             }
 
-            var settings = GameSettings.Current;
             switch ( Bladder.BladderSize ) {
                 case BladderSize.Small:
                     switch ( DesperationState ) {
@@ -381,7 +371,8 @@ namespace Assets.Scripts.Customers {
                     SetWillingnessToGoLookup();
                 }
                 int chance = WillingnessToGoLookup[size][state];
-                return chance > 0 ? Random.Range(0, chance) == 0 : false;
+                int rng = Random.Range(0, chance);
+                return chance > 0 && rng == 0;
             }
         }
 
@@ -421,7 +412,7 @@ namespace Assets.Scripts.Customers {
                 switch ( DesperationState ) {
                     case CustomerDesperationState.State0:
                         // TODO: Willing to buy a drink?
-                        if (false) {
+                        if ( false ) {
 
                         }
                         break;
@@ -430,13 +421,13 @@ namespace Assets.Scripts.Customers {
                     case CustomerDesperationState.State3:
                         // Willing to go pee?
                         Bathroom bathroom = GetBathroomWillingToEnter();
-                        if ( bathroom == null ) {
+                        if ( bathroom != null ) {
                             if ( bathroom.TryEnterQueue(this) ) {
                                 return;
                             }
                         }
                         // TODO: Willing to buy a drink?
-                        if (false) {
+                        if ( false ) {
 
                         }
                         break;
@@ -675,11 +666,7 @@ namespace Assets.Scripts.Customers {
                     Path = VertexPath2.PathCache[vectors];
                 }
                 else {
-                    BezierPath bezierPath = new BezierPath(vectors, false, PathSpace.xy);
-                    ApproximatePathLength = 0f;
-                    for ( int i = 1; i < vectors.Count(); i++ ) {
-                        ApproximatePathLength += Vector2.Distance(vectors[0], vectors[1]);
-                    }
+                    BezierPath bezierPath = new(vectors, false, PathSpace.xy);
                     Path = new VertexPath2(bezierPath, GameController.GC.transform, 20f);
                     if ( VertexPath2.PathCache.Count > 2000 ) {
                         VertexPath2.PathCache.Clear();
@@ -840,7 +827,7 @@ namespace Assets.Scripts.Customers {
         }
         public static bool CanUseUrinal(Customer customer) {
             Bathroom bathroom = customer.GetCurrentBathroom();
-            return bathroom == null ? false : bathroom.Urinals.Any(x => x.OccupiedBy == null);
+            return bathroom != null && bathroom.Urinals.Any(x => x.OccupiedBy == null);
         }
         // Current willingness to use a sink for relief
         public static bool WillUseSink(Customer customer) {
@@ -881,7 +868,7 @@ namespace Assets.Scripts.Customers {
                 Debug.Log($"losing control when started peeing and will take longer", this);
             }
 
-            ReliefType reliefType = Occupying?.RType ?? ReliefType.None;
+            ReliefType reliefType = Occupying != null ? Occupying.RType : ReliefType.None;
             switch ( reliefType ) {
                 case ReliefType.Toilet:
                 case ReliefType.Urinal:
@@ -1044,8 +1031,8 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         /// <returns></returns>
         public bool CanDisplayReliefMenu() {
-            return CurrentAction == CustomerAction.Peeing && Bladder.Fullness > 0.2d 
-                && (ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink);
+            return CurrentAction == CustomerAction.Peeing && Bladder.Fullness > 0.2d
+                && ( ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink );
         }
         #endregion
 
@@ -1164,14 +1151,12 @@ namespace Assets.Scripts.Customers {
         // Goes back to the bar
         public void EnterBar(Seat seat) {
             MinTimeAtBarNow = 0f;
-            MinTimeBetweenChecksNow = 0f;
             Occupy(seat);
             HasNext = false;
         }
         public void EnterBar() {
             Seat seat = Bar.Singleton.GetRandomOpenSeat();
             MinTimeAtBarNow = 0f;
-            MinTimeBetweenChecksNow = 0f;
             Occupy(seat);
             HasNext = false;
         }

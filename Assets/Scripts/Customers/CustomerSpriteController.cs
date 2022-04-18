@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static Collections;
 
 namespace Assets.Scripts.Customers {
     [Serializable]
@@ -38,8 +37,8 @@ namespace Assets.Scripts.Customers {
             switch ( state ) {
                 case CustomerAction.PantsDown:
                 case CustomerAction.PantsUp:
-                    lookup = interactable.Alignment == Alignment.Vertical 
-                        ? PantsSpriteLookup 
+                    lookup = interactable.Alignment == Alignment.Vertical
+                        ? PantsSpriteLookup
                         : PantsSidewaysSpriteLookup;
                     break;
                 default:

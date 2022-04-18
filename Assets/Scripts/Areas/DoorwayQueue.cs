@@ -7,9 +7,9 @@ namespace Assets.Scripts.Areas {
     [Serializable]
     public class DoorwayQueue {
         public Bathroom Bathroom;
-        public List<WaitingSpot> waitingSpots = new List<WaitingSpot>();
+        public List<WaitingSpot> waitingSpots = new();
         public WaitingSpot PhantomEntrySpot;
-        public List<Customer> CustomersEnteringQueue = new List<Customer>();
+        public List<Customer> CustomersEnteringQueue = new();
         public int CustomerCount => waitingSpots.Count(x => x.Occupied) + CustomersEnteringQueue.Count();
 
         public void Update() {

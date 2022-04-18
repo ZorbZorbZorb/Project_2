@@ -23,7 +23,7 @@ namespace Assets.Scripts.Customers {
         public IEnumerable<Customer> CustomersInBar => Customers
             .Where(x => x.Location == Location.Bar || x.Location == Location.Hallway);
 
-        public List<Customer> Customers = new List<Customer>();
+        public List<Customer> Customers = new();
         public GameObject CustomersHolder;
 
         public Customer CreateCustomer(bool desperate) {

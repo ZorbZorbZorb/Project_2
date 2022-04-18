@@ -21,8 +21,8 @@ namespace Assets.Scripts.Customers {
         private string animationStateName;
         private string animationStateNameLast;
 
-        private Color femaleColor = new Color(1f, 175f / 255f, 175f / 255f);
-        private Color maleColor = new Color(175f / 255f, 175f / 255f, 255f);
+        private Color femaleColor = new(1f, 175f / 255f, 175f / 255f);
+        private Color maleColor = new(175f / 255f, 175f / 255f, 255f);
         public Color Color => customer.Gender == 'm' ? maleColor : femaleColor;
 
         public string AnimationStateNameLast { get => animationStateNameLast; }
