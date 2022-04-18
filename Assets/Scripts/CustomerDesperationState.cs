@@ -6,6 +6,5 @@
         State3,  // Desperation3
         State4,  // Losing Control
         State5,  // Wetting
-        State6,  // Wet
     }
 }
