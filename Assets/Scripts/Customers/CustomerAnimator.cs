@@ -75,16 +75,24 @@ namespace Assets.Scripts.Customers {
                 switch ( customer.DesperationState ) {
                     case CustomerDesperationState.State4:
                         shakeAccumulator += Time.deltaTime;
-                        if ( shakeAccumulator > 0.1f ) {
+                        if ( shakeAccumulator > GameController.GC.DebugSliderShakeState4 ) {
                             renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
-                            shakeAccumulator -= 0.1f;
+                            shakeAccumulator -= GameController.GC.DebugSliderShakeState4;
                         }
+                        //if ( shakeAccumulator > 0.1f ) {
+                        //    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
+                        //    shakeAccumulator -= 0.1f;
+                        //}
                         break;
                     case CustomerDesperationState.State3:
-                        if ( shakeAccumulator > 0.25f ) {
+                        if ( shakeAccumulator > GameController.GC.DebugSliderShakeState3 ) {
                             renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(0, 2), 0, 0);
-                            shakeAccumulator -= 0.25f;
+                            shakeAccumulator -= GameController.GC.DebugSliderShakeState3;
                         }
+                        //if ( shakeAccumulator > 0.25f ) {
+                        //    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(0, 2), 0, 0);
+                        //    shakeAccumulator -= 0.25f;
+                        //}
                         break;
                     default:
                         renderer.transform.position = customer.gameObject.transform.position;

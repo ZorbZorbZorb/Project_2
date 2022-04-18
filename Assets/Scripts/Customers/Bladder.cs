@@ -35,8 +35,8 @@ namespace Assets.Scripts.Customers {
         /// Percentage from 1f to 0f representing how much holding strength the bladder has left
         /// <para>This number sits at 0.01f (1%) while reserve holding time is ticking down</para>
         /// </summary>
-        public float Strength => HoldingPowerReserve > 0f 
-            ? Math.Max(0.01f, HoldingPower / MaxHoldingPower) 
+        public float Strength => HoldingPowerReserve > 0f
+            ? Math.Max(0.01f, HoldingPower / MaxHoldingPower)
             : HoldingPower / MaxHoldingPower;
         public bool LosingControl => HoldingPower == 0f;
         /// <summary>
@@ -53,7 +53,7 @@ namespace Assets.Scripts.Customers {
 
         #region Instance External Methods
 
-        public void Update(CustomerAction action) {
+        public void Update( CustomerAction action ) {
 
             float fullness = Fullness;
 
@@ -84,7 +84,7 @@ namespace Assets.Scripts.Customers {
 
                 case CustomerAction.PeeingPinchOff:
 
-                    if (PinchOffTime > 0f) {
+                    if ( PinchOffTime > 0f ) {
                         Amount -= PinchOffTime * DrainRate * DrainMultiplier * Customer.DeltaTime;
                         if ( Amount < 0f ) {
                             Amount = 0f;
@@ -98,7 +98,7 @@ namespace Assets.Scripts.Customers {
                 default:
 
                     Amount += FillRate * Customer.DeltaTime;
-                    if (fullness > 1.2f) {
+                    if ( fullness > 1.2f ) {
                         Debug.LogWarning("Bladder is abnormally full");
                         DecreaseHoldingPower(10f);
                     }
@@ -108,18 +108,18 @@ namespace Assets.Scripts.Customers {
                     else if ( fullness > 0.80f ) {
                         DecreaseHoldingPower(0.5f);
                     }
-                    else if (fullness > 0.7f) {
+                    else if ( fullness > 0.7f ) {
                         DecreaseHoldingPower(0.2f);
                     }
-                    else if (fullness < 0.5f) {
+                    else if ( fullness < 0.5f ) {
                         IncreaseHoldingPower(1f);
                     }
 
                     break;
             }
         }
-        public void Add(CustomerAction action, float ml) {
-            if ( action != CustomerAction.Peeing && action != CustomerAction.Wetting 
+        public void Add( CustomerAction action, float ml ) {
+            if ( action != CustomerAction.Peeing && action != CustomerAction.Wetting
                 && action != CustomerAction.PeeingPinchOff ) {
                 Amount += ml;
             }
@@ -150,10 +150,10 @@ namespace Assets.Scripts.Customers {
 
         #region Instance Internal Methods
 
-        private void IncreaseHoldingPower(float powerPerSecond) {
+        private void IncreaseHoldingPower( float powerPerSecond ) {
             HoldingPower = Math.Min(0f, HoldingPower + powerPerSecond * Customer.DeltaTime);
         }
-        private void DecreaseHoldingPower(float powerPerSecond) {
+        private void DecreaseHoldingPower( float powerPerSecond ) {
             HoldingPower = Math.Max(0f, HoldingPower - powerPerSecond * Customer.DeltaTime);
         }
 
@@ -165,7 +165,7 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         /// <param name="size">The size this bladder should be.
         /// <param name="startFull">Should this bladder start full?</param>
-        public Bladder(Customer customer, BladderSize size, bool startFull) {
+        public Bladder( Customer customer, BladderSize size, bool startFull ) {
             var settings = GameSettings.Current.BladderSettings;
             Customer = customer;
 
@@ -190,7 +190,7 @@ namespace Assets.Scripts.Customers {
         /// <summary>
         /// </summary>
         /// <param name="startFull">Should this bladder start full?</param>
-        public Bladder(Customer customer, bool startFull) : this(customer, GetRandomBladderSize(), startFull) { }
+        public Bladder( Customer customer, bool startFull ) : this(customer, GetRandomBladderSize(), startFull) { }
 
         #endregion
 
@@ -222,7 +222,7 @@ namespace Assets.Scripts.Customers {
         /// <returns>
         /// Dependent on <paramref name="size"/>. See <see cref="GameSettings.Bladder"/>
         /// </returns>
-        private static float GetRandomBladderMax(BladderSize size) {
+        private static float GetRandomBladderMax( BladderSize size ) {
             var settings = GameSettings.Current.BladderSettings;
             switch ( size ) {
                 case BladderSize.Small:
@@ -246,9 +246,9 @@ namespace Assets.Scripts.Customers {
         /// <param name="t">0 &#8804; <paramref name="t"/> &#8804; 1</param>
         /// <param name="startFull"></param>
         /// <returns>(<paramref name="max"/> * 0.1)~ &#8804; x &#8804; (<paramref name="max"/> * 0.9) </returns>
-        private static float GetBladderStartingFullness(float max, float t, bool startFull) {
-            float percent = MathF.Pow(-( ( t * 1.5f ) - 0.75f ), 2f) / 2f;
-            percent += startFull ? 0.95f : 0.4f;
+        private static float GetBladderStartingFullness( float max, float t, bool startFull ) {
+            float percent = (1f - MathF.Pow(( t * 1.5f ) - 0.75f, 2f)) / 2f;
+            percent += startFull ? 0.45f : 0;
             return percent * max;
         }
 
