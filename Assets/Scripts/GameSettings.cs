@@ -34,16 +34,37 @@ namespace Assets.Scripts {
             public float SizeMaxMassive = 1900f;
 
             // Default values for customers's bladders.
-            public float DefaultControlRemaining = 130f;
             public float DefaultFillRate = 1f;
-            public float DefaultDrainRate = 30f;
-            public float DefaultLossOfControlTimeM = 16f;
-            public float DefaultLossOfControlTimeF = 8f;
+            public float DefaultDrainRate = 25f;
             public float DefaultStartingFullness = 0.5f;
+            public float DefaultHoldingPower = 130f;
+            public float DefaultHoldingPowerReserveM = 16f;
+            public float DefaultHoldingPowerReserveF = 8f;
+            public float DefaultPinchOffTime = 2.5f;
 
             [JsonIgnore]
             public int ChanceTotal => ChanceSmall + ChanceMedium + ChanceLarge + ChanceMassive;
         }
+
+        // Chances each bladder size will get up to use the restroom each second. 1/x chance each second
+        public int SmallUsesBathroomStage1 = 6;
+        public int SmallUsesBathroomStage2 = 3;
+        public int SmallUsesBathroomStage3 = 2;
+        // Medium
+        public int MediumUsesBathroomStage1 = 30;
+        public int MediumUsesBathroomStage2 = 10;
+        public int MediumUsesBathroomStage3 = 5;
+        // Large
+        public int LargeUsesBathroomStage1 = 0;
+        public int LargeUsesBathroomStage2 = 20;
+        public int LargeUsesBathroomStage3 = 10;
+        // Massive
+        public int MassiveUsesBathroomStage1 = 0;
+        public int MassiveUsesBathroomStage2 = 0;
+        public int MassiveUsesBathroomStage3 = 20;
+
+        public float PantsDownTime = 2f;
+        public float PantsUpTime = 1f;
 
         public static GameSettings Load(string path) {
             string json = Resources.Load<TextAsset>(path).text;

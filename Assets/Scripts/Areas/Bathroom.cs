@@ -18,6 +18,8 @@ namespace Assets.Scripts.Areas {
         public Line SinksLine;
 
         public DoorwayQueue Line;
+        public int CustomersInLine => Line.CustomerCount;
+        public int CustomersWaiting => Line.CustomerCount + waitingRoom.CustomerCount;
         public WaitingRoom waitingRoom;
 
         // Several of these are checked once per tick by each customer.

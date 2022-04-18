@@ -81,13 +81,13 @@ namespace Assets.Scripts.Customers {
                 double scaleY = 160f;
 
                 // Note, Code breaks down at bladder sizes over AverageMax * 2.
-                factor = Customer.bladder.Max / AverageMax;
+                factor = Customer.Bladder.Max / AverageMax;
                 double multiplier = ( ( ( factor / 2 ) * Math.PI ) - Math.PI / 2 ) * 0.5;
                 multiplier = Math.Max(0.5, Math.Min(1.5, multiplier));
 
-                value = Math.Max(0.15, Math.Min(1, Customer.bladder.Percentage));
+                value = Math.Max(0.15, Math.Min(1, Customer.Bladder.Fullness));
                 width = ( Math.Sin(( ( value * 1.2d ) + bladderWidthCalculationFactor1 ) * 2.5) + bladderWidthCalculationFactor2 ) / bladderWidthCalculationFactor3;
-                height = Math.Max(0.15, Customer.bladder.Percentage / 1.1 + bladderHeightCalculationFactor1);
+                height = Math.Max(0.15, Customer.Bladder.Fullness / 1.1 + bladderHeightCalculationFactor1);
 
                 // Update the size
                 double x = height * multiplier * scaleX;
@@ -95,18 +95,18 @@ namespace Assets.Scripts.Customers {
                 BladderCircleTransform.localScale = new Vector3((float)x, (float)y);
 
                 // Update text display
-                BladderAmountText.text = $"{Math.Round(Customer.bladder.Amount, 0)}";
+                BladderAmountText.text = $"{Math.Round(Customer.Bladder.Amount, 0)}";
 
                 // Fade the display if too low amount
-                if ( Customer.bladder.Amount < 250 ) {
+                if ( Customer.Bladder.Amount < 250 ) {
                     Color colorText = new Color(1f, 1f, 1f, 0f);
                     Color color = new Color(SpriteBladderTop.color.r, SpriteBladderTop.color.g, SpriteBladderTop.color.g, 0f);
                     BladderAmountText.color = colorText;
                     SpriteBladderTop.color = color;
                     SpriteBladderBottom.color = color;
                 }
-                else if ( Customer.bladder.Amount < 500 ) {
-                    float a = ( (float)Customer.bladder.Amount - 450f ) / 50f;
+                else if ( Customer.Bladder.Amount < 500 ) {
+                    float a = ( (float)Customer.Bladder.Amount - 450f ) / 50f;
                     Color colorText = new Color(0f, 0f, 0f, Mathf.Clamp(a, 0f, 1f));
                     Color color = bladderColorNormal * new Vector4(1f, 1f, 1f, Mathf.Clamp(a, 0f, 1f));
                     BladderAmountText.color = colorText;

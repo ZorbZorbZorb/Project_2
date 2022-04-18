@@ -21,29 +21,29 @@ public static class Collections {
     public static Sprite SpriteStoolNormal = Resources.Load<Sprite>("Sprites/Entities/Stool_normal");
     public static Sprite SpriteStoolWet = Resources.Load<Sprite>("Sprites/Entities/Stool_wet");
 
-    public static Dictionary<CustomerActionState, Sprite> BubbleSpriteLookupF = 
-        BubbleSpriteLookupF = new Dictionary<CustomerActionState, Sprite>() {
-            { CustomerActionState.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
+    public static Dictionary<CustomerAction, Sprite> BubbleSpriteLookupF = 
+        BubbleSpriteLookupF = new Dictionary<CustomerAction, Sprite>() {
+            { CustomerAction.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            { CustomerAction.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            { CustomerAction.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
+            { CustomerAction.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };
-    public static Dictionary<CustomerActionState, Sprite> BubbleSpriteLookupM = 
-        BubbleSpriteLookupM = new Dictionary<CustomerActionState, Sprite>() {
-            { CustomerActionState.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerActionState.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
-            { CustomerActionState.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
+    public static Dictionary<CustomerAction, Sprite> BubbleSpriteLookupM = 
+        BubbleSpriteLookupM = new Dictionary<CustomerAction, Sprite>() {
+            { CustomerAction.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            { CustomerAction.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            { CustomerAction.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
+            { CustomerAction.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };
 
-    public static Dictionary<char, Dictionary<CustomerActionState, Sprite>> GenderedBubbleSpriteLookup = 
-        new Dictionary<char, Dictionary<CustomerActionState, Sprite>>() {
+    public static Dictionary<char, Dictionary<CustomerAction, Sprite>> GenderedBubbleSpriteLookup = 
+        new Dictionary<char, Dictionary<CustomerAction, Sprite>>() {
             {'f', BubbleSpriteLookupF },
             {'m', BubbleSpriteLookupM }
     };
 
-    public static CustomerActionState[] ValidBubbleActionStatesF = BubbleSpriteLookupF.Keys.ToArray();
-    public static CustomerActionState[] ValidBubbleActionStatesM = BubbleSpriteLookupM.Keys.ToArray();
+    public static CustomerAction[] ValidBubbleActionStatesF = BubbleSpriteLookupF.Keys.ToArray();
+    public static CustomerAction[] ValidBubbleActionStatesM = BubbleSpriteLookupM.Keys.ToArray();
 
     public static readonly Dictionary<InteractableType, Sprite> VerticalInteractableSprites =
         new Dictionary<InteractableType, Sprite>() {
@@ -59,14 +59,14 @@ public static class Collections {
     };
 
     public static Sprite GetBubbleSprite(Customer customer) {
-        CustomerActionState[] ValidBubbleActionStates = customer.Gender == 'm' ? ValidBubbleActionStatesM : ValidBubbleActionStatesF;
-        if ( !ValidBubbleActionStates.Contains(customer.ActionState) ) {
+        CustomerAction[] ValidBubbleActionStates = customer.Gender == 'm' ? ValidBubbleActionStatesM : ValidBubbleActionStatesF;
+        if ( !ValidBubbleActionStates.Contains(customer.CurrentAction) ) {
             return null;
         }
 
         // Bubble displays early if they are about to wet themselves
         if ( customer.DesperationState == CustomerDesperationState.State5 || customer.AtDestination ) {
-            return GenderedBubbleSpriteLookup[customer.Gender][customer.ActionState];
+            return GenderedBubbleSpriteLookup[customer.Gender][customer.CurrentAction];
         }
 
         return null;

@@ -3,180 +3,164 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.Customers {
-    // Pee is stored in the balls
     [Serializable]
     public class Bladder {
+
+        #region Fields
+
         [NonSerialized]
-        public Customer Customer;
+        private Customer Customer;
         public BladderSize BladderSize;  // Internal for keeping track of values and debugging
-        public float Stomach;  // The stomach is stored in the bladder
         public float Amount;
         public float Max;
-        public float DrainRate;
-        public float DrainRateNow;
-        public float NormalizedPercentEmptied;
-        public float NormalizedPercentEmptiedStart;
         public float FillRate;
-        public float ControlRemaining;
-        public float LossOfControlTime;  //  Time remaining before tranfering from about to wet to wetting
-        public float LossOfControlTimeNow;
-        public bool StruggleStopPeeing;
-        public bool StruggleStopSpurt = false;
-        public bool StruggleStopSpurtNow = false;
+        public float DrainRate;
+        public float PinchOffTime;
 
+        public float MaxHoldingPower;
+        public float HoldingPower;
+        public float HoldingPowerReserve;
+        // Leak amount?
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Percentage from 0f to 1f representing how full the bladder is.
+        /// <para>This number can go over 1f if the bladder is overfilled.</para>
+        /// </summary>
+        public float Fullness => Amount / Max;
+        /// <summary>
+        /// Percentage from 1f to 0f representing how much holding strength the bladder has left
+        /// <para>This number sits at 0.01f (1%) while reserve holding time is ticking down</para>
+        /// </summary>
+        public float Strength => HoldingPowerReserve > 0f 
+            ? Math.Max(0.01f, HoldingPower / MaxHoldingPower) 
+            : HoldingPower / MaxHoldingPower;
+        public bool LosingControl => HoldingPower == 0f;
+        /// <summary>
+        /// Denotes if the bladder is empty or not.
+        /// <para>Will be false after calling <see cref="FinishPeeing"/></para>
+        /// </summary>
+        public bool IsEmpty { get; private set; }
         /// <summary>
         /// Amount to multiply the normal drain rate by, to make the customer pee faster when their bladder is fuller
         /// </summary>
-        public float DrainMultiplier => Mathf.Min(0.75f + Mathf.Pow(0.7f * Amount / Max, 2), 2f);
+        private float DrainMultiplier => Mathf.Min(0.75f + Mathf.Pow(0.7f * Amount / Max, 2), 2f);
 
-        // Leak amount?
-        public bool Emptying = false;  // Flag to set if emptying or filling
-        public bool LosingControl = false;  // Flag for losing control
-        public bool Wetting = false;  // For use by customer class
-        public bool ShouldWetNow = false;  // Used by customer to tell when bladder wants to start involuntarily emptying
+        #endregion
 
-        public bool StartedLosingControlThisFrame;
+        #region Instance External Methods
 
-        public float Percentage => Amount / Max;
+        public void Update(CustomerAction action) {
 
-        /// <summary>
-        /// Forces bladder to hold on a bit longer by resetting loss of control time.
-        /// <para>does not reset state for wetting or control remaining.</para>
-        /// </summary>
-        public void ResetLossOfControlTime() {
-            LossOfControlTimeNow = LossOfControlTime;
+            float fullness = Fullness;
+
+            switch ( action ) {
+                case CustomerAction.Wetting:
+                case CustomerAction.Peeing:
+
+                    Amount -= DrainRate * DrainMultiplier * Customer.DeltaTime;
+                    if ( Amount < 0f ) {
+                        Amount = 0f;
+                        IsEmpty = true;
+                    }
+
+                    // Quickly regain control if empty
+                    if ( fullness < 0.6f ) {
+                        IncreaseHoldingPower(6f);
+                    }
+                    // Moderatly regain control if not full
+                    else if ( fullness < 0.85f ) {
+                        IncreaseHoldingPower(3f);
+                    }
+                    // Very slowly regain control if still full
+                    else if ( fullness < 0.95f ) {
+                        IncreaseHoldingPower(1.5f);
+                    }
+
+                    break;
+
+                case CustomerAction.PeeingPinchOff:
+
+                    if (PinchOffTime > 0f) {
+                        Amount -= PinchOffTime * DrainRate * DrainMultiplier * Customer.DeltaTime;
+                        if ( Amount < 0f ) {
+                            Amount = 0f;
+                            IsEmpty = true;
+                        }
+                        PinchOffTime -= Customer.DeltaTime;
+                    }
+
+                    break;
+
+                default:
+
+                    Amount += FillRate * Customer.DeltaTime;
+                    if (fullness > 1.2f) {
+                        Debug.LogWarning("Bladder is abnormally full");
+                        DecreaseHoldingPower(10f);
+                    }
+                    else if ( fullness > 1f ) {
+                        DecreaseHoldingPower(2f);
+                    }
+                    else if ( fullness > 0.80f ) {
+                        DecreaseHoldingPower(0.5f);
+                    }
+                    else if (fullness > 0.7f) {
+                        DecreaseHoldingPower(0.2f);
+                    }
+                    else if (fullness < 0.5f) {
+                        IncreaseHoldingPower(1f);
+                    }
+
+                    break;
+            }
         }
-
-        public void Update() {
-            // Set all started/stopped x this frame bools to false
-            ResetFrameStates();
-
-            // If Emptying
-            if ( Emptying ) {
-                // Calculate the normalized amount emptied. It's okay to do it this way for now, because it only matters
-                //   for wettings or determining how much someone has emptied BEFORE having them stop.
-                NormalizedPercentEmptiedStart = Mathf.Max(NormalizedPercentEmptiedStart, (float)Amount);
-                NormalizedPercentEmptied = 1f - ( (float)Amount / NormalizedPercentEmptiedStart );
-
-                if ( StruggleStopPeeing ) {
-                    // If finished struggling to stop peeing
-                    if ( DrainRateNow <= 0d ) {
-                        Emptying = false;
-                        StruggleStopPeeing = false;
-                        DrainRateNow = DrainRate;
-                    }
-                    // Struggle to stop peeing
-                    else {
-                        if ( StruggleStopSpurtNow ) {
-                            if ( DrainRateNow > DrainRate * 1.5f ) {
-                                StruggleStopSpurtNow = false;
-                            }
-                            else {
-                                DrainRateNow += ( 15f * Customer.DeltaTime );
-                            }
-                        }
-                        else {
-                            // Guys will be better at interrupting peeing than girls
-                            if ( Customer.Gender == 'm' ) {
-                                DrainRateNow -= ( 16f * Customer.DeltaTime );
-                            }
-                            else {
-                                DrainRateNow -= ( 8f * Customer.DeltaTime );
-                            }
-                        }
-                        // To make it more interesting heres some naive for spurting when stopping
-                        if ( !StruggleStopSpurtNow && !StruggleStopSpurt && DrainRateNow < DrainRate / 2 ) {
-                            StruggleStopSpurt = true;
-                            if ( Random.Range(0, 2) == 1 && Percentage > 0.4d ) {  // 50/50 for this behavior to trigger when full
-                                StruggleStopSpurtNow = true;
-                            }
-                        }
-                        // TODO add posibility for wetting by reducing control here?
-                    }
-                }
-                DoBladderEmpty();
-                return;
-            }
-            // If Losing Control
-            else if ( LosingControl ) {
-                DoBladderFill();
-                float timeToSubtract = 1 * Customer.DeltaTime;
-                LossOfControlTimeNow -= timeToSubtract;
-                if ( LossOfControlTimeNow <= 0 ) {
-                    LosingControl = false;
-                    ShouldWetNow = true;
-                }
-            }
-            // If Filling
-            else {
-                DoBladderFill();
-                if ( ControlRemaining <= 0d ) {
-                    if ( LosingControl == false ) {
-                        StartedLosingControlThisFrame = true;
-                    }
-                    LosingControl = true;
-                }
+        public void Add(CustomerAction action, float ml) {
+            if ( action != CustomerAction.Peeing && action != CustomerAction.Wetting 
+                && action != CustomerAction.PeeingPinchOff ) {
+                Amount += ml;
             }
         }
         /// <summary>
-        /// Fill a customers bladder. Called once per update
+        /// Resets <see cref="HoldingPowerReserve"/>
         /// </summary>
-        private void DoBladderFill() {
-            float amountToAdd = FillRate * Customer.DeltaTime;
-            if ( GameController.GC.RapidBladderFill ) {
-                amountToAdd *= 3;
-            }
-            Amount += amountToAdd;
-            if ( Stomach > 0 ) {
-                amountToAdd = Customer.DeltaTime * ( 2f + ( Stomach / 200f ) );
-                Stomach -= amountToAdd;
-                Amount += amountToAdd;
-            }
-            float percentFull = Percentage;
-            if ( percentFull > 0.8f && percentFull < 1.0f ) {
-                ControlRemaining -= 0.5f * Customer.DeltaTime;
-                if ( ControlRemaining < 0f ) {
-                    ControlRemaining = 0f;
-                }
-            }
-            else if ( percentFull > 1.0f ) {
-                ControlRemaining -= 5f * Customer.DeltaTime;
-                if ( ControlRemaining < 0f ) {
-                    ControlRemaining = 0f;
-                }
-            }
+        public void ResetReserveHoldingPower() {
+            var settings = GameSettings.Current.BladderSettings;
+            HoldingPowerReserve = Customer.Gender == 'm'
+                ? settings.DefaultHoldingPowerReserveM
+                : settings.DefaultHoldingPowerReserveF;
         }
-        /// <summary>
-        /// Empty a customers bladder. Called once per update
-        /// </summary>
-        private void DoBladderEmpty() {
-            float amountToRemove = DrainRateNow * DrainMultiplier * Customer.DeltaTime;
+        public void ResetStrength() {
+            var settings = GameSettings.Current.BladderSettings;
+            HoldingPower = settings.DefaultHoldingPower;
+            HoldingPowerReserve = Customer.Gender == 'm'
+                ? settings.DefaultHoldingPowerReserveM
+                : settings.DefaultHoldingPowerReserveF;
+        }
+        public void FinishPeeing() {
+            PinchOffTime = GameSettings.Current.BladderSettings.DefaultPinchOffTime;
+            ResetReserveHoldingPower();
+            IsEmpty = false;
+        }
 
-            if ( GameController.GC.RapidBladderEmpty ) {
-                amountToRemove *= 3f;
-            }
+        #endregion
 
-            Amount -= amountToRemove;
-            if ( Percentage < 0.9f ) {
-                LosingControl = false;
-            }
-            if ( Amount < 1f ) {
-                Amount = 0f;
-                Emptying = false;
-                Wetting = false;
-                ShouldWetNow = false;
-                DrainRateNow = DrainRate;
-                if ( ControlRemaining < 1f ) {
-                    ControlRemaining = 1f;
-                }
-            }
+        #region Instance Internal Methods
+
+        private void IncreaseHoldingPower(float powerPerSecond) {
+            HoldingPower = Math.Min(0f, HoldingPower + powerPerSecond * Customer.DeltaTime);
         }
-        private void ResetFrameStates() {
-            StartedLosingControlThisFrame = false;
+        private void DecreaseHoldingPower(float powerPerSecond) {
+            HoldingPower = Math.Max(0f, HoldingPower - powerPerSecond * Customer.DeltaTime);
         }
-        public void StopPeeingEarly() {
-            StruggleStopPeeing = true;
-        }
+
+        #endregion
+
+        #region Constructors
+
         /// <summary>
         /// </summary>
         /// <param name="size">The size this bladder should be.
@@ -191,25 +175,26 @@ namespace Assets.Scripts.Customers {
 
             // Determine the starting fullness
             Amount = GetBladderStartingFullness(Max, Random.Range(0f, 1f), startFull);
+            IsEmpty = false;
 
-            ControlRemaining = settings.DefaultControlRemaining;
-            LossOfControlTime = customer.Gender == 'm' ? settings.DefaultLossOfControlTimeM : settings.DefaultLossOfControlTimeF;
-            LossOfControlTimeNow = LossOfControlTime;
-            ControlRemaining = settings.DefaultControlRemaining;
+            MaxHoldingPower = settings.DefaultHoldingPower;
+            HoldingPower = MaxHoldingPower;
+            HoldingPowerReserve = customer.Gender == 'm'
+                ? settings.DefaultHoldingPowerReserveM
+                : settings.DefaultHoldingPowerReserveF;
+            PinchOffTime = settings.DefaultPinchOffTime;
 
             FillRate = settings.DefaultFillRate;
             DrainRate = settings.DefaultDrainRate;
-            DrainRateNow = settings.DefaultDrainRate;
-            Stomach = 0f;
-
-            ResetFrameStates();
         }
         /// <summary>
         /// </summary>
         /// <param name="startFull">Should this bladder start full?</param>
         public Bladder(Customer customer, bool startFull) : this(customer, GetRandomBladderSize(), startFull) { }
 
-        #region Internal Methods
+        #endregion
+
+        #region Static Internal Methods
 
         /// <summary>
         /// Decides a bladder size at random using the weighted distribution table in <see cref="GameSettings.BladderSettings"/>
@@ -268,12 +253,6 @@ namespace Assets.Scripts.Customers {
         }
 
         #endregion
-    }
-}
 
-public enum BladderSize {
-    Small,
-    Medium,
-    Large,
-    Massive
+    }
 }

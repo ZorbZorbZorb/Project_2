@@ -10,6 +10,106 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.Customers {
     public class Customer : MonoBehaviour {
+
+        #region Fields
+
+        public static GameController GC = null;
+
+        public double Funds = 0d;
+        private CustomerSpriteController marshal;
+        [HideInInspector]
+        public CustomerAnimator customerAnimator;
+        private CustomerAction LastActionState;
+        [HideInInspector]
+        public Vector2[] PathVectors = new Vector2[0];
+        [HideInInspector]
+        public VertexPath2 Path;
+        /// <summary>0f is the start of the path, 1f is the end of the path.</summary>
+        private float PathTime = 0f;
+        private float ApproximatePathLength;
+        private float PathLength;
+        private float PathMoveSpeed;
+
+        public float MoveSpeed;
+        public MovementType MovementType = MovementType.None;
+
+        /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
+        [HideInInspector]
+        public static float BathroomStartX, BathroomStartY;
+
+        private int sortingLayerIdAboveOverlay = -1;
+
+        public SpriteRenderer SRenderer;
+        public Animator animator;
+        public string animatorStateName;
+        public string lastAnimatorStateName;
+
+        [SerializeField]
+        public Text EmotesBladderAmountText;
+
+        public bool Active = false;
+        public int UID = GameController.GetUid();
+        public CustomerDesperationState lastState;
+
+        // Enum for behavior types
+        public bool CanReenterBathroom = true;
+        public float CanReenterBathroomIn = 0f;
+        public bool IsRelievingSelf = false;
+        public bool IsFinishedPeeing;
+        [SerializeField]
+        public bool IsWetting = false;
+        public bool IsWet = false;
+        public CustomerDesperationState DesperationState = CustomerDesperationState.State0;
+        private CustomerDesperationState LastDesperationState = CustomerDesperationState.State0;
+        public bool DesperationStateChangeThisUpdate = false;
+        public Bladder Bladder;
+
+        // Times
+        public double UrinateStartDelay;
+        public double UrinateStopDelay;
+        private double RemainingUrinateStartDelay;
+        private double RemainingUrinateStopDelay;
+        public float WetSelfLeaveBathroomDelay = 6f;
+        public float TotalTimeAtBar = 0f;
+        public float MinTimeAtBar = 60f;
+        public float MinTimeAtBarNow = 0f;
+        public float MinTimeBetweenChecks = 8f;
+        public float MinTimeBetweenChecksNow = 0f;
+        /// <summary>
+        /// Accumulates 1f to make customers think once a second
+        /// </summary>
+        private float CustomerThinkTicker = 0f;
+
+        // Position
+        public CustomerAction CurrentAction = CustomerAction.None;
+        public Location Location = Location.None;
+        public CustomerInteractable Occupying;
+
+        // Class that contains all of the emotes / thought bubbles / etc for the person
+        public Emotes Emotes;
+
+        public static Dictionary<BladderSize, Dictionary<CustomerDesperationState, int>> WillingnessToGoLookup;
+
+        #endregion
+
+        #region Properties
+
+        [HideInInspector]
+        internal float DeltaTime { get; private set; }
+
+        [HideInInspector]
+        public bool AtDestination => MovementType == MovementType.None;
+        /// <summary>
+        /// https://www.desmos.com/calculator
+        /// <para>-\left(0.85-\left(x\cdot1.7\right)\right)^{4}+1.1</para>
+        /// </summary>
+        [HideInInspector]
+        private float PathMoveSpeedMultiplier => -Mathf.Pow(-( 0.8f - ( PathTime * 1.6f ) ), 4) + 1.1f;
+        [SerializeField] public char Gender { get; set; }
+        public ReliefType ReliefType => Occupying?.RType ?? ReliefType.None;
+
+        #endregion
+
         private void Awake() {
             UID = GameController.GetUid();
             // Cache sorting layer id
@@ -34,30 +134,30 @@ namespace Assets.Scripts.Customers {
             MinTimeAtBarNow += DeltaTime;
             MinTimeBetweenChecksNow += DeltaTime;
             NextDelay -= DeltaTime;
+            CustomerThinkTicker += DeltaTime;
 
-            // Update bladder
-            bladder.Update();
+            Bladder.Update(CurrentAction);
+            UpdateDesperationState();
 
-            if ( !bladder.ShouldWetNow ) {
-                UpdateDesperationState();
+            // Handle next action, or think
+            if ( Next != null ) {
+                NextActionHandler();
+            }
+            else if (AtDestination) {
+                PeeLogicUpdate();
+            }
+            if (CustomerThinkTicker >= 1f) {
+                CustomerThinkTicker -= 1f;
+                if (Next != null) {
+                    Think();
+                }
             }
 
-            // Update peeing logic
-            PeeLogicUpdate();
-
-            // Think
-            Think();
-
-            // Update anim
             customerAnimator.Update();
-            // Emote think
             Emotes.Update();
-
-            // Menu updates
             BathroomMenu.Update();
             ReliefMenu.Update();
 
-            // Move sprite
             MoveUpdate();
 
             // Debug logging
@@ -66,7 +166,6 @@ namespace Assets.Scripts.Customers {
             }
 
         }
-
         public void SetupCustomer(bool startFull) {
             marshal = CustomerSpriteController.Controller[Gender];
 
@@ -77,10 +176,8 @@ namespace Assets.Scripts.Customers {
             BathroomMenuCanvas = gameObject.transform.Find("BathroomMenuCanvas").GetComponent<Canvas>();
             ReliefMenuCanvas = gameObject.transform.Find("ReliefMenuCanvas").GetComponent<Canvas>();
             // Set up the menus for this customer
-            BathroomMenu = new Menu(BathroomMenuCanvas);
-            BathroomMenu.canOpenNow = CanDisplayBathroomMenu;
-            ReliefMenu = new Menu(ReliefMenuCanvas);
-            ReliefMenu.canOpenNow = CanDisplayReliefMenu;
+            BathroomMenu = new Menu(BathroomMenuCanvas, CanDisplayBathroomMenu);
+            ReliefMenu = new Menu(ReliefMenuCanvas, CanDisplayReliefMenu);
 
             ButtonWaitingRoom = gameObject.transform.Find("BathroomMenuCanvas/ButtonWait").GetComponent<Button>();
             ButtonDecline = gameObject.transform.Find("BathroomMenuCanvas/ButtonDecline").GetComponent<Button>();
@@ -100,7 +197,7 @@ namespace Assets.Scripts.Customers {
 
             Funds = Random.Range(20f, 100f);
 
-            bladder = new Bladder(this, startFull);
+            Bladder = new Bladder(this, startFull);
 
             UrinateStartDelay = 4d;
             UrinateStopDelay = 6d;
@@ -110,9 +207,48 @@ namespace Assets.Scripts.Customers {
             BathroomMenu.Update();
             ReliefMenu.Update();
 
-            bladder.Update();
             UpdateDesperationState();
             PeeLogicUpdate();
+        }
+
+        public void SetWillingnessToGoLookup() {
+            WillingnessToGoLookup = new Dictionary<BladderSize, Dictionary<CustomerDesperationState, int>>() {
+                { BladderSize.Small, new Dictionary<CustomerDesperationState, int>() {
+                    { CustomerDesperationState.State0, 0 },
+                    { CustomerDesperationState.State1, GameSettings.Current.SmallUsesBathroomStage1 },
+                    { CustomerDesperationState.State2, GameSettings.Current.SmallUsesBathroomStage2 },
+                    { CustomerDesperationState.State3, GameSettings.Current.SmallUsesBathroomStage3 },
+                    { CustomerDesperationState.State4, 1 },
+                    { CustomerDesperationState.State5, 0 }
+                }
+            },
+            { BladderSize.Medium, new Dictionary<CustomerDesperationState, int>() {
+                    { CustomerDesperationState.State0, 0 },
+                    { CustomerDesperationState.State1, GameSettings.Current.MediumUsesBathroomStage1 },
+                    { CustomerDesperationState.State2, GameSettings.Current.MediumUsesBathroomStage2 },
+                    { CustomerDesperationState.State3, GameSettings.Current.MediumUsesBathroomStage3 },
+                    { CustomerDesperationState.State4, 1 },
+                    { CustomerDesperationState.State5, 0 }
+                }
+            },
+            { BladderSize.Large, new Dictionary<CustomerDesperationState, int>() {
+                    { CustomerDesperationState.State0, 0 },
+                    { CustomerDesperationState.State1, GameSettings.Current.LargeUsesBathroomStage1 },
+                    { CustomerDesperationState.State2, GameSettings.Current.LargeUsesBathroomStage2 },
+                    { CustomerDesperationState.State3, GameSettings.Current.LargeUsesBathroomStage3 },
+                    { CustomerDesperationState.State4, 1 },
+                    { CustomerDesperationState.State5, 0 }
+                }
+            },
+            { BladderSize.Massive, new Dictionary<CustomerDesperationState, int>() {
+                    { CustomerDesperationState.State0, 0 },
+                    { CustomerDesperationState.State1, GameSettings.Current.MassiveUsesBathroomStage1 },
+                    { CustomerDesperationState.State2, GameSettings.Current.MassiveUsesBathroomStage2 },
+                    { CustomerDesperationState.State3, GameSettings.Current.MassiveUsesBathroomStage3 },
+                    { CustomerDesperationState.State4, 1 },
+                    { CustomerDesperationState.State5, 0 }
+                }
+            }};
         }
 
         #region NextAction
@@ -132,8 +268,10 @@ namespace Assets.Scripts.Customers {
 
         #endregion
 
-        internal float DeltaTime { get; private set; }
-        public static GameController GC = null;
+        /// <summary>
+        /// Bathroom customer is in, or in line to enter.
+        /// </summary>
+        /// <returns>The current bathroom this customer is either in, or in line to enter.</returns>
         public Bathroom GetCurrentBathroom() {
             switch ( Location ) {
                 case Location.BathroomF:
@@ -147,292 +285,287 @@ namespace Assets.Scripts.Customers {
                     return null;
             }
         }
-        public double Funds = 0d;
-        public float LastDrinkAt = -25f;
-        public float DrinkInterval = 30f;
-        public int EnteredTicksElapsed = 0;
-        private CustomerSpriteController marshal;
-        public CustomerAnimator customerAnimator;
-        private CustomerDesperationState GetDesperationState() {
-            if ( IsWetting ) {
-                return CustomerDesperationState.State5;
+
+        public Bathroom GetBathroomWillingToEnter() {
+            if ( DesperationState == CustomerDesperationState.State0
+                || DesperationState == CustomerDesperationState.State5 ) {
+                return null;
             }
-            else if ( IsWet ) {
-                return CustomerDesperationState.State6;
+
+            var settings = GameSettings.Current;
+            switch ( Bladder.BladderSize ) {
+                case BladderSize.Small:
+                    switch ( DesperationState ) {
+                        case CustomerDesperationState.State1:
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 1 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State2:
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 3 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State3:
+                        case CustomerDesperationState.State4:
+                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                case BladderSize.Medium:
+                    switch ( DesperationState ) {
+                        case CustomerDesperationState.State1:
+                            if ( GenderCorrectBathroom.CustomersWaiting == 0 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State2:
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 2 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State3:
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 4 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State4:
+                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                case BladderSize.Large:
+                    switch ( DesperationState ) {
+                        case CustomerDesperationState.State1:
+                            return null;
+                        case CustomerDesperationState.State2:
+                            if ( GenderCorrectBathroom.CustomersWaiting == 0 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State3:
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 3 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State4:
+                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                case BladderSize.Massive:
+                    switch ( DesperationState ) {
+                        case CustomerDesperationState.State1:
+                        case CustomerDesperationState.State2:
+                            return null;
+                        case CustomerDesperationState.State3:
+                            if ( GenderCorrectBathroom.CustomersWaiting <= 2 ) {
+                                return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                            }
+                            return null;
+                        case CustomerDesperationState.State4:
+                            return RandomUseChance(Bladder.BladderSize, DesperationState) ? GenderCorrectBathroom : null;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                default:
+                    throw new NotImplementedException();
             }
-            else if ( bladder.LosingControl || bladder.Percentage > 0.90d ) {
-                return CustomerDesperationState.State4;
-            }
-            else if ( bladder.Percentage > 0.80d ) {
-                return CustomerDesperationState.State3;
-            }
-            else if ( bladder.Percentage > 0.55d ) {
-                return CustomerDesperationState.State2;
-            }
-            else if ( WantsToEnterBathroom() ) {
-                return CustomerDesperationState.State1;
-            }
-            else {
-                return CustomerDesperationState.State0;
+
+            bool RandomUseChance(BladderSize size, CustomerDesperationState state) {
+                if ( WillingnessToGoLookup == null || !WillingnessToGoLookup.Any() ) {
+                    SetWillingnessToGoLookup();
+                }
+                int chance = WillingnessToGoLookup[size][state];
+                return chance > 0 ? Random.Range(0, chance) == 0 : false;
             }
         }
 
-        void Think() {
-            // Next action handler
-            if ( Next != null ) {
-                if ( NextDelay > 0f ) {
-                    return;
-                }
-                else if ( NextWhenTrue == null || NextWhenTrue() ) {
-                    NextAction last = Next;
-                    Next();
-                    // If next was not assigned a new method from inside next clear it out.
-                    if ( Next.Method == last.Method ) {
-                        Next = null;
-                    }
-                    return;
-                }
-                else {
-                    return;
-                }
-            }
+        public Bathroom GenderCorrectBathroom => Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
+        public Bathroom GenderIncorrectBathroom => Gender == 'm' ? Bathroom.BathroomF : Bathroom.BathroomM;
 
+        void NextActionHandler() {
+            if ( NextDelay > 0f ) {
+                return;
+            }
+            else if ( NextWhenTrue == null || NextWhenTrue() ) {
+                NextAction last = Next;
+                Next();
+                // If next was not assigned a new method from inside next clear it out.
+                if ( Next.Method == last.Method ) {
+                    Next = null;
+                }
+                return;
+            }
+            else {
+                return;
+            }
+        }
+        private void Think() {
             // If wet self and finished wetting self
             if ( IsWet && !IsWetting ) {
                 SetNext(WetSelfLeaveBathroomDelay, () => { Leave(); });
             }
-
-            if ( IsWetting ) {
+            else if ( IsWetting || !AtDestination ) {
                 return;
             }
 
-            if ( !AtDestination ) {
-                return;
-            }
 
             // If in bar...
-            if ( Location == Location.Bar ) {
-                ThinkAboutThingsInBar();
-            }
-        }
-        private void ThinkAboutThingsInBar() {
+            if ( Location == Location.Bar && MinTimeAtBarNow > 8f ) {
 
-            // Should get up to pee?
-            if ( WantsToEnterBathroom() ) {
-                if ( ThinkAboutEnteringBathroom() ) {
-                    return;
+                switch ( DesperationState ) {
+                    case CustomerDesperationState.State0:
+                        // TODO: Willing to buy a drink?
+                        if (false) {
+
+                        }
+                        break;
+                    case CustomerDesperationState.State1:
+                    case CustomerDesperationState.State2:
+                    case CustomerDesperationState.State3:
+                        // Willing to go pee?
+                        Bathroom bathroom = GetBathroomWillingToEnter();
+                        if ( bathroom == null ) {
+                            if ( bathroom.TryEnterQueue(this) ) {
+                                return;
+                            }
+                        }
+                        // TODO: Willing to buy a drink?
+                        if (false) {
+
+                        }
+                        break;
+                    case CustomerDesperationState.State4:
+                        // If they're about to wet and were not turned away, have them try to go to the bathroom
+                        if ( MinTimeAtBarNow > 10f && Bladder.LosingControl ) {
+                            // Can any use correct bathroom?
+                            if ( GenderCorrectBathroom.TryEnterQueue(this) ) {
+                                Bladder.ResetReserveHoldingPower();
+                            }
+                            // Can girl use incorrect bathroom?
+                            else if ( Gender == 'f' && GenderIncorrectBathroom.TryEnterQueue(this) ) {
+                                Bladder.ResetReserveHoldingPower();
+                            }
+                            // Seal their fate
+                            else {
+                                Debug.Log("Can't enter bathroom when bursting.", this);
+                                SetNext(0f, () => {
+                                    // Here's where some special wetting in bar actions / scenes / interactions can go.
+                                },
+                                // Hold until no bladder strength left
+                                () => Bladder.Strength <= 0f);
+                            }
+                        }
+                        break;
+                    default:
+                        return;
                 }
             }
-
-            // Should leave?
-            if ( WantsToLeaveBar() ) {
-                Leave();
-            }
-
-            // Should buy drink?
-            //if ( WantsToBuyDrink() && Funds >= Bar.DrinkCost && DesperationState != CustomerDesperationState.State4 ) {
-            //    BuyDrink();
-            //}
-
-            // Returns true if think about things in bar should return.
-            bool ThinkAboutEnteringBathroom() {
-                // If they just got sent away don't let them rejoin the line at all.
-                if ( MinTimeAtBarNow < 8d ) {
-                    return false;
-                }
-
-                // If they're about to wet and werent just turned away, have them try to go to the bathroom
-                if ( bladder.StartedLosingControlThisFrame ) {
-                    //Debug.Log($"Customer {UID} trying to enter bathroom because they are losing control.");
-                    bladder.ResetLossOfControlTime();
-                    if ( TryEnterBathroom() ) {
-                        return true;
-                    }
-                }
-
-                // Don't let customers about to wet themselves in the bar get into the line. Their fate is sealed.
-                var bladderTooFull = bladder.ControlRemaining <= 0d || bladder.LossOfControlTimeNow < bladder.LossOfControlTime;
-                if ( bladderTooFull ) {
-                    return true;
-                }
-
-                if ( MinTimeAtBarNow >= MinTimeAtBar && !bladderTooFull && !IsWetting && !IsWet ) {
-                    // Try to enter the bathroom
-                    if ( TryEnterBathroom() ) {
-                        return true;
-                    }
-                }
-
-                // If they got more desperate this frame and have waited at least a third the required time, should they run to the bathroom right now?
-                if ( DesperationStateChangeThisUpdate && ( MinTimeAtBarNow * 3d ) > MinTimeAtBar ) {
-                    if ( DesperationState == CustomerDesperationState.State3 ) {
-                        //Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
-                        if ( TryEnterBathroom() ) {
-                            return true;
+            // Make girls try to use the guys bathroom
+            else if ( Location == Location.Hallway ) {
+                Bathroom bathroom = GetCurrentBathroom();
+                // If not next in line, and girl, and about to wet
+                if ( !bathroom.Line.IsNextInLine(this) && Gender == 'f' && DesperationState == CustomerDesperationState.State4 ) {
+                    int currentLineCount = bathroom.Line.CustomerCount;
+                    int otherLineCount = GenderIncorrectBathroom.Line.CustomerCount;
+                    bool worthEnteringOtherLine = otherLineCount + 1 < currentLineCount;
+                    // If other line is significantly shorter and not already switched lines
+                    if ( GenderCorrectBathroom == bathroom && worthEnteringOtherLine ) {
+                        if ( GenderIncorrectBathroom.TryEnterQueue(this) ) {
+                            Bladder.ResetReserveHoldingPower();
                         }
                     }
-                    if ( DesperationState == CustomerDesperationState.State4 ) {
-                        //Debug.Log($"Customer {UID} trying to enter bathroom because they became more desperate.");
-                        if ( TryEnterBathroom() ) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-
-            bool TryEnterBathroom() {
-                var bathroom = Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
-                if ( !GetInLine(bathroom) ) {
-                    MinTimeAtBarNow = MinTimeAtBar / 1.5f;
-                    return false;
-                }
-                else {
-                    MinTimeAtBarNow = 0f;
-                    return true;
                 }
             }
+
         }
-        public void BuyDrink() {
-            //Debug.Log($"Customer {UID} bought a drink");
-            LastDrinkAt = TotalTimeAtBar;
-            bladder.Stomach += (float)Bar.DrinkAmount;
-            //Funds -= Bar.DrinkCost;
-            //GameController.AddFunds(Bar.DrinkCost);
-        }
-
-        #region Wants to X...
-        public bool WantsToEnterBathroom() {
-            return bladder.Percentage > 0.40d;
-        }
-        public bool WantsToLeaveBar() {
-            CustomerDesperationState[] tooDesperateStates;
-
-            if ( GC.timeTicksElapsed >= ( GC.NightMaxCustomerSpawnTime + GC.NightMaxCustomerSpawnTime / 2 ) ) {
-                tooDesperateStates = new CustomerDesperationState[] {
-                CustomerDesperationState.State4
-            };
-            }
-            else {
-                tooDesperateStates = new CustomerDesperationState[] {
-                CustomerDesperationState.State4,
-                CustomerDesperationState.State3
-            };
-            }
-
-            // Basic assertions
-            bool tooDesperate = tooDesperateStates.Contains(DesperationState);
-            bool wetted = IsWet && !IsWetting;
-            bool stayedTooLong = EnteredTicksElapsed - GC.timeTicksElapsed > 10;
-            bool noMoreFunds = Funds < Bar.DrinkCost && TotalTimeAtBar - LastDrinkAt > 30f;
-            bool tooLateAtNight = GC.timeTicksElapsed >= GC.NightMaxCustomerSpawnTime;
-
-            // Compound assertions
-            bool wouldNormallyLeave = stayedTooLong || noMoreFunds || tooLateAtNight;
-
-            // The thought juice
-            return wetted || ( !tooDesperate && wouldNormallyLeave );
-        }
-        public bool WantsToBuyDrink() {
-            return TotalTimeAtBar - LastDrinkAt > DrinkInterval;
-        }
-        #endregion
-
-        private CustomerActionState LastActionState;
-        private void FrameActionDebug() {
-            if ( !Active ) {
-                return;
-            }
-            if ( LastActionState != ActionState ) {
-                LastActionState = ActionState;
-                Debug.Log($"Customer {UID} new action: {ActionState}");
-            }
-
-            // Desperation State Logging
-            if ( lastState != DesperationState ) {
-                lastState = DesperationState;
-                AnnounceStateChange();
-            }
-        }
-        public void AnnounceStateChange() {
-            string logString = "";
-            logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(bladder.Amount)} / {bladder.Max} ({Math.Round(bladder.Percentage, 2)}%)";
-            logString += $"Control: {Math.Round(bladder.ControlRemaining)}";
-            Debug.Log(logString);
-        }
-
         private void PeeLogicUpdate() {
-            if ( Next != null && !bladder.ShouldWetNow ) {
-                // TODO: If bladder should wet now, issue inturrupt on actions by clearing next
-                return;
-            }
-
-            // Can customer relieve themselves now?
+            // Get occupying relief type
             ReliefType reliefType = Occupying?.RType ?? ReliefType.None;
-
-            // Get the relief the customer is occupying, if applicable
             Relief relief = reliefType == ReliefType.None ? null : (Relief)Occupying;
 
-            // Behavior depending on if have reached an area they can relieve themselves
-            if ( reliefType == ReliefType.None ) {
-                // If should wet now
-                if ( bladder.ShouldWetNow || CheatPeeNow ) {
-                    CheatPeeNow = false;
-                    BeginPeeingSelf();
-                }
-                // If finishing wetting
-                else if ( IsWetting && !bladder.Emptying ) {
-                    EndPeeingSelf();
-                }
-            }
-            else {
-                // When finished peeing
-                if ( !bladder.Emptying ) {
-                    if ( Next == null ) {
-                        SetNext(0f, () => {
-                            ActionState = CustomerActionState.PantsUp;
+            switch ( CurrentAction ) {
+                case CustomerAction.Wetting:
+                    if ( Bladder.IsEmpty ) {
+                        EndPeeingSelf();
+                    }
+                    return;
+                case CustomerAction.Peeing:
+                    if ( Bladder.IsEmpty ) {
+                        if ( Next == null ) {
+                            CurrentAction = CustomerAction.PantsUp;
                             Emotes.Emote(Emote.PantsUp);
                             SetNext((float)RemainingUrinateStopDelay, () => {
                                 EndPeeingWithThing();
                             });
-                        });
-                    }
-                }
-                // If bladder isnt emptying, set it to empty
-                // Display unzip/pantsdown animation
-                else if ( !bladder.Emptying ) {
-                    if ( RemainingUrinateStartDelay > 0 ) {
-                        RemainingUrinateStartDelay -= 1 * DeltaTime;
+                        }
                     }
                     else {
-                        bladder.Emptying = true;
-                        ActionState = CustomerActionState.Peeing;
+                        Emote emote = Emote.GetPeeStreamEmote(Bladder.Fullness);
                     }
-                }
-                // Wait for bladder to empty.
-                // Display emptying bladder animation
-                else if ( bladder.Emptying ) {
-                    bladder.ShouldWetNow = false;
-                    // Update pee stream emote
-                    Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
-                    if ( emote == null ) {
-                        Debug.Break();
-                        throw new NullReferenceException();
+                    break;
+                case CustomerAction.None:
+                    if ( reliefType == ReliefType.None ) {
+                        if ( Bladder.Strength == 0f ) {
+                            BeginPeeingSelf();
+                        }
                     }
-                    if ( Emotes.currentEmote != emote ) {
-                        Emotes.Emote(emote);
+                    else {
+                        SetNext((float)UrinateStartDelay, () => {
+                            BeginPeeingWithThing();
+                        });
                     }
-                }
+                    break;
+                default:
+                    return;
             }
+
         }
         /// <summary>
         /// Updates the customers desperation state and state machine
         /// </summary>
         private void UpdateDesperationState() {
-            DesperationState = GetDesperationState();
+            if ( CurrentAction == CustomerAction.Wetting ) {
+                DesperationState = CustomerDesperationState.State5;
+            }
+            else if ( Bladder.HoldingPower <= 0.05f || Bladder.Fullness >= 1f ) {
+                DesperationState = CustomerDesperationState.State4;
+            }
+            else if ( Bladder.Fullness > 0.85f ) {
+                DesperationState = CustomerDesperationState.State3;
+            }
+            else if ( Bladder.Fullness > 0.7f ) {
+                DesperationState = CustomerDesperationState.State2;
+            }
+            else if ( Bladder.Fullness > 0.45f ) {
+                DesperationState = CustomerDesperationState.State1;
+            }
+            else {
+                DesperationState = CustomerDesperationState.State0;
+            }
+
             DesperationStateChangeThisUpdate = DesperationState != LastDesperationState;
             LastDesperationState = DesperationState;
+        }
+        private void FrameActionDebug() {
+            if ( !Active ) {
+                return;
+            }
+            if ( LastActionState != CurrentAction ) {
+                LastActionState = CurrentAction;
+                Debug.Log($"Customer {UID} new action: {CurrentAction}");
+            }
+
+            // Desperation State Logging
+            if ( lastState != DesperationState ) {
+                lastState = DesperationState;
+
+                string logString = "";
+                logString += $"Customer {UID} {lastState} => {DesperationState} @ Bladder: {Math.Round(Bladder.Amount)} / {Bladder.Max} ({Math.Round(Bladder.Fullness, 2)}%)";
+                logString += $"Control: {Math.Round(Bladder.HoldingPower)}";
+                Debug.Log(logString);
+            }
         }
 
         #region Movement
@@ -475,7 +608,7 @@ namespace Assets.Scripts.Customers {
                         vectors = new Vector2[] {
                             transform.position,
                             target.GetCustomerPosition(Gender)
-                        }; 
+                        };
                         break;
                 }
             }
@@ -625,22 +758,13 @@ namespace Assets.Scripts.Customers {
             }
         }
         /// <summary>
-        /// Debugging function that moves the customer to the end of their path instantly.
-        /// </summary>
-        public void TeleportToDestination() {
-            if ( Path != null ) {
-                transform.position = Path.GetPointAtTime(1f, EndOfPathInstruction.Stop);
-                Path = null;
-            }
-        }
-        /// <summary>
         /// Calculates a linear bezier point
         /// </summary>
         /// <param name="t">Time, from 0f to 1f</param>
         /// <param name="pointA">Starting point</param>
         /// <param name="pointB">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
+        private static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB) {
             return pointA + t * ( pointB - pointA );
         }
         /// <summary>
@@ -651,7 +775,7 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointB">Approached point</param>
         /// <param name="pointC">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC) {
+        private static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC) {
             float u = 1f - t;
             float uu = u * u;
             float tt = t * t;
@@ -666,13 +790,13 @@ namespace Assets.Scripts.Customers {
         /// <param name="pointC">Approached point 2</param>
         /// <param name="pointD">Ending point</param>
         /// <returns>BezierPoint</returns>
-        public static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+        private static Vector2 GetBezierPoint(float t, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
             var tt = t * t;
             var u = 1 - t;
             var uu = u * u;
             return uu * u * pointA + 3 * uu * t * pointB + 3 * u * tt * pointC + tt * t * pointD;
         }
-        public static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
+        private static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC) {
             float l = 0f;
             float t = 0.1f;
             Vector2 last = pointA;
@@ -685,7 +809,7 @@ namespace Assets.Scripts.Customers {
             while ( t < 1f );
             return l + Vector2.Distance(last, pointC);
         }
-        public static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
+        private static float EstimatePathLength(Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD) {
             float l = 0f;
             float t = 0.1f;
             Vector2 last = pointA;
@@ -698,79 +822,8 @@ namespace Assets.Scripts.Customers {
             while ( t < 1f );
             return l + Vector2.Distance(last, pointC);
         }
-        public bool AtDestination => MovementType == MovementType.None;
-        public Vector2[] PathVectors = new Vector2[0];
-        public VertexPath2 Path;
-        /// <summary>0f is the start of the path, 1f is the end of the path.</summary>
-        public float PathTime = 0f;
-        public float ApproximatePathLength;
-        public float PathLength;
-        public float PathMoveSpeed;
-        /// <summary>
-        /// https://www.desmos.com/calculator
-        /// <para>-\left(0.85-\left(x\cdot1.7\right)\right)^{4}+1.1</para>
-        /// </summary>
-        public float PathMoveSpeedMultiplier => -Mathf.Pow(-( 0.8f - ( PathTime * 1.6f ) ), 4) + 1.1f;
-
-        public float MoveSpeed;
-        public MovementType MovementType = MovementType.None;
-
-        /// <summary>Records the y position that the bathrooms start at, for moving the customer behind the door overlay</summary>
-        public static float BathroomStartX;
-        public static float BathroomStartY;
 
         #endregion
-
-        private int sortingLayerIdAboveOverlay = -1;
-
-        public SpriteRenderer SRenderer;
-        public Animator animator;
-        public string animatorStateName;
-        public string lastAnimatorStateName;
-
-        [SerializeField]
-        public Text EmotesBladderAmountText;
-
-        public bool CheatPeeNow = false;
-
-        public bool Active = false;
-        public int UID = GameController.GetUid();
-        public CustomerDesperationState lastState;
-        public string DisplayName { get; set; }
-        [SerializeField] public char Gender { get; set; }
-        // Enum for behavior types
-        public bool CanReenterBathroom = true;
-        public float CanReenterBathroomIn = 0f;
-        public bool IsRelievingSelf = false;
-        public bool IsFinishedPeeing;
-        [SerializeField]
-        public bool IsWetting = false;
-        public bool CanWetNow = false;
-        public bool IsWet = false;
-        public CustomerDesperationState DesperationState = CustomerDesperationState.State0;
-        private CustomerDesperationState LastDesperationState = CustomerDesperationState.State0;
-        public bool DesperationStateChangeThisUpdate = false;
-        public Bladder bladder;
-
-        // Times
-        public double UrinateStartDelay;
-        public double UrinateStopDelay;
-        private double RemainingUrinateStartDelay;
-        private double RemainingUrinateStopDelay;
-        public float WetSelfLeaveBathroomDelay = 6f;
-        public float TotalTimeAtBar = 0f;
-        public float MinTimeAtBar = 60f;
-        public float MinTimeAtBarNow = 0f;
-        public float MinTimeBetweenChecks = 8f;
-        public float MinTimeBetweenChecksNow = 0f;
-
-        // Position
-        public CustomerActionState ActionState = CustomerActionState.None;
-        public Location Location = Location.None;
-        public CustomerInteractable Occupying;
-
-        // Class that contains all of the emotes / thought bubbles / etc for the person
-        public Emotes Emotes;
 
         #region Desperation/Wetting/Peeing
         // Current willingness to use a urinal for relief
@@ -781,7 +834,7 @@ namespace Assets.Scripts.Customers {
             }
             // Only if they're about to lose it
             if ( customer.Gender == 'f' ) {
-                return GC.CustomersWillUseAnything || customer.bladder.LosingControl || customer.bladder.Percentage > 0.93;
+                return GC.CustomersWillUseAnything || customer.Bladder.Strength <= 0.01f || customer.Bladder.Fullness > 0.95;
             }
             throw new NotImplementedException();
         }
@@ -791,17 +844,17 @@ namespace Assets.Scripts.Customers {
         }
         // Current willingness to use a sink for relief
         public static bool WillUseSink(Customer customer) {
-            if (GC.CustomersWillUseAnything) {
+            if ( GC.CustomersWillUseAnything ) {
                 return true;
             }
 
-            switch (customer.Gender) {
+            switch ( customer.Gender ) {
                 case 'm':
                     // It's just a weird urinal you wash your hands in, right?
-                    return customer.bladder.LosingControl || customer.bladder.Percentage > 0.93d;
+                    return customer.Bladder.LosingControl || customer.Bladder.Fullness > 0.93d;
                 case 'f':
                     // Girls will only use the sink if they're wetting themselves
-                    return customer.bladder.LosingControl || customer.bladder.Percentage > 0.99d;
+                    return customer.Bladder.LosingControl || customer.Bladder.Fullness > 0.99d;
                 default:
                     throw new NotImplementedException();
             }
@@ -816,31 +869,27 @@ namespace Assets.Scripts.Customers {
 
             return sinksLineEmpty && hasUnoccupiedSink;
         }
-        private ReliefType ReliefType => Occupying?.RType ?? ReliefType.None;
 
         public void BeginPeeingWithThing() {
-            IsRelievingSelf = true;
             Emotes.Emote(Emote.PantsDown);
             Emotes.ShowBladderCircle(true);
 
-            // Make them pee slower if they don't need to go badly to incentivize making them hold it longer
-            bladder.DrainRateNow = bladder.DrainRate * 0.75f;
             // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
             RemainingUrinateStopDelay = UrinateStopDelay;
-            if ( bladder.LosingControl ) {
+            if ( Bladder.Strength <= 0.01f ) {
                 RemainingUrinateStopDelay *= 2.5d;
-                //Debug.Log($"Customer {UID} will take longer when they finish up because they were losing control");
+                Debug.Log($"losing control when started peeing and will take longer", this);
             }
+
             ReliefType reliefType = Occupying?.RType ?? ReliefType.None;
             switch ( reliefType ) {
                 case ReliefType.Toilet:
                 case ReliefType.Urinal:
                 case ReliefType.Sink:
-                    ActionState = CustomerActionState.PantsDown;
+                    CurrentAction = CustomerAction.PantsDown;
                     SetNext((float)UrinateStartDelay, () => {
-                        bladder.Emptying = true;
                         Relief relief = reliefType == ReliefType.None ? null : (Relief)Occupying;
-                        ActionState = CustomerActionState.Peeing;
+                        CurrentAction = CustomerAction.Peeing;
                     });
                     break;
                 default:
@@ -851,7 +900,7 @@ namespace Assets.Scripts.Customers {
             IsRelievingSelf = false;
             Emotes.Emote(null);
             Emotes.ShowBladderCircle(false);
-            ActionState = CustomerActionState.None;
+            CurrentAction = CustomerAction.None;
             if ( IsWet ) {
                 Leave();
             }
@@ -867,8 +916,7 @@ namespace Assets.Scripts.Customers {
             }
         }
         public void BeginPeeingSelf() {
-            bladder.Emptying = true;
-            Emote emote = Emote.GetPeeStreamEmote(bladder.Percentage);
+            Emote emote = Emote.GetPeeStreamEmote(Bladder.Fullness);
             if ( emote == null ) {
                 Debug.Break();
                 throw new NullReferenceException();
@@ -882,13 +930,13 @@ namespace Assets.Scripts.Customers {
                 Occupying.IsSoiled = true;
             }
             DesperationState = CustomerDesperationState.State5;
-            ActionState = CustomerActionState.Wetting;
+            CurrentAction = CustomerAction.Wetting;
         }
         public void EndPeeingSelf() {
             Emotes.Emote(null);
             Emotes.ShowBladderCircle(false);
             IsWetting = false;
-            ActionState = CustomerActionState.None;
+            CurrentAction = CustomerAction.None;
         }
         #endregion
 
@@ -912,7 +960,6 @@ namespace Assets.Scripts.Customers {
                 Location = thing.Location;
                 Occupying = thing;
                 thing.OccupiedBy = this;
-                CanWetNow = thing.CanWetHere;
             }
             else {
                 Debug.LogWarning("Customer tried to occupy a thing they were already occupying");
@@ -984,12 +1031,12 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         /// <returns></returns>
         public bool CanDisplayBathroomMenu() {
-            if (!AtDestination) {
+            if ( !AtDestination ) {
                 return false;
             }
             bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
             bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.Line.IsNextInLine(this);
-            bool acting = ActionState != CustomerActionState.None;
+            bool acting = CurrentAction != CustomerAction.None;
             return AtDestination && !IsWet && !acting && ( inBathroom || firstInLine );
         }
         /// <summary>
@@ -997,7 +1044,8 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         /// <returns></returns>
         public bool CanDisplayReliefMenu() {
-            return IsRelievingSelf && bladder.Percentage > 0.1d && bladder.Emptying && ( ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink );
+            return CurrentAction == CustomerAction.Peeing && Bladder.Fullness > 0.2d 
+                && (ReliefType == ReliefType.Urinal || ReliefType == ReliefType.Sink);
         }
         #endregion
 
@@ -1053,22 +1101,20 @@ namespace Assets.Scripts.Customers {
             return false;
         }
         /// <summary>
-        /// This option commands the customer to stop relief with object
+        /// Commands the customer to stop relief with thing
         /// </summary>
-        /// <returns></returns>
-        public bool MenuOptionStopPeeing() {
-            // TODO: Make them wet themselves if they are still very full or have no control remaining and are commanded to stop
-            bladder.StopPeeingEarly();
+        public void MenuOptionStopPeeing() {
+            CurrentAction = CustomerAction.PeeingPinchOff;
             Emotes.Emote(Emote.StruggleStop);
-            SetNext(0f, () => {
-                float t = 1f;
-                Emotes.Emote(Emote.PantsUp, t);
-                ActionState = CustomerActionState.PantsUp;
-                SetNext(t, () => {
+
+            // TODO: Make them wet themselves if they are still very full or have no control remaining and are commanded to stop
+            SetNext(GameSettings.Current.BladderSettings.DefaultPinchOffTime, () => {
+                Emotes.Emote(Emote.PantsUp, GameSettings.Current.PantsUpTime);
+                CurrentAction = CustomerAction.PantsUp;
+                SetNext(GameSettings.Current.PantsUpTime, () => {
                     EndPeeingWithThing();
                 });
-            }, () => !bladder.Emptying);
-            return true;
+            });
         }
         #endregion
 
@@ -1078,7 +1124,7 @@ namespace Assets.Scripts.Customers {
             CanReenterBathroom = false;
             if ( bathroom.TryEnterQueue(this) ) {
                 // Makes customer hold on for a while longer when entering doorway.
-                bladder.ResetLossOfControlTime();
+                Bladder.ResetReserveHoldingPower();
                 return true;
             }
             else {
@@ -1107,7 +1153,7 @@ namespace Assets.Scripts.Customers {
                 return true;
             }
             else if ( bathroom.SinksLine.HasOpenWaitingSpot() ) {
-                if ( bathroom.Sinks.Any(x => x.OccupiedBy.ActionState == CustomerActionState.WashingHands) ) {
+                if ( bathroom.Sinks.Any(x => x.OccupiedBy.CurrentAction == CustomerAction.WashingHands) ) {
                     WaitingSpot spot = bathroom.SinksLine.GetNextWaitingSpot();
                     Occupy(spot);
                     return true;

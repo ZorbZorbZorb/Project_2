@@ -10,6 +10,7 @@ namespace Assets.Scripts.Areas {
         public List<WaitingSpot> waitingSpots = new List<WaitingSpot>();
         public WaitingSpot PhantomEntrySpot;
         public List<Customer> CustomersEnteringQueue = new List<Customer>();
+        public int CustomerCount => waitingSpots.Count(x => x.Occupied) + CustomersEnteringQueue.Count();
 
         public void Update() {
             // Advance queue

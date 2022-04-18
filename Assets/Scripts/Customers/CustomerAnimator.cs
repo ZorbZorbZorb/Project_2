@@ -28,7 +28,7 @@ namespace Assets.Scripts.Customers {
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
         public void Update() {
-            animationStateName = GetAnimation(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination);
+            animationStateName = GetAnimation(customer.DesperationState, customer.CurrentAction, customer.Occupying, !customer.AtDestination);
             
             SetAnimationOrSprite();
 
@@ -53,7 +53,7 @@ namespace Assets.Scripts.Customers {
                 }
                 else {
                     animator.enabled = false;
-                    renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.ActionState, customer.Occupying, !customer.AtDestination);
+                    renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.CurrentAction, customer.Occupying, !customer.AtDestination);
                     renderer.color = Color;
                 }
             }
@@ -62,7 +62,7 @@ namespace Assets.Scripts.Customers {
             // Is this state's animation controlled manually?
             switch ( customer.DesperationState ) {
                 case CustomerDesperationState.State5:
-                    animator.Play(animationStateName, 0, customer.bladder.NormalizedPercentEmptied);
+                    animator.Play(animationStateName, 0, 1f- Math.Min(1f, customer.Bladder.Fullness));
                     break;
             }
         }
@@ -115,16 +115,16 @@ namespace Assets.Scripts.Customers {
         #region Static methods for looking up animations
         private static readonly Dictionary<CustomerDesperationState, string> DesperationAnimationClipLookup;
         private static readonly Dictionary<CustomerDesperationState, string> DesperationSeatAnimationClipLookup;
-        private static readonly Dictionary<CustomerActionState, string> PantsAnimationClipLookup;
-        private static readonly Dictionary<CustomerActionState, string> PantsSidewaysAnimationClipLookup;
-        private static readonly Dictionary<InteractableType, Dictionary<CustomerActionState, string>> ActionStateAnimationClipLookup;
-        private static readonly Dictionary<InteractableType, Dictionary<CustomerActionState, string>> ActionStateSidewaysAnimationClipLookup;
+        private static readonly Dictionary<CustomerAction, string> PantsAnimationClipLookup;
+        private static readonly Dictionary<CustomerAction, string> PantsSidewaysAnimationClipLookup;
+        private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateAnimationClipLookup;
+        private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateSidewaysAnimationClipLookup;
 
-        public static string GetAnimation<T>(CustomerDesperationState desperationState, CustomerActionState actionState, T interactable, bool forceStandingSprite)
+        public static string GetAnimation<T>(CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite)
             where T : CustomerInteractable {
 
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
-                if ( interactable.IType == InteractableType.Seat && ( actionState == CustomerActionState.None || actionState == CustomerActionState.Wetting ) ) {
+                if ( interactable.IType == InteractableType.Seat && ( actionState == CustomerAction.None || actionState == CustomerAction.Wetting ) ) {
                     return DesperationSeatAnimationClipLookup[desperationState];
                 }
                 else {
@@ -135,11 +135,11 @@ namespace Assets.Scripts.Customers {
                 return DesperationAnimationClipLookup[desperationState];
             }
         }
-        private static string GetActionAnimation<T>(CustomerActionState state, T interactable) where T : CustomerInteractable {
-            Dictionary<CustomerActionState, string> lookup;
+        private static string GetActionAnimation<T>(CustomerAction state, T interactable) where T : CustomerInteractable {
+            Dictionary<CustomerAction, string> lookup;
             switch ( state ) {
-                case CustomerActionState.PantsDown:
-                case CustomerActionState.PantsUp:
+                case CustomerAction.PantsDown:
+                case CustomerAction.PantsUp:
                     lookup = interactable.Alignment == Alignment.Vertical 
                         ? PantsAnimationClipLookup 
                         : PantsSidewaysAnimationClipLookup;
@@ -161,7 +161,7 @@ namespace Assets.Scripts.Customers {
                 { CustomerDesperationState.State3, "desp_state_3" },
                 { CustomerDesperationState.State4, "desp_state_4" },
                 { CustomerDesperationState.State5, "desp_state_5" },
-                { CustomerDesperationState.State6, "desp_state_6" }
+                //{ CustomerDesperationState.State6, "desp_state_6" }
             };
             DesperationSeatAnimationClipLookup = new Dictionary<CustomerDesperationState, string>() {
                 { CustomerDesperationState.State0, "desp_state_stool_0" },
@@ -170,35 +170,35 @@ namespace Assets.Scripts.Customers {
                 { CustomerDesperationState.State3, "desp_state_stool_3" },
                 { CustomerDesperationState.State4, "desp_state_stool_4" },
                 { CustomerDesperationState.State5, "desp_state_stool_5" },
-                { CustomerDesperationState.State6, "desp_state_stool_6" }
+                //{ CustomerDesperationState.State6, "desp_state_stool_6" }
             };
-            PantsAnimationClipLookup = new Dictionary<CustomerActionState, string>() {
-                { CustomerActionState.PantsDown, "pants_down" },
-                { CustomerActionState.PantsUp, "pants_up" }
+            PantsAnimationClipLookup = new Dictionary<CustomerAction, string>() {
+                { CustomerAction.PantsDown, "pants_down" },
+                { CustomerAction.PantsUp, "pants_up" }
             };
-            PantsSidewaysAnimationClipLookup = new Dictionary<CustomerActionState, string>() {
-                { CustomerActionState.PantsDown, "pants_down_side" },
-                { CustomerActionState.PantsUp, "pants_up_side"}
+            PantsSidewaysAnimationClipLookup = new Dictionary<CustomerAction, string>() {
+                { CustomerAction.PantsDown, "pants_down_side" },
+                { CustomerAction.PantsUp, "pants_up_side"}
             };
-            ActionStateAnimationClipLookup = new Dictionary<InteractableType, Dictionary<CustomerActionState, string>>();
-            ActionStateSidewaysAnimationClipLookup = new Dictionary<InteractableType, Dictionary<CustomerActionState, string>>();
+            ActionStateAnimationClipLookup = new Dictionary<InteractableType, Dictionary<CustomerAction, string>>();
+            ActionStateSidewaysAnimationClipLookup = new Dictionary<InteractableType, Dictionary<CustomerAction, string>>();
 
             // Front facing sink
-            ActionStateAnimationClipLookup.Add(InteractableType.Sink, new Dictionary<CustomerActionState, string>() {
-                { CustomerActionState.Peeing, "peeing_sink"},
-                {CustomerActionState.WashingHands, "wash"}
+            ActionStateAnimationClipLookup.Add(InteractableType.Sink, new Dictionary<CustomerAction, string>() {
+                { CustomerAction.Peeing, "peeing_sink"},
+                {CustomerAction.WashingHands, "wash"}
             });
             // Front facing toilet
-            ActionStateAnimationClipLookup.Add(InteractableType.Toilet, new Dictionary<CustomerActionState, string>() {
-                { CustomerActionState.Peeing, "peeing_toilet" },
+            ActionStateAnimationClipLookup.Add(InteractableType.Toilet, new Dictionary<CustomerAction, string>() {
+                { CustomerAction.Peeing, "peeing_toilet" },
             });
             // Front facing urinal
-            ActionStateAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerActionState, string>() {
-                { CustomerActionState.Peeing, "peeing_urinal" },
+            ActionStateAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerAction, string>() {
+                { CustomerAction.Peeing, "peeing_urinal" },
             });
             // Side facing urinal
-            ActionStateSidewaysAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerActionState, string>() {
-                { CustomerActionState.Peeing, "peeing_urinal_side" },
+            ActionStateSidewaysAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerAction, string>() {
+                { CustomerAction.Peeing, "peeing_urinal_side" },
             });
         }
         #endregion

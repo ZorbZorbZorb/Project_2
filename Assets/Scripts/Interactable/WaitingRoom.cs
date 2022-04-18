@@ -8,8 +8,7 @@ using Assets.Scripts.Areas;
 public class WaitingRoom {
     public Bathroom Bathroom;
     public List<WaitingSpot> WaitingSpots = new List<WaitingSpot>();
-    public int UID => _uid;
-    private readonly int _uid = GameController.GetUid();
+    public int CustomerCount => WaitingSpots.Count(x => x.Occupied);
     public bool HasOpenWaitingSpot() {
         return WaitingSpots.Any(x => x.OccupiedBy == null);
     }

@@ -101,10 +101,11 @@ namespace Assets.Scripts {
             Buttons.Clear();
             AllUpdatingButtons.Clear();
         }
-        public Menu(Canvas _canvas) {
+        public Menu(Canvas _canvas) : this(_canvas, () => { return true; }) { }
+        public Menu(Canvas _canvas, Func<bool> canOpenNow) {
             canvas = _canvas;
             canvas.sortingLayerName = "UI";
-            canOpenNow = () => { return true; };
+            this.canOpenNow = canOpenNow;
             Enabled = false;
             canvas.gameObject.SetActive(false);
         }

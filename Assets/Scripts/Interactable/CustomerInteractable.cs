@@ -45,6 +45,7 @@ namespace Assets.Scripts.Objects {
             : Alignment.Horizontal;
         public Location Location;
         public Customer OccupiedBy;
+        public bool Occupied => OccupiedBy != null;
         public abstract bool ChangesCustomerSprite { get; }
         public abstract bool HidesCustomer { get; }
         public abstract bool CanWetHere { get; }

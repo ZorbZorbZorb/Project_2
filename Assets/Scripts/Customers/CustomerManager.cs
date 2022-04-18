@@ -16,7 +16,7 @@ namespace Assets.Scripts.Customers {
             .Count(x => x.IsSoiled);
         public int CountEmptyWorkingSeats => Bar.Singleton.Seats
             .Count(x => !x.IsSoiled && x.OccupiedBy == null);
-        public int RemainingSpawns => CountWorkingSeats - Customers.Count(x => x.ActionState != CustomerActionState.Leaving);
+        public int RemainingSpawns => CountWorkingSeats - Customers.Count(x => x.CurrentAction != CustomerAction.Leaving);
 
         public IEnumerable<Customer> CustomersInBathroom => Customers
             .Where(x => x.Location == Location.BathroomM || x.Location == Location.BathroomF);
@@ -36,15 +36,12 @@ namespace Assets.Scripts.Customers {
             //Debug.Log($"Created | state: {newCustomer.DesperationState} bladder: {Math.Round(newCustomer.bladder.Amount)} / {newCustomer.bladder.Max} control: {Math.Round(newCustomer.bladder.ControlRemaining)}", newCustomer);
             newCustomer.Active = true;
             bool enteredDoorway = false;
-            if ( newCustomer.WantsToEnterBathroom() &&
-                ( newCustomer.DesperationState == CustomerDesperationState.State3 ||
-                newCustomer.DesperationState == CustomerDesperationState.State4 ||
-                newCustomer.DesperationState == CustomerDesperationState.State5 ) ) {
 
-                var bathroom = newCustomer.Gender == 'm' ? Bathroom.BathroomM : Bathroom.BathroomF;
+            // Enter bathroom or bar on spawn
+            Bathroom bathroom = newCustomer.GetBathroomWillingToEnter();
+            if ( bathroom != null ) {
                 enteredDoorway = newCustomer.GetInLine(bathroom);
             }
-            // Else sit right down at the bar and wait
             if ( !enteredDoorway ) {
                 Seat seat = Bar.Singleton.GetRandomOpenSeat();
                 newCustomer.Occupy(seat);

@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\Objects\LayoutSpot.cs" />
     <Compile Include="Assets\Scripts\Customers\Emotes.cs" />
     <Compile Include="Assets\Scripts\BezierPath.cs" />
+    <Compile Include="Assets\Scripts\CustomerDesperationState.cs" />
     <Compile Include="Assets\Scripts\Prefabs.cs" />
     <Compile Include="Assets\Scripts\Objects\BuildClickable.cs" />
     <Compile Include="Assets\Scripts\MathUtility.cs" />
@@ -96,7 +97,9 @@
     <Compile Include="Assets\Scripts\Extensions\RandomExtensions.cs" />
     <Compile Include="Assets\Scripts\Areas\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Customers\NavigationNode.cs" />
+    <Compile Include="Assets\Scripts\Customers\BladderSize.cs" />
     <Compile Include="Assets\Scripts\UI\MenuButton.cs" />
+    <Compile Include="Assets\Scripts\Customers\CustomerAction.cs" />
     <Compile Include="Assets\Scripts\UI\CameraPosition.cs" />
     <Compile Include="Assets\Scripts\Customers\CustomerAnimator.cs" />
     <Compile Include="Assets\Scripts\Customers\CustomerManager.cs" />
@@ -106,8 +109,6 @@
     <Compile Include="Assets\Scripts\Areas\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\UI\BuildMenu.cs" />
     <Compile Include="Assets\Scripts\Areas\Area.cs" />
-    <Compile Include="Assets\Scripts\CustomerDesperationState.cs" />
-    <Compile Include="Assets\Scripts\CustomerActionState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Notes\Bathroom Layout Ideas.txt" />
