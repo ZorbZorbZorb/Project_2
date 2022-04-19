@@ -35,7 +35,7 @@ namespace Assets.Scripts.Customers {
             // Update bladder display
             BladderDisplayUpdate();
             // Flip emotes if need be
-            if ( Customer.Occupying?.Facing == Objects.Orientation.East ) {
+            if ( Customer.Occupying != null && Customer.Occupying.Facing == Objects.Orientation.East ) {
                 if ( !flipped ) {
                     FlipEmoteX();
                 }
@@ -56,7 +56,7 @@ namespace Assets.Scripts.Customers {
         void EmoteUpdate() {
             // Update emotes
             if ( currentEmote != null ) {
-                // Abort if emote is permanen-t
+                // Abort if emote is permanent
                 if ( remaining == null ) {
                     return;
                 }
@@ -95,7 +95,7 @@ namespace Assets.Scripts.Customers {
                 BladderCircleTransform.localScale = new Vector3((float)x, (float)y);
 
                 // Update text display
-                BladderAmountText.text = $"{Math.Round(Customer.Bladder.Amount, 0)}";
+                BladderAmountText.text = ((int)Customer.Bladder.Amount).ToString();
 
                 // Fade the display if too low amount
                 if ( Customer.Bladder.Amount < 250 ) {
@@ -105,8 +105,8 @@ namespace Assets.Scripts.Customers {
                     SpriteBladderTop.color = color;
                     SpriteBladderBottom.color = color;
                 }
-                else if ( Customer.Bladder.Amount < 500 ) {
-                    float a = ( (float)Customer.Bladder.Amount - 450f ) / 50f;
+                else if ( Customer.Bladder.Amount < 300 ) {
+                    float a = ( (float)Customer.Bladder.Amount - 250f ) / 50f;
                     Color colorText = new Color(0f, 0f, 0f, Mathf.Clamp(a, 0f, 1f));
                     Color color = bladderColorNormal * new Vector4(1f, 1f, 1f, Mathf.Clamp(a, 0f, 1f));
                     BladderAmountText.color = colorText;

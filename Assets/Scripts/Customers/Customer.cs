@@ -69,7 +69,7 @@ namespace Assets.Scripts.Customers {
         public float MinTimeAtBar = 60f;
         public float MinTimeAtBarNow = 0f;
         /// <summary>
-        /// Accumulates 1f to make customers think once a second
+        /// Accumulates 0.5f to make customers think twice a second
         /// </summary>
         private float CustomerThinkTicker = 0f;
 
@@ -119,14 +119,9 @@ namespace Assets.Scripts.Customers {
                 return;
             }
 
-            DeltaTime = Time.deltaTime;
-            if ( GC.RapidSimulation ) {
-                DeltaTime *= 10f;
-            }
+            DeltaTime = GC.RapidSimulation ? Time.deltaTime * 10f : Time.deltaTime;
 
             // Update all of the time accumulators
-            TotalTimeAtBar += DeltaTime;
-            NextDelay -= DeltaTime;
             if ( Location == Location.Bar ) {
                 MinTimeAtBarNow += DeltaTime;
             }
@@ -139,12 +134,13 @@ namespace Assets.Scripts.Customers {
 
             // Handle next action, or think
             if ( Next != null ) {
+                NextDelay -= DeltaTime;
                 NextActionHandler();
             }
             else if ( AtDestination ) {
                 PeeLogicUpdate();
-                if ( CustomerThinkTicker >= 1f ) {
-                    CustomerThinkTicker -= 1f;
+                if ( CustomerThinkTicker >= 0.5f ) {
+                    CustomerThinkTicker -= 0.5f;
                     Think();
                 }
                 else {
@@ -165,7 +161,7 @@ namespace Assets.Scripts.Customers {
             }
 
         }
-        public void SetupCustomer( bool startFull ) {
+        public void SetupCustomer( float fullness ) {
             marshal = CustomerSpriteController.Controller[Gender];
 
             // Set up the customers animator
@@ -194,7 +190,7 @@ namespace Assets.Scripts.Customers {
 
             MenuButton MenuButtonReliefStop = new(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
 
-            Bladder = new Bladder(this, startFull);
+            Bladder = new Bladder(this, fullness);
 
             UrinateStartDelay = 4d;
             UrinateStopDelay = 6d;
@@ -287,10 +283,10 @@ namespace Assets.Scripts.Customers {
             }
 
             // If losing control
-            if (DesperationState == CustomerDesperationState.State4) {
-                if ( Gender == 'f') {
+            if ( DesperationState == CustomerDesperationState.State4 ) {
+                if ( Gender == 'f' ) {
                     // Will girl use guys restroom
-                    if (GenderCorrectBathroom.CustomersInLine >= 2 && GenderIncorrectBathroom.CustomersInLine < GenderCorrectBathroom.CustomersInLine ) {
+                    if ( GenderCorrectBathroom.CustomersInLine >= 2 && GenderIncorrectBathroom.CustomersInLine < GenderCorrectBathroom.CustomersInLine ) {
                         return GenderIncorrectBathroom;
                     }
                     // Use correct bathroom
@@ -300,11 +296,11 @@ namespace Assets.Scripts.Customers {
                 }
                 else {
                     // Will guy use girls restroom
-                    if (GenderCorrectBathroom.CustomersInLine >= 2 && GenderIncorrectBathroom.LineIsEmpty) {
+                    if ( GenderCorrectBathroom.CustomersInLine >= 2 && GenderIncorrectBathroom.LineIsEmpty ) {
                         return GenderIncorrectBathroom;
                     }
                     // Use correct bathroom
-                    else if (!GenderCorrectBathroom.LineIsFull) {
+                    else if ( !GenderCorrectBathroom.LineIsFull ) {
                         return GenderCorrectBathroom;
                     }
                 }
@@ -391,7 +387,7 @@ namespace Assets.Scripts.Customers {
                 int chance = WillingnessToGoLookup[size][state];
                 int rng = Random.Range(0, chance);
                 string debugMessage = (chance > 0 && rng == 0 ? "T" : "F") +
-                    $" {Gender} {size} {state} ({Mathf.RoundToInt(Bladder.Fullness)}%) use c=({chance})";
+                    $" {Gender} {size} {state} ({Mathf.RoundToInt(Bladder.Fullness * 100)}%) use c=({chance})";
                 Debug.Log(debugMessage, this);
                 return chance > 0 && rng == 0;
             }
@@ -426,52 +422,63 @@ namespace Assets.Scripts.Customers {
                 return;
             }
 
-
             // If in bar...
-            if ( Location == Location.Bar && MinTimeAtBarNow > 8f ) {
-
+            if ( Location == Location.Bar ) {
+                Bathroom bathroom;
                 switch ( DesperationState ) {
                     case CustomerDesperationState.State0:
                         // TODO: Willing to buy a drink?
-                        if ( false ) {
-
+                        if ( Random.Range(0, 2) == 0 ) {
+                            BuyDrink();
                         }
                         break;
                     case CustomerDesperationState.State1:
-                    case CustomerDesperationState.State2:
-                    case CustomerDesperationState.State3:
-                        // Willing to go pee?
-                        Bathroom bathroom = GetBathroomWillingToEnter();
-                        if ( bathroom != null ) {
-                            if ( bathroom.TryEnterQueue(this) ) {
-                                return;
-                            }
+                        // Wants to go pee?
+                        if ( !MaybeEnterBathroom(90f) ) {
+                            return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( false ) {
-
+                        if ( Random.Range(0, 3) == 0 ) {
+                            BuyDrink();
+                        }
+                        break;
+                    case CustomerDesperationState.State2:
+                        // Wants to go pee?
+                        if ( !MaybeEnterBathroom(60f) ) {
+                            return;
+                        }
+                        // TODO: Willing to buy a drink?
+                        if ( Random.Range(0, 4) == 0 ) {
+                            BuyDrink();
+                        }
+                        break;
+                    case CustomerDesperationState.State3:
+                        // Wants to go pee?
+                        if ( !MaybeEnterBathroom(40f) ) {
+                            return;
+                        }
+                        // TODO: Willing to buy a drink?
+                        if ( Random.Range(0, 5) == 0 ) {
+                            BuyDrink();
                         }
                         break;
                     case CustomerDesperationState.State4:
-                        // If they're about to wet and were not turned away, have them try to go to the bathroom
-                        if ( MinTimeAtBarNow > 10f && Bladder.LosingControl ) {
-                            // Can any use correct bathroom?
-                            if ( GenderCorrectBathroom.TryEnterQueue(this) ) {
-                                Bladder.ResetReserveHoldingPower();
-                            }
-                            // Can girl use incorrect bathroom?
-                            else if ( Gender == 'f' && GenderIncorrectBathroom.TryEnterQueue(this) ) {
-                                Bladder.ResetReserveHoldingPower();
-                            }
-                            // Seal their fate
-                            else {
-                                Debug.Log("Can't enter bathroom when bursting.", this);
+                        // Losing control?
+                        if ( Bladder.LosingControl && MinTimeAtBarNow > 8 ) {
+                            bathroom = GetBathroomWillingToEnter();
+                            if ( bathroom != null && !bathroom.TryEnterQueue(this) ) {
+                                // Seal their fate
+                                Debug.Log("Can't enter bathroom when bursting so going to wet.", this);
                                 SetNext(0f, () => {
                                     // Here's where some special wetting in bar actions / scenes / interactions can go.
                                 },
                                 // Hold until no bladder strength left
                                 () => Bladder.Strength <= 0f);
                             }
+                        }
+                        // Just totally full
+                        else {
+                            MaybeEnterBathroom(30f);
                         }
                         break;
                     default:
@@ -495,6 +502,21 @@ namespace Assets.Scripts.Customers {
                 }
             }
 
+            // Considers entering the bathroom, and returns true if decided to, or false if not
+            bool MaybeEnterBathroom(float timeRequiredAtBar) {
+                if (MinTimeAtBarNow >= timeRequiredAtBar) {
+                    Bathroom bathroom = GetBathroomWillingToEnter();
+                    return bathroom != null && bathroom.TryEnterQueue(this);
+                }
+                return false;
+            }
+
+        }
+
+        private void BuyDrink() {
+            // TODO
+            float drinkAmount = 20f;
+            Bladder.Amount += drinkAmount;
         }
         private void PeeLogicUpdate() {
             switch ( CurrentAction ) {
@@ -514,7 +536,7 @@ namespace Assets.Scripts.Customers {
                         }
                     }
                     else {
-                        Emote emote = Emote.GetPeeStreamEmote(Bladder.Fullness);
+                        Emotes.Emote(Emote.GetPeeStreamEmote(Bladder.Fullness));
                     }
                     break;
                 case CustomerAction.None:
@@ -879,9 +901,6 @@ namespace Assets.Scripts.Customers {
         }
 
         public void BeginPeeingWithThing() {
-            Emotes.Emote(Emote.PantsDown);
-            Emotes.ShowBladderCircle(true);
-
             // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
             RemainingUrinateStopDelay = UrinateStopDelay;
             if ( Bladder.Strength <= 0.01f ) {
@@ -889,16 +908,18 @@ namespace Assets.Scripts.Customers {
                 Debug.Log($"losing control when started peeing and will take longer", this);
             }
 
-            ReliefType reliefType = Occupying != null ? Occupying.RType : ReliefType.None;
-            switch ( reliefType ) {
+            switch ( ReliefType ) {
                 case ReliefType.Toilet:
                 case ReliefType.Urinal:
                 case ReliefType.Sink:
-                    CurrentAction = CustomerAction.PantsDown;
-                    SetNext((float)UrinateStartDelay, () => {
-                        Relief relief = reliefType == ReliefType.None ? null : (Relief)Occupying;
-                        CurrentAction = CustomerAction.Peeing;
-                    });
+                    SetNext(0f, () => { 
+                        Emotes.Emote(Emote.PantsDown);
+                        CurrentAction = CustomerAction.PantsDown;
+                        SetNext((float)UrinateStartDelay, () => {
+                            Emotes.ShowBladderCircle(true);
+                            CurrentAction = CustomerAction.Peeing;
+                        });
+                    }, () => AtDestination);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -965,9 +986,11 @@ namespace Assets.Scripts.Customers {
                     SRenderer.flipX = thing.Facing == Orientation.East;
                 }
 
+                // Set location, occupying, thing occupying ref and reset time at bar
                 Location = thing.Location;
                 Occupying = thing;
                 thing.OccupiedBy = this;
+                MinTimeAtBarNow = 0f;
             }
             else {
                 Debug.LogWarning("Customer tried to occupy a thing they were already occupying");
@@ -1115,14 +1138,25 @@ namespace Assets.Scripts.Customers {
             CurrentAction = CustomerAction.PeeingPinchOff;
             Emotes.Emote(Emote.StruggleStop);
 
-            // TODO: Make them wet themselves if they are still very full or have no control remaining and are commanded to stop
-            SetNext(GameSettings.Current.BladderSettings.DefaultPinchOffTime, () => {
-                Emotes.Emote(Emote.PantsUp, GameSettings.Current.PantsUpTime);
-                CurrentAction = CustomerAction.PantsUp;
-                SetNext(GameSettings.Current.PantsUpTime, () => {
-                    EndPeeingWithThing();
+            // If bladder strength is >= 20 (Let out around 20%~)
+            if (Bladder.HoldingPower >= 20) {
+                SetNext(GameSettings.Current.BladderSettings.DefaultPinchOffTime, () => {
+                    Emotes.Emote(Emote.PantsUp, GameSettings.Current.PantsUpTime);
+                    CurrentAction = CustomerAction.PantsUp;
+                    SetNext(GameSettings.Current.PantsUpTime, () => {
+                        EndPeeingWithThing();
+                    });
                 });
-            });
+            }
+            // Else fail and wet
+            else {
+                SetNext(GameSettings.Current.BladderSettings.DefaultPinchOffTime, () => {
+                    BeginPeeingSelf();
+                    SetNext(GameSettings.Current.PantsUpTime, () => {
+                        EndPeeingWithThing();
+                    });
+                });
+            }
         }
         #endregion
 

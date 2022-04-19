@@ -19,24 +19,22 @@ public class Toilet : Relief {
     // TODO: This doesn't need to be an on update. I was just lazy.
     private void Update() {
         // Open or close the stall door
-        if ( OccupiedBy != null) {
-            if ( OccupiedBy.AtDestination && !doorClosed ) {
+        if ( Occupied ) {
+            if ( !doorClosed && OccupiedBy.AtDestination ) {
                 doorClosed = true;
                 AltSRenderer.sprite = Collections.spriteStallClosed;
                 MainSRenderer.sprite = Collections.spriteToiletOpened;
             }
-            else if (!OccupiedBy.AtDestination && doorClosed) {
+            else if ( doorClosed && !OccupiedBy.AtDestination) {
                 doorClosed = false;
                 AltSRenderer.sprite = Collections.spriteStallOpened;
                 MainSRenderer.sprite = Collections.spriteToiletClosed;
             }
         }
-        else {
-            if (doorClosed) {
-                doorClosed = false;
-                AltSRenderer.sprite = Collections.spriteStallOpened;
-                MainSRenderer.sprite = Collections.spriteToiletClosed;
-            }
+        else if ( doorClosed ) {
+            doorClosed = false;
+            AltSRenderer.sprite = Collections.spriteStallOpened;
+            MainSRenderer.sprite = Collections.spriteToiletClosed;
             // Unfade the door 
             if ( faded ) {
                 AltSRenderer.color = colorNormal;

@@ -16,13 +16,8 @@ public partial class GameController : MonoBehaviour {
 
     #region Fields
 
-    [Range(0.05f, 0.5f)]
-    public float DebugSliderShakeState3 = 0.25f;
-    [Range(0.05f, 0.5f)]
-    public float DebugSliderShakeState4 = 0.1f;
-
     public static bool CreateNewSaveData = true;
-    public static int TargetFramerate = 70;
+    public static int TargetFramerate = -1;
 
     [Header("Important")]
     public bool DisplayNightStartSplash = true;
@@ -139,10 +134,13 @@ public partial class GameController : MonoBehaviour {
 
     #endregion
 
+    #region Unity Methods
+
     private void Awake() {
         // Reset screen resolution
-        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, TargetFramerate);
+        Screen.SetResolution(1366, 768, FullScreenMode.Windowed, TargetFramerate );
         Application.targetFrameRate = TargetFramerate;
+        
 
         if ( GC != null ) {
             Debug.LogError("GC singleton was already set! May have possible created a second game controller!");
@@ -251,7 +249,7 @@ public partial class GameController : MonoBehaviour {
                 GameStarted = true;
                 CanPause = true;
                 FC.Locked = false;
-                CM.CreateCustomer(desperate: true);
+                CM.CreateCustomer(0.7f);
 
                 // Debugging only
                 if ( OnlySpawnOneCustomer ) {
@@ -322,9 +320,28 @@ public partial class GameController : MonoBehaviour {
 
             // Customer spawning
             if ( SpawningEnabled && CM.RemainingSpawns > 0 ) {
-                if ( ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
+                // Attempt to detect if the game is boring
+                if (CM.CountCustomersInBar > 8 && CM.CustomersInBathroom)
+                if ( CM.CustomersAboveBladderFullness(0.7f) <= 3 ) {
+                    for ( int i = 0; i < Math.Min(Random.Range(1, 3), CM.RemainingSpawns); i++ ) {
+                        CM.CreateCustomer(0.9f);
+                    }
+                    ticksSinceLastSpawn = 0;
+                }
+                // Oh shit we spawned too many full customers
+                else if ( CM.CustomersAboveBladderFullness(0.8f) > 4 ) {
+                    if ( ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
+                        // Try to spawn them so they'll be full after the player handles the current batch
+                        for ( int i = 0; i < NumberToSpawn(CM.RemainingSpawns); i++ ) {
+                            CM.CreateCustomer(0.4f);
+                        }
+                        ticksSinceLastSpawn = 0;
+                    }
+                }
+                // Normal spawning behavior
+                else if ( ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
                     for ( int i = 0; i < NumberToSpawn(CM.RemainingSpawns); i++ ) {
-                        CM.CreateCustomer(desperate: false);
+                        CM.CreateCustomer(0.5f);
                     }
                     ticksSinceLastSpawn = 0;
                 }
@@ -339,13 +356,13 @@ public partial class GameController : MonoBehaviour {
 
             bool ShouldSpawnCustomerNow( int ticks, int remainingSpawns ) {
                 if ( remainingSpawns > 15 ) {
-                    return ticks > 4 || Random.Range(0, 5) == 0;
+                    return ticks > 2 || Random.Range(0, 4) == 0;
                 }
                 else if ( remainingSpawns > 10 ) {
-                    return ticks > 5 || Random.Range(0, 6) == 0;
+                    return ticks > 2 || Random.Range(0, 5) == 0;
                 }
                 else {
-                    return ticks > 5 || Random.Range(0, 6) == 0;
+                    return ticks > 5 || Random.Range(0, 5) == 0;
                 }
             }
             int NumberToSpawn( int remainingSpawns ) {
@@ -420,10 +437,12 @@ public partial class GameController : MonoBehaviour {
         }
         void SpawnManyCustomers() {
             if ( CM.RemainingSpawns > 0 ) {
-                CM.CreateCustomer(true);
+                CM.CreateCustomer(0.4f);
             }
         }
     }
+
+    #endregion
 
     #region External Methods
 

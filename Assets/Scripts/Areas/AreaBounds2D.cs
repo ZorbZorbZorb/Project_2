@@ -44,7 +44,6 @@ namespace Assets.Scripts {
         }
         public AreaBounds2D(BoxCollider2D collider, int GridScaleX, int GridScaleY) {
             this.collider = collider;
-            Debug.Log(collider.bounds.center);
             this.GridScaleX = GridScaleX;
             this.GridScaleY = GridScaleY;
             UpdateArea();

@@ -34,12 +34,12 @@ namespace Assets.Scripts {
             public float SizeMaxMassive = 1900f;
 
             // Default values for customers's bladders.
-            public float DefaultFillRate = 1f;
+            public float DefaultFillRate = 2f;
             public float DefaultDrainRate = 25f;
             public float DefaultStartingFullness = 0.5f;
             public float DefaultHoldingPower = 130f;
-            public float DefaultHoldingPowerReserveM = 16f;
-            public float DefaultHoldingPowerReserveF = 8f;
+            public float DefaultHoldingPowerReserveM = 15f;
+            public float DefaultHoldingPowerReserveF = 10f;
             public float DefaultPinchOffTime = 2.5f;
 
             [JsonIgnore]
@@ -47,7 +47,7 @@ namespace Assets.Scripts {
         }
 
         // Chances each bladder size will get up to use the restroom each second. 1/x chance each second
-        public int SmallUsesBathroomStage1 = 6;
+        public int SmallUsesBathroomStage1 = 10;
         public int SmallUsesBathroomStage2 = 3;
         public int SmallUsesBathroomStage3 = 2;
         // Medium

@@ -23,15 +23,15 @@ public static class Collections {
 
     public static Dictionary<CustomerAction, Sprite> BubbleSpriteLookupF = 
         BubbleSpriteLookupF = new Dictionary<CustomerAction, Sprite>() {
-            { CustomerAction.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerAction.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            //{ CustomerAction.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            //{ CustomerAction.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
             { CustomerAction.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
             { CustomerAction.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };
     public static Dictionary<CustomerAction, Sprite> BubbleSpriteLookupM = 
         BubbleSpriteLookupM = new Dictionary<CustomerAction, Sprite>() {
-            { CustomerAction.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
-            { CustomerAction.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            //{ CustomerAction.Wetting, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
+            //{ CustomerAction.Peeing, Resources.Load<Sprite>("Sprites/Bubbles/bubble_pee_stream") },
             { CustomerAction.PantsDown, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_down") },
             { CustomerAction.PantsUp, Resources.Load<Sprite>("Sprites/Bubbles/bubble_zipper_up") },
         };

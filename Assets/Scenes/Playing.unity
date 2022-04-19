@@ -3487,10 +3487,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugSliderShakeState3: 0.15
+  DebugSliderShakeState4: 0.1
   DisplayNightStartSplash: 0
   DisplayBuildMenuOnFirstNight: 0
-  NightMaxTime: 30
-  NightMaxCustomerSpawnTime: 20
+  NightMaxTime: 60
+  NightMaxCustomerSpawnTime: 50
   nightStartDelay: 2
   CameraTolerangeTight: 22
   CameraTolerangeMid: 50
@@ -6260,14 +6262,14 @@ MonoBehaviour:
   Sinks: []
   SinksLine:
     Items: []
+  waitingRoom:
+    Bathroom: {fileID: 0}
+    WaitingSpots: []
   Line:
     Bathroom: {fileID: 0}
     waitingSpots: []
     PhantomEntrySpot: {fileID: 0}
     CustomersEnteringQueue: []
-  waitingRoom:
-    Bathroom: {fileID: 0}
-    WaitingSpots: []
 --- !u!61 &1013489708
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9753,14 +9755,14 @@ MonoBehaviour:
   Sinks: []
   SinksLine:
     Items: []
+  waitingRoom:
+    Bathroom: {fileID: 0}
+    WaitingSpots: []
   Line:
     Bathroom: {fileID: 0}
     waitingSpots: []
     PhantomEntrySpot: {fileID: 0}
     CustomersEnteringQueue: []
-  waitingRoom:
-    Bathroom: {fileID: 0}
-    WaitingSpots: []
 --- !u!4 &1598575289
 Transform:
   m_ObjectHideFlags: 0

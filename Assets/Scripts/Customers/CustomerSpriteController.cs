@@ -17,11 +17,21 @@ namespace Assets.Scripts.Customers {
         private readonly Dictionary<CustomerAction, Sprite> PantsSidewaysSpriteLookup;
         private readonly Dictionary<InteractableType, Dictionary<CustomerAction, Sprite>> ActionStateSpriteLookup;
         private readonly Dictionary<InteractableType, Dictionary<CustomerAction, Sprite>> ActionStateSidewaysSpriteLookup;
+        private readonly Sprite wetSeated;
+        private readonly Sprite wetStanding;
 
-        public Sprite GetSprite<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
+        public Sprite GetSprite<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite, bool isWet )
             where T : CustomerInteractable {
 
-            if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
+            if (isWet) {
+                if (interactable is Seat seat) {
+                    return wetSeated;
+                }
+                else {
+                    return wetStanding;
+                }
+            }
+            else if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
                 // The only time action state can be none while interacting with something where you aren't forcing standing is seated
                 //   on a stool so do we only need one of these checks in the below if?
                 return interactable.IType == InteractableType.Seat && (actionState == CustomerAction.None || actionState == CustomerAction.Wetting)
@@ -74,7 +84,6 @@ namespace Assets.Scripts.Customers {
                 { CustomerDesperationState.State3, Resources.Load<Sprite>($"{root}/stand/desp_state_3") },
                 { CustomerDesperationState.State4, Resources.Load<Sprite>($"{root}/stand/desp_state_4") },
                 { CustomerDesperationState.State5, Resources.Load<Sprite>($"{root}/stand/desp_state_5") },
-                //{ CustomerDesperationState.State6, Resources.Load<Sprite>($"{root}/stand/desp_state_6") }
             };
             DesperationSeatSpriteLookup = new Dictionary<CustomerDesperationState, Sprite>() {
                 { CustomerDesperationState.State0, Resources.Load<Sprite>($"{root}/sit/desp_state_stool_0") },
@@ -85,6 +94,8 @@ namespace Assets.Scripts.Customers {
                 { CustomerDesperationState.State5, Resources.Load<Sprite>($"{root}/sit/desp_state_stool_5") },
                 //{ CustomerDesperationState.State6, Resources.Load<Sprite>($"{root}/sit/desp_state_stool_6") }
             };
+            wetSeated = Resources.Load<Sprite>($"{root}/sit/desp_state_stool_6");
+            wetStanding = Resources.Load<Sprite>($"{root}/stand/desp_state_6");
             PantsSpriteLookup = new Dictionary<CustomerAction, Sprite>() {
                 { CustomerAction.PantsDown, Resources.Load<Sprite>($"{root}/act/pants_down") },
                 { CustomerAction.PantsUp, Resources.Load<Sprite>($"{root}/act/pants_up") }

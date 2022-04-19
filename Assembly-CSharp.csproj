@@ -94,7 +94,7 @@
     <Compile Include="Assets\Scripts\Interactable\Toilet.cs" />
     <Compile Include="Assets\Scripts\VertexPath2.cs" />
     <Compile Include="Assets\Scripts\Interactable\BarTable.cs" />
-    <Compile Include="Assets\Scripts\Extensions\RandomExtensions.cs" />
+    <Compile Include="Assets\Scripts\Helpers\RandomExtensions.cs" />
     <Compile Include="Assets\Scripts\Areas\Bathroom.cs" />
     <Compile Include="Assets\Scripts\Customers\NavigationNode.cs" />
     <Compile Include="Assets\Scripts\Customers\BladderSize.cs" />
@@ -109,6 +109,8 @@
     <Compile Include="Assets\Scripts\Areas\DoorwayQueue.cs" />
     <Compile Include="Assets\Scripts\UI\BuildMenu.cs" />
     <Compile Include="Assets\Scripts\Areas\Area.cs" />
+    <Compile Include="Assets\Scripts\Customers\Stomach.cs" />
+    <Compile Include="Assets\Scripts\Helpers\CustomerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Notes\Bathroom Layout Ideas.txt" />

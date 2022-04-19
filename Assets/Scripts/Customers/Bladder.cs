@@ -69,7 +69,7 @@ namespace Assets.Scripts.Customers {
 
                     // Quickly regain control if empty
                     if ( fullness < 0.6f ) {
-                        IncreaseHoldingPower(6f);
+                        IncreaseHoldingPower(10f);
                     }
                     // Moderatly regain control if not full
                     else if ( fullness < 0.85f ) {
@@ -103,13 +103,13 @@ namespace Assets.Scripts.Customers {
                         DecreaseHoldingPower(10f);
                     }
                     else if ( fullness > 1f ) {
-                        DecreaseHoldingPower(2f);
+                        DecreaseHoldingPower(3f);
                     }
                     else if ( fullness > 0.80f ) {
-                        DecreaseHoldingPower(0.5f);
+                        DecreaseHoldingPower(1f);
                     }
                     else if ( fullness > 0.7f ) {
-                        DecreaseHoldingPower(0.2f);
+                        DecreaseHoldingPower(0.5f);
                     }
                     else if ( fullness < 0.5f ) {
                         IncreaseHoldingPower(1f);
@@ -151,10 +151,13 @@ namespace Assets.Scripts.Customers {
         #region Instance Internal Methods
 
         private void IncreaseHoldingPower( float powerPerSecond ) {
-            HoldingPower = Mathf.Max(MaxHoldingPower, HoldingPower + (powerPerSecond * Customer.DeltaTime));
+            HoldingPower = Mathf.Min(MaxHoldingPower, HoldingPower + (powerPerSecond * Customer.DeltaTime));
         }
         private void DecreaseHoldingPower( float powerPerSecond ) {
             HoldingPower = Mathf.Max(0f, HoldingPower - (powerPerSecond * Customer.DeltaTime));
+            if (HoldingPower <= 0f) {
+                HoldingPowerReserve -= Customer.DeltaTime;
+            }
         }
 
         #endregion
@@ -164,8 +167,8 @@ namespace Assets.Scripts.Customers {
         /// <summary>
         /// </summary>
         /// <param name="size">The size this bladder should be.
-        /// <param name="startFull">Should this bladder start full?</param>
-        public Bladder( Customer customer, BladderSize size, bool startFull ) {
+        /// <param name="fullness">Amount / Max value to start at</param>
+        public Bladder( Customer customer, BladderSize size, float fullness ) {
             var settings = GameSettings.Current.BladderSettings;
             Customer = customer;
 
@@ -174,7 +177,8 @@ namespace Assets.Scripts.Customers {
             Max = GetRandomBladderMax(size);
 
             // Determine the starting fullness
-            Amount = GetBladderStartingFullness(Max, Random.Range(0f, 1f), startFull);
+            //Amount = GetBladderStartingFullness(Max, Random.Range(0f, 1f), startFull);
+            Amount = fullness * Max;
             IsEmpty = false;
 
             MaxHoldingPower = settings.DefaultHoldingPower;
@@ -189,8 +193,8 @@ namespace Assets.Scripts.Customers {
         }
         /// <summary>
         /// </summary>
-        /// <param name="startFull">Should this bladder start full?</param>
-        public Bladder( Customer customer, bool startFull ) : this(customer, GetRandomBladderSize(), startFull) { }
+        /// <param name="fullness">Amount / Max value to start at</param>
+        public Bladder( Customer customer, float fullness ) : this(customer, GetRandomBladderSize(), fullness) { }
 
         #endregion
 
