@@ -48,14 +48,13 @@ namespace Assets.Scripts.Customers {
                 if ( clipNames.Contains(animationStateName) ) {
                     animator.enabled = true;
                     animator.Play(animationStateName);
-                    // For debugging, we only have one animation set right now. Change the color of the animation so it matches the genderand isnt confusing.
-                    renderer.color = Color;
                 }
                 else {
                     animator.enabled = false;
-                    renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.CurrentAction, customer.Occupying, !customer.AtDestination);
-                    renderer.color = Color;
+                    renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.CurrentAction, customer.Occupying, !customer.AtDestination, customer.IsWet);
                 }
+                // For debugging, we only have one animation set right now. Change the color of the animation so it matches the gender.
+                renderer.color = Color;
             }
         }
         private void ManuallyControlAnimations() {
@@ -75,21 +74,18 @@ namespace Assets.Scripts.Customers {
                 switch ( customer.DesperationState ) {
                     case CustomerDesperationState.State4:
                         shakeAccumulator += Time.deltaTime;
-                        if ( shakeAccumulator > GameController.GC.DebugSliderShakeState4 ) {
+                        if ( shakeAccumulator > 0.1f ) {
                             renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
-                            shakeAccumulator -= GameController.GC.DebugSliderShakeState4;
+                            shakeAccumulator -= 0.1f;
                         }
-                        //if ( shakeAccumulator > 0.1f ) {
-                        //    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
-                        //    shakeAccumulator -= 0.1f;
-                        //}
                         break;
                     case CustomerDesperationState.State3:
+                        shakeAccumulator += Time.deltaTime;
                         if ( shakeAccumulator > GameController.GC.DebugSliderShakeState3 ) {
-                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(0, 2), 0, 0);
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), 0, 0);
                             shakeAccumulator -= GameController.GC.DebugSliderShakeState3;
                         }
-                        //if ( shakeAccumulator > 0.25f ) {
+                        //if ( shakeAccumulator > 0.15f ) {
                         //    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(0, 2), 0, 0);
                         //    shakeAccumulator -= 0.25f;
                         //}
@@ -130,10 +126,9 @@ namespace Assets.Scripts.Customers {
         private static readonly Dictionary<CustomerAction, string> PantsSidewaysAnimationClipLookup;
         private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateAnimationClipLookup;
         private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateSidewaysAnimationClipLookup;
-
+        
         public static string GetAnimation<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
             where T : CustomerInteractable {
-
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
                 if ( interactable.IType == InteractableType.Seat && (actionState == CustomerAction.None || actionState == CustomerAction.Wetting) ) {
                     return DesperationSeatAnimationClipLookup[desperationState];
