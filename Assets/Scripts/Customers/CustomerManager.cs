@@ -36,7 +36,7 @@ namespace Assets.Scripts.Customers {
             .Count(x => x.Location == Location.Bar || x.Location == Location.Hallway);
         public IEnumerable<Customer> CustomersInBar => Customers
             .Where(x => x.Location == Location.Bar || x.Location == Location.Hallway);
-
+        
         public int CustomersBelowBladderFullness( float fullness ) {
             return Customers.Count(x => x.Bladder.Fullness <= fullness);
         }

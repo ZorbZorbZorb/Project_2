@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.Scripts.Helpers {
     public static class RandomExtensions {
@@ -28,6 +29,9 @@ namespace Assets.Scripts.Helpers {
                 }
                 yield break;
             }
+        }
+        public static IEnumerable<T> TakeRandom<T>( this IEnumerable<T> collection, int take ) {
+            return TakeRandom(collection.ToList(), take);
         }
     }
 }

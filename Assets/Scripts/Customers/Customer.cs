@@ -448,7 +448,7 @@ namespace Assets.Scripts.Customers {
                         break;
                     case CustomerDesperationState.State2:
                         // Wants to go pee?
-                        if ( !MaybeEnterBathroom(60f) ) {
+                        if ( !MaybeEnterBathroom(40f) ) {
                             return;
                         }
                         // TODO: Willing to buy a drink?
@@ -458,7 +458,7 @@ namespace Assets.Scripts.Customers {
                         break;
                     case CustomerDesperationState.State3:
                         // Wants to go pee?
-                        if ( !MaybeEnterBathroom(40f) ) {
+                        if ( !MaybeEnterBathroom(25f) ) {
                             return;
                         }
                         // TODO: Willing to buy a drink?
