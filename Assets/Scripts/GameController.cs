@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using Assets.Scripts.Areas;
 using Assets.Scripts.Customers;
+using Assets.Scripts.Helpers;
 using Assets.Scripts.Objects;
 using Assets.Scripts.UI;
 using System;
@@ -117,7 +118,7 @@ public partial class GameController : MonoBehaviour {
     public int AdvanceBarTimeEveryXSeconds;
     public int AdvanceBarTimeByXMinutes;
 
-    public int ticksSinceLastSpawn = 0;
+    public int ThinksSinceLastGmAction = 0;
     public double nightStartFunds;
     public bool GameStarted = false;
     public bool GameLost = false;
@@ -250,6 +251,8 @@ public partial class GameController : MonoBehaviour {
                 CanPause = true;
                 FC.Locked = false;
                 CM.CreateCustomer(0.7f);
+                CM.CreateCustomer(0.6f);
+                CM.CreateCustomer(0.6f);
 
                 // Debugging only
                 if ( OnlySpawnOneCustomer ) {
@@ -317,34 +320,9 @@ public partial class GameController : MonoBehaviour {
                     return;
                 }
             }
-
-            // Customer spawning
-            if ( SpawningEnabled && CM.RemainingSpawns > 0 ) {
-                // Attempt to detect if the game is boring
-                if (CM.CountCustomersInBar > 8 && CM.CustomersInBathroom)
-                if ( CM.CustomersAboveBladderFullness(0.7f) <= 3 ) {
-                    for ( int i = 0; i < Math.Min(Random.Range(1, 3), CM.RemainingSpawns); i++ ) {
-                        CM.CreateCustomer(0.9f);
-                    }
-                    ticksSinceLastSpawn = 0;
-                }
-                // Oh shit we spawned too many full customers
-                else if ( CM.CustomersAboveBladderFullness(0.8f) > 4 ) {
-                    if ( ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
-                        // Try to spawn them so they'll be full after the player handles the current batch
-                        for ( int i = 0; i < NumberToSpawn(CM.RemainingSpawns); i++ ) {
-                            CM.CreateCustomer(0.4f);
-                        }
-                        ticksSinceLastSpawn = 0;
-                    }
-                }
-                // Normal spawning behavior
-                else if ( ShouldSpawnCustomerNow(++ticksSinceLastSpawn, CM.RemainingSpawns) ) {
-                    for ( int i = 0; i < NumberToSpawn(CM.RemainingSpawns); i++ ) {
-                        CM.CreateCustomer(0.5f);
-                    }
-                    ticksSinceLastSpawn = 0;
-                }
+            
+            if (SpawningEnabled ) {
+                CustomerSpawningLogic();
             }
 
             // Update the bar time
@@ -353,28 +331,108 @@ public partial class GameController : MonoBehaviour {
                     AdvanceTime();
                 }
             }
+        }
+        void CustomerSpawningLogic() {
+            // Attempt to detect if the game is boring
+            float[] BladdersInBar = CM.CustomersInBar.GetBladders();
+            float[] BladdersInBathroom = CM.CustomersInBathroom.GetBladders();
+            float[] BladdersInHallway = CM.CustomersInHallway.GetBladders();
 
-            bool ShouldSpawnCustomerNow( int ticks, int remainingSpawns ) {
-                if ( remainingSpawns > 15 ) {
-                    return ticks > 2 || Random.Range(0, 4) == 0;
+            // Too few people in bathroom and hallway?
+            if ( CM.CountCustomersInBathroom + CM.CountCustomersInHallway <= 3 ) {
+                // Lots of people in bar?
+                float averageFullness = CM.CustomersInBar.AverageFullness();
+                if ( BladdersInBar.Length > 8 ) {
+                    // Average fullness in bar is very low? We fucked up to get here.
+                    if (averageFullness < 0.5f) {
+                        // Make the most desperate customers get drinks and spawn some customers that are full?
+                        var customers = CM.CustomersInBar
+                            .Where(x => x.AtDestination && x.Bladder.Fullness < 0.99f && x.Stomach.Fullness < 0.2f)
+                            .OrderByDescending(x => x.Bladder.Fullness)
+                            .Take(3);
+                        MakeDrink(customers);
+
+                        // Spawn desperate customers who want drinks
+                        int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
+                        CM.CreateCustomers(x, 0.88f)
+                            .ToList()
+                            .ForEach(x => x.SetNext(2f, () => x.BuyDrink(), ()=>x.AtDestination));
+                        ThinksSinceLastGmAction = 0;
+                        return;
+                    }
+                    else if (averageFullness < 0.7f) {
+                        // Make a few customers drink, and spawn a customer needing to go
+                        var customers = CM.CustomersInBar
+                            .Where(x => x.AtDestination && x.Bladder.Fullness < 0.9f && x.Stomach.Fullness < 0.6f)
+                            .TakeRandom(3);
+                        MakeDrink(customers);
+
+                        CM.CreateCustomer(0.9f);
+                    }
+                    else if (averageFullness > 0.85f) {
+                        // Okay, Don't panic, everythings going to sort itself out in a sec. Should we be evil?
+                        if ( BladdersInBar.Count(x => x > 0.92f) > 3) {
+                            // No, too many about to lose it
+                            int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
+                            CM.CreateCustomers(x, Random.Range(0.35f, 0.45f));
+                            ThinksSinceLastGmAction = 0;
+                            return;
+                        }
+                        else {
+                            // Chaos, Chaos!
+                            int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
+                            CM.CreateCustomers(x, 0.88f);
+                            ThinksSinceLastGmAction = 0;
+                            return;
+                        }
+                    }
                 }
-                else if ( remainingSpawns > 10 ) {
-                    return ticks > 2 || Random.Range(0, 5) == 0;
+                // Not a lot of people in the bar. Game may have just begun. Spawn more customers.
+                else if (Random.Range(0, 4 - ThinksSinceLastGmAction) == 0) {
+
                 }
                 else {
-                    return ticks > 5 || Random.Range(0, 5) == 0;
+                    ThinksSinceLastGmAction++;
                 }
             }
-            int NumberToSpawn( int remainingSpawns ) {
-                if ( remainingSpawns > 15 ) {
-                    return Random.Range(1, 3);
+
+
+            // Obsolete code below.
+            #warning Delete the below code after refactoring it
+            return;
+
+            if ( CM.CustomersAboveBladderFullness(0.7f) <= 3 ) {
+                for ( int i = 0; i < Math.Min(Random.Range(1, 3), CM.RemainingSpawns); i++ ) {
+                    CM.CreateCustomer(0.9f);
                 }
-                else if ( remainingSpawns > 10 ) {
-                    return Random.Range(0, 5) == 0 ? 2 : 1;
+                ThinksSinceLastGmAction = 0;
+            }
+            // Oh shit we spawned too many full customers
+            else if ( CM.CustomersAboveBladderFullness(0.8f) > 4 ) {
+                if ( ShouldSpawnCustomerNow(++ThinksSinceLastGmAction, CM.RemainingSpawns) ) {
+                    // Try to spawn them so they'll be full after the player handles the current batch
+                    for ( int i = 0; i < NumberOfCustomersToSpawn(CM.RemainingSpawns); i++ ) {
+                        CM.CreateCustomer(0.4f);
+                    }
+                    ThinksSinceLastGmAction = 0;
                 }
-                else {
-                    return 1;
+            }
+            // Normal spawning behavior
+            else if ( ShouldSpawnCustomerNow(++ThinksSinceLastGmAction, CM.RemainingSpawns) ) {
+                for ( int i = 0; i < NumberOfCustomersToSpawn(CM.RemainingSpawns); i++ ) {
+                    CM.CreateCustomer(0.5f);
                 }
+                ThinksSinceLastGmAction = 0;
+            }
+
+
+
+        }
+        // Makes the provided customers go buy a drink
+        void MakeDrink(IEnumerable<Customer> collection) {
+            var array = collection.ToArray();
+            for ( int i = 0; i < array.Length; i++ ) {
+                array[i].BuyDrink();
             }
         }
         void HandleKeypresses() {
@@ -438,6 +496,28 @@ public partial class GameController : MonoBehaviour {
         void SpawnManyCustomers() {
             if ( CM.RemainingSpawns > 0 ) {
                 CM.CreateCustomer(0.4f);
+            }
+        }
+        bool ShouldSpawnCustomerNow( int ticks, int remainingSpawns ) {
+            if ( remainingSpawns > 15 ) {
+                return ticks > 2 || Random.Range(0, 4) == 0;
+            }
+            else if ( remainingSpawns > 10 ) {
+                return ticks > 2 || Random.Range(0, 5) == 0;
+            }
+            else {
+                return ticks > 5 || Random.Range(0, 5) == 0;
+            }
+        }
+        int NumberOfCustomersToSpawn( int remainingSpawns ) {
+            if ( remainingSpawns > 10 ) {
+                return Random.Range(1, 3);
+            }
+            else if ( remainingSpawns > 5 ) {
+                return Random.Range(0, 5) == 0 ? 2 : 1;
+            }
+            else {
+                return 1;
             }
         }
     }

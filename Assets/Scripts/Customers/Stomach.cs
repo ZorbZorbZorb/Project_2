@@ -22,5 +22,11 @@ namespace Assets.Scripts.Customers {
             Fullness = Amount / Max;
             return removed;
         }
+
+        public Stomach(float max) {
+            Max = max;
+            Amount = 0f;
+            Fullness = Amount / max;
+        }
     }
 }

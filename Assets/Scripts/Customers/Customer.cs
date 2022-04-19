@@ -43,6 +43,8 @@ namespace Assets.Scripts.Customers {
         public string animatorStateName;
         public string lastAnimatorStateName;
 
+        public float DrinkAmount;
+
         public Text EmotesBladderAmountText;
 
         public bool Active = false;
@@ -58,6 +60,7 @@ namespace Assets.Scripts.Customers {
         public CustomerDesperationState DesperationState = CustomerDesperationState.State0;
         private CustomerDesperationState LastDesperationState = CustomerDesperationState.State0;
         public bool DesperationStateChangeThisUpdate = false;
+        public Stomach Stomach;
         public Bladder Bladder;
 
         // Times
@@ -190,6 +193,7 @@ namespace Assets.Scripts.Customers {
 
             MenuButton MenuButtonReliefStop = new(this, ReliefMenu, ButtonReliefStop, () => { MenuOptionStopPeeing(); });
 
+            Stomach = new Stomach(600f);
             Bladder = new Bladder(this, fullness);
 
             UrinateStartDelay = 4d;
@@ -245,7 +249,7 @@ namespace Assets.Scripts.Customers {
         /// <summary>Next will wait to trigger until this function returns true</summary>
         public Func<bool> NextWhenTrue = null;
 
-        private void SetNext( float delay, NextAction d, Func<bool> whenTrue = null ) {
+        public void SetNext( float delay, NextAction d, Func<bool> whenTrue = null ) {
             HasNext = true;
             NextDelay = delay;
             NextWhenTrue = whenTrue;
@@ -428,7 +432,7 @@ namespace Assets.Scripts.Customers {
                 switch ( DesperationState ) {
                     case CustomerDesperationState.State0:
                         // TODO: Willing to buy a drink?
-                        if ( Random.Range(0, 2) == 0 ) {
+                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 2) == 0 ) {
                             BuyDrink();
                         }
                         break;
@@ -438,7 +442,7 @@ namespace Assets.Scripts.Customers {
                             return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( Random.Range(0, 3) == 0 ) {
+                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 3) == 0 ) {
                             BuyDrink();
                         }
                         break;
@@ -448,7 +452,7 @@ namespace Assets.Scripts.Customers {
                             return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( Random.Range(0, 4) == 0 ) {
+                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 4) == 0 ) {
                             BuyDrink();
                         }
                         break;
@@ -458,7 +462,7 @@ namespace Assets.Scripts.Customers {
                             return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( Random.Range(0, 5) == 0 ) {
+                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 5) == 0 ) {
                             BuyDrink();
                         }
                         break;
@@ -503,21 +507,21 @@ namespace Assets.Scripts.Customers {
             }
 
             // Considers entering the bathroom, and returns true if decided to, or false if not
-            bool MaybeEnterBathroom(float timeRequiredAtBar) {
-                if (MinTimeAtBarNow >= timeRequiredAtBar) {
+            bool MaybeEnterBathroom( float timeRequiredAtBar ) {
+                if ( MinTimeAtBarNow >= timeRequiredAtBar ) {
                     Bathroom bathroom = GetBathroomWillingToEnter();
                     return bathroom != null && bathroom.TryEnterQueue(this);
                 }
                 return false;
             }
-
         }
 
-        private void BuyDrink() {
+        public void BuyDrink() {
             // TODO
-            float drinkAmount = 20f;
-            Bladder.Amount += drinkAmount;
+            float drinkAmount = 200f;
+            Stomach.Add(drinkAmount);
         }
+
         private void PeeLogicUpdate() {
             switch ( CurrentAction ) {
                 case CustomerAction.Wetting:
@@ -912,7 +916,7 @@ namespace Assets.Scripts.Customers {
                 case ReliefType.Toilet:
                 case ReliefType.Urinal:
                 case ReliefType.Sink:
-                    SetNext(0f, () => { 
+                    SetNext(0f, () => {
                         Emotes.Emote(Emote.PantsDown);
                         CurrentAction = CustomerAction.PantsDown;
                         SetNext((float)UrinateStartDelay, () => {
@@ -1139,7 +1143,7 @@ namespace Assets.Scripts.Customers {
             Emotes.Emote(Emote.StruggleStop);
 
             // If bladder strength is >= 20 (Let out around 20%~)
-            if (Bladder.HoldingPower >= 20) {
+            if ( Bladder.HoldingPower >= 20 ) {
                 SetNext(GameSettings.Current.BladderSettings.DefaultPinchOffTime, () => {
                     Emotes.Emote(Emote.PantsUp, GameSettings.Current.PantsUpTime);
                     CurrentAction = CustomerAction.PantsUp;

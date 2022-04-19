@@ -70,6 +70,13 @@ namespace Assets.Scripts.Customers {
 
             return newCustomer;
         }
+        public Customer[] CreateCustomers(int numberToCreate, float fullness) {
+            Customer[] created = new Customer[numberToCreate];
+            for ( int i = 0; i < numberToCreate; i++ ) {
+                created[i] = CreateCustomer(fullness);
+            }
+            return created;
+        }
 
         public void RemoveCustomer( Customer customer ) {
             customer.StopOccupyingAll();
