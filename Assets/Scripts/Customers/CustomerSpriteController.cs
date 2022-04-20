@@ -19,12 +19,16 @@ namespace Assets.Scripts.Customers {
         private readonly Dictionary<InteractableType, Dictionary<CustomerAction, Sprite>> ActionStateSidewaysSpriteLookup;
         private readonly Sprite wetSeated;
         private readonly Sprite wetStanding;
+        private readonly Sprite leaking;
 
         public Sprite GetSprite<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite, bool isWet )
             where T : CustomerInteractable {
 
-            if (isWet) {
-                if (interactable is Seat seat) {
+            if (actionState == CustomerAction.Leaking) {
+                return null;
+            }
+            else if (isWet) {
+                if (interactable is Seat) {
                     return wetSeated;
                 }
                 else {
@@ -96,6 +100,7 @@ namespace Assets.Scripts.Customers {
             };
             wetSeated = Resources.Load<Sprite>($"{root}/sit/desp_state_stool_6");
             wetStanding = Resources.Load<Sprite>($"{root}/stand/desp_state_6");
+            leaking = Resources.Load<Sprite>($"{root}/stand/desp_state_4_leak");
             PantsSpriteLookup = new Dictionary<CustomerAction, Sprite>() {
                 { CustomerAction.PantsDown, Resources.Load<Sprite>($"{root}/act/pants_down") },
                 { CustomerAction.PantsUp, Resources.Load<Sprite>($"{root}/act/pants_up") }

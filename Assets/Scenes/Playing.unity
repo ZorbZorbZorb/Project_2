@@ -3487,10 +3487,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayNightStartSplash: 0
-  DisplayBuildMenuOnFirstNight: 0
-  NightMaxTime: 60
-  NightMaxCustomerSpawnTime: 50
+  DisplayNightStartSplash: 1
+  DisplayBuildMenuOnFirstNight: 1
+  NightMaxTime: 41
+  NightMaxCustomerSpawnTime: 40
   nightStartDelay: 2
   CameraTolerangeTight: 22
   CameraTolerangeMid: 50

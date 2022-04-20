@@ -69,24 +69,33 @@ namespace Assets.Scripts.Customers {
             // Sprite shaking to show desperation
             // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
             // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
-            switch ( customer.DesperationState ) {
-                case CustomerDesperationState.State4:
-                    shakeAccumulator += Time.deltaTime;
-                    if ( shakeAccumulator > 0.1f ) {
-                        renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
-                        shakeAccumulator -= 0.1f;
-                    }
-                    break;
-                case CustomerDesperationState.State3:
-                    shakeAccumulator += Time.deltaTime;
-                    if ( shakeAccumulator > 0.15f ) {
-                        renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), 0, 0);
-                        shakeAccumulator -= 0.15f;
-                    }
-                    break;
-                default:
-                    renderer.transform.position = customer.gameObject.transform.position;
-                    break;
+            if (customer.CurrentAction == CustomerAction.Leaking) {
+                shakeAccumulator += Time.deltaTime;
+                if ( shakeAccumulator > 0.1f ) {
+                    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2) * 2, 0, 0);
+                    shakeAccumulator -= 0.1f;
+                }
+            }
+            else {
+                switch ( customer.DesperationState ) {
+                    case CustomerDesperationState.State4:
+                        shakeAccumulator += Time.deltaTime;
+                        if ( shakeAccumulator > 0.1f ) {
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
+                            shakeAccumulator -= 0.1f;
+                        }
+                        break;
+                    case CustomerDesperationState.State3:
+                        shakeAccumulator += Time.deltaTime;
+                        if ( shakeAccumulator > 0.15f ) {
+                            renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), 0, 0);
+                            shakeAccumulator -= 0.15f;
+                        }
+                        break;
+                    default:
+                        renderer.transform.position = customer.gameObject.transform.position;
+                        break;
+                }
             }
         }
         public CustomerAnimator( Customer _customer, SpriteRenderer _renderer, Animator _animator, CustomerSpriteController _marshal ) {

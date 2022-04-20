@@ -244,20 +244,6 @@ namespace Assets.Scripts.Customers {
                     throw new NotImplementedException();
             }
         }
-        /// <summary>
-        /// Returns a starting <see cref="Amount"/> depending on the value of <paramref name="t"/>, the customers 
-        /// <paramref name="max"/> and if the customer should <paramref name="startFull"/>
-        /// <para>https://www.desmos.com/calculator/nw8zdk2krx</para>
-        /// </summary>
-        /// <param name="max"></param>
-        /// <param name="t">0 &#8804; <paramref name="t"/> &#8804; 1</param>
-        /// <param name="startFull"></param>
-        /// <returns>(<paramref name="max"/> * 0.1)~ &#8804; x &#8804; (<paramref name="max"/> * 0.9) </returns>
-        private static float GetBladderStartingFullness( float max, float t, bool startFull ) {
-            float percent = (1f - MathF.Pow(( t * 1.5f ) - 0.75f, 2f)) / 2f;
-            percent += startFull ? 0.45f : 0;
-            return percent * max;
-        }
 
         #endregion
 
