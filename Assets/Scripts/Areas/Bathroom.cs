@@ -95,9 +95,18 @@ namespace Assets.Scripts.Areas {
                 return false;
             }
             else {
-                customer.Occupy(Line.PhantomEntrySpot);
-                Line.CustomersEnteringQueue.Add(customer);
-                return true;
+                // Hotfix for girls switching to the guys line, they go to the back of the line because its to the left
+                if (customer.Location == Location.Hallway) {
+                    customer.MoveTo(Line.waitingSpots[0]);
+                    customer.Occupying = Line.PhantomEntrySpot;
+                    Line.CustomersEnteringQueue.Add(customer);
+                    return true;
+                }
+                else {
+                    customer.Occupy(Line.PhantomEntrySpot);
+                    Line.CustomersEnteringQueue.Add(customer);
+                    return true;
+                }
             }
         }
         public new void Awake() {
