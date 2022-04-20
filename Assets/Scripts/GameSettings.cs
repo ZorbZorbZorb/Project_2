@@ -33,6 +33,11 @@ namespace Assets.Scripts {
             public float SizeMinMassive = 1500f;
             public float SizeMaxMassive = 1900f;
 
+            public float SmallHoldPower = 60f;
+            public float MediumHoldPower = 90f;
+            public float LargeHoldPower = 130f;
+            public float MassiveHoldPower = 200f;
+
             // Default values for customers's bladders.
             public float DefaultFillRate = 2f;
             public float DefaultDrainRate = 25f;
@@ -62,6 +67,12 @@ namespace Assets.Scripts {
         public int MassiveUsesBathroomStage1 = 0;
         public int MassiveUsesBathroomStage2 = 0;
         public int MassiveUsesBathroomStage3 = 20;
+
+        // V2
+        public float SmallUsesBathroom = 50f;
+        public float MediumUsesBathroom = 65f;
+        public float LargeUsesBathroom = 75f;
+        public float MassiveUsesBathroom = 85f;
 
         public float PantsDownTime = 2f;
         public float PantsUpTime = 1f;

@@ -35,9 +35,12 @@ namespace Assets.Scripts.Customers {
         /// Percentage from 1f to 0f representing how much holding strength the bladder has left
         /// <para>This number sits at 0.01f (1%) while reserve holding time is ticking down</para>
         /// </summary>
+        //public float Strength => HoldingPowerReserve > 0f
+        //    ? Math.Max(0.01f, HoldingPower / MaxHoldingPower)
+        //    : HoldingPower / MaxHoldingPower;
         public float Strength => HoldingPowerReserve > 0f
             ? Math.Max(0.01f, HoldingPower / MaxHoldingPower)
-            : HoldingPower / MaxHoldingPower;
+            : Math.Max(0f, HoldingPower / MaxHoldingPower);
         public bool LosingControl => HoldingPower == 0f;
         /// <summary>
         /// Denotes if the bladder is empty or not.

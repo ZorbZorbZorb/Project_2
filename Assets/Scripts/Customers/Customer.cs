@@ -868,7 +868,7 @@ namespace Assets.Scripts.Customers {
             }
             // Only if they're about to lose it
             if ( customer.Gender == 'f' ) {
-                return GC.CustomersWillUseAnything || customer.Bladder.Strength <= 0.01f || customer.Bladder.Fullness > 0.95;
+                return GC.CustomersWillUseAnything || customer.Bladder.LosingControl || customer.Bladder.Fullness > 0.95;
             }
             throw new NotImplementedException();
         }
@@ -907,7 +907,7 @@ namespace Assets.Scripts.Customers {
         public void BeginPeeingWithThing() {
             // Make it take 2.5x as long for them to finish up if you made them hold it to the point they were about to lose it
             RemainingUrinateStopDelay = UrinateStopDelay;
-            if ( Bladder.Strength <= 0.01f ) {
+            if ( Bladder.LosingControl ) {
                 RemainingUrinateStopDelay *= 2.5d;
                 Debug.Log($"losing control when started peeing and will take longer", this);
             }
