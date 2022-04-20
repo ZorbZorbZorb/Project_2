@@ -111,6 +111,7 @@
     <Compile Include="Assets\Scripts\Areas\Area.cs" />
     <Compile Include="Assets\Scripts\Customers\Stomach.cs" />
     <Compile Include="Assets\Scripts\Helpers\CustomerExtensions.cs" />
+    <Compile Include="Assets\Scripts\Director.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Notes\Bathroom Layout Ideas.txt" />

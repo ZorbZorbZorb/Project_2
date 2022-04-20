@@ -1,7 +1,6 @@
 using Assets.Scripts;
 using Assets.Scripts.Areas;
 using Assets.Scripts.Customers;
-using Assets.Scripts.Helpers;
 using Assets.Scripts.Objects;
 using Assets.Scripts.UI;
 using System;
@@ -11,11 +10,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using Random = UnityEngine.Random;
-
 public partial class GameController : MonoBehaviour {
 
     #region Fields
+
+    /// <summary>
+    /// Ai director. Controls customer drinking, spawning, and other behaviors regarding game balance and
+    ///   general player enjoyment.
+    /// </summary>
+    public static Director AID;
+    /// <summary><see cref="CustomerManager"/> singleton. Tracks custromers and handles spawning.</summary>
+    [HideInInspector]
+    public static CustomerManager CM;
 
     public static bool CreateNewSaveData = true;
     public static int TargetFramerate = -1;
@@ -93,15 +99,10 @@ public partial class GameController : MonoBehaviour {
 
     // State booleans
     [HideInInspector]
-    public bool SpawningEnabled = true;
-    [HideInInspector]
     public bool CanPause = true;
     [HideInInspector]
     public bool DisplayedNightStartSplashScreen = false;
 
-    /// <summary><see cref="CustomerManager"/> singleton. Tracks custromers and handles spawning.</summary>
-    [HideInInspector]
-    public static CustomerManager CM;
     /// <summary><see cref="GameController"/> singleton</summary>
     [HideInInspector]
     public static GameController GC = null;
@@ -227,6 +228,9 @@ public partial class GameController : MonoBehaviour {
             ReadyToStartNight = true;
         }
 
+        // Create the ai director
+        AID = new Director(CM);
+
         // Reset frame rate just incase Unity didnt take it in Awake();
         Application.targetFrameRate = TargetFramerate;
     }
@@ -260,7 +264,7 @@ public partial class GameController : MonoBehaviour {
                 // Debugging only
                 if ( OnlySpawnOneCustomer ) {
                     OnlySpawnOneCustomer = false;
-                    SpawningEnabled = false;
+                    AID.Disable();
                 }
             }
             else {
@@ -300,11 +304,14 @@ public partial class GameController : MonoBehaviour {
             NightClock = NightClock.Subtract(OneSecond);
             barTimeDisplay.text = $"{NightClock.Minutes.ToString().PadLeft(2, '0')}:{NightClock.Seconds.ToString().PadLeft(2, '0')}";
             Think();
+            AID.Act();
             if ( Autoplay ) {
                 StupidIdiotAutoplayThing();
             }
             if ( SpawnEveryTick ) {
-                SpawnManyCustomers();
+                if ( CM.RemainingSpawns > 0 ) {
+                    CM.CreateCustomer(0.4f);
+                }
             }
         }
 
@@ -313,22 +320,19 @@ public partial class GameController : MonoBehaviour {
             if ( CM.CountBrokenSeats > CM.CountWorkingSeats && !NoLose ) {
                 GameEnd = true;
                 GameLost = true;
+                AID.Disable();
                 return;
             }
 
             // Stop spawning customers when its too late
             if ( TicksElapsed >= NightMaxTicks ) {
-                SpawningEnabled = false;
+                AID.Disable();
 
                 // End game at end time or everyone has left
-                if ( !CM.Customers.Any() || TicksElapsed >= NightMaxTicks + 2) {
+                if ( !CM.Customers.Any() || TicksElapsed >= NightMaxTicks + 2 ) {
                     GameEnd = true;
                     return;
                 }
-            }
-
-            if ( SpawningEnabled ) {
-                CustomerSpawningLogic();
             }
 
             // Update the bar time
@@ -336,236 +340,6 @@ public partial class GameController : MonoBehaviour {
                 if ( !FreezeTime ) {
                     AdvanceTime();
                 }
-            }
-        }
-        void CustomerSpawningLogic() {
-            if ( ThinksSinceLastGmAction < 2 ) {
-                ThinksSinceLastGmAction++;
-                return;
-            }
-
-            // Attempt to detect if the game is boring
-            float[] BladdersInBar = CM.CustomersInBar.GetBladders();
-            float[] BladdersInBathroom = CM.CustomersInBathroom.GetBladders();
-            float[] BladdersInHallway = CM.CustomersInHallway.GetBladders();
-            float AllHoldingAverageFullness = CM.AverageFullness;
-            float BarHoldingAvgFullness = CM.CustomersInBar.AverageFullness();
-            //Debug.Log($"AllHoldingAvgFullness: {Mathf.RoundToInt(AllHoldingAverageFullness * 100)} BarAvgFullness: {Mathf.RoundToInt(BarHoldingAvgFullness * 100)}");
-
-            // Not a lot of people in the bar. Game may have just begun. Spawn more customers.
-            if ( CM.Customers.Count() < 6 ) {
-                SpawnNormally();
-            }
-            // Too few people in bathroom and hallway?
-            else if ( CM.CountCustomersInBathroom + CM.CountCustomersInHallway <= 3 ) {
-                // Not so fast buddy. These are drastic actions, 
-                if ( ThinksSinceLastGmAction < 2 ) {
-                    ThinksSinceLastGmAction++;
-                    return;
-                }
-
-                // Lots of people in bar?
-                TakeAction();
-
-                ThinksSinceLastGmAction = 0;
-                return;
-            }
-            else {
-                SpawnNormally();
-            }
-
-            void TakeAction() {
-                float averageFullness = CM.Customers.AverageFullness();
-
-                // Average fullness in bar is very low? We fucked up to get here.
-                if ( averageFullness < 0.6f ) {
-                    Debug.Log($"GM | Drastic | Average fullness too low. Game is VERY boring!");
-                    // Make the most desperate customers get drinks and spawn some customers that are full?
-                    var customers = CM.CustomersInBar
-                            .ValidActionTargets()
-                            .Where(x => x.Bladder.Fullness < 0.97f && x.Stomach.Fullness < 0.2f)
-                            .OrderByDescending(x => x.Bladder.Fullness)
-                            .Take(3);
-                    MakeDrink(customers);
-
-                    Debug.Log($"GM | Drastic | made {customers.Count()} drink");
-
-                    // Spawn desperate customers who want drinks
-                    int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
-                    CM.CreateCustomers(x, 0.88f)
-                        .ToList()
-                        .ForEach(x => x.SetNext(2f, () => x.BuyDrink(), () => x.AtDestination));
-                    Debug.Log($"GM | Drastic | spawned {x} desperate");
-                    Debug.Log($"GM | Drastic | made {x} drink");
-                }
-                else if ( averageFullness < 0.8f ) {
-                    Debug.Log($"GM | Drastic | Average fullness kinda low. Game is boring!");
-                    // Make a few customers drink, and spawn a customer needing to go
-                    var customers = CM.CustomersInBar
-                            .ValidActionTargets()
-                            .Where(x => x.Bladder.Fullness < 0.9f && x.Stomach.Fullness < 0.6f)
-                            .TakeRandom(2);
-                    MakeDrink(customers);
-                    Debug.Log($"GM | Drastic | made {customers.Count()} drink");
-
-                    if ( CM.RemainingSpawns > 0 ) {
-                        CM.CreateCustomer(0.9f);
-                        Debug.Log($"GM | Drastic | spawned {1} desperate");
-                    }
-                }
-                else {
-                    Debug.Log($"GM | Lots of customers full but nobodys in the bathroom.");
-                    // Okay, Don't panic, everythings going to sort itself out in a sec. Should we be evil?
-                    if ( BladdersInHallway.Length > 3 ) {
-                        // No, too many about to lose it
-                        if ( CM.RemainingSpawns > 0 ) {
-                            int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
-                            CM.CreateCustomers(x, Random.Range(0.35f, 0.45f));
-                            Debug.Log($"GM | Spawned {x} low need customer(s)");
-                        }
-                        // No, also we cant do much anyways
-                        else {
-                        }
-                    }
-                    else {
-                        // Chaos, Chaos!
-                        int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
-                        CM.CreateCustomers(x, 0.6f);
-                        Debug.Log($"GM | spawned {1} full");
-                    }
-                }
-            }
-            void SpawnNormally() {
-                if ( CM.RemainingSpawns <= 0 ) {
-                    return;
-                }
-
-                // Few customers who are full.
-                if ( CM.CustomersAboveBladderFullness(0.7f) <= 3 ) {
-                    for ( int i = 0; i < Math.Min(Random.Range(1, 3), CM.RemainingSpawns); i++ ) {
-                        CM.CreateCustomer(Random.Range(0.83f, 0.89f));
-                    }
-                    ThinksSinceLastGmAction = 0;
-                }
-                // Oh shit we spawned too many full customers
-                else if ( CM.CustomersAboveBladderFullness(0.8f) > 4 ) {
-                    if ( ShouldSpawnCustomerNow(++ThinksSinceLastGmAction, CM.RemainingSpawns) ) {
-                        // Try to spawn them so they'll be full after the player handles the current batch
-                        var x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
-                        CM.CreateCustomers(x, 0.4f);
-                        Debug.Log($"GM | spawned {x} desperate");
-
-                        ThinksSinceLastGmAction = 0;
-                        return;
-                    }
-                }
-                // Normal spawning behavior
-                else if ( ShouldSpawnCustomerNow(++ThinksSinceLastGmAction, CM.RemainingSpawns) ) {
-                    var x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
-                    CM.CreateCustomers(x, 0.5f);
-                    Debug.Log($"GM | spawned {x} desperate");
-                    ThinksSinceLastGmAction = 0;
-                    return;
-                }
-                else {
-                    ThinksSinceLastGmAction++;
-                }
-            }
-
-        }
-        // Makes the provided customers go buy a drink
-        void MakeDrink( IEnumerable<Customer> collection ) {
-            var array = collection.ToArray();
-            for ( int i = 0; i < array.Length; i++ ) {
-                array[i].BuyDrink();
-            }
-        }
-        void HandleKeypresses() {
-            // Pressing escape will pause the game
-            if ( Input.GetKeyDown(KeyCode.Escape) ) {
-                ToggleGamePaused();
-            }
-
-            // Camera movement hotkeys
-            if ( Input.GetKeyDown(KeyCode.D) ) {
-                CycleCamera(Orientation.East);
-            }
-            else if ( Input.GetKeyDown(KeyCode.A) ) {
-                CycleCamera(Orientation.West);
-            }
-            else if ( Input.GetKeyDown(KeyCode.S) ) {
-                CycleCamera(Orientation.South);
-            }
-            else if ( Input.GetKeyDown(KeyCode.W) ) {
-                CycleCamera(Orientation.North);
-            }
-
-        }
-        void StupidIdiotAutoplayThing() {
-            foreach ( Customer customer in CM.Customers ) {
-                if ( customer.AtDestination ) {
-                    if ( customer.Location == Location.Bar ) {
-                        customer.Leave();
-                        break;
-                    }
-                    if ( customer.Location == Location.Hallway ) {
-                        var bathroom = customer.GetCurrentBathroom();
-                        if ( bathroom.Line.IsNextInLine(customer) ) {
-                            if ( bathroom.HasToiletAvailable ) {
-                                customer.MenuOptionGotoToilet();
-                                break;
-                            }
-                            else if ( bathroom.HasUrinalAvailable && Customer.WillUseUrinal(customer) ) {
-                                customer.MenuOptionGotoUrinal();
-                                break;
-                            }
-                            else if ( bathroom.HasSinkForRelief && Customer.WillUseSink(customer) ) {
-                                customer.MenuOptionGotoSink();
-                                break;
-                            }
-                            else if ( bathroom.HasWaitingSpot ) {
-                                customer.MenuOptionGotoWaiting();
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // TODO: Convert this into its own debug toggle
-            foreach ( var seat in Bar.Singleton.Seats ) {
-                if ( seat.OccupiedBy == null && seat.IsSoiled ) {
-                    seat.IsSoiled = false;
-                }
-            }
-        }
-        void SpawnManyCustomers() {
-            if ( CM.RemainingSpawns > 0 ) {
-                CM.CreateCustomer(0.4f);
-            }
-        }
-        bool ShouldSpawnCustomerNow( int ticks, int remainingSpawns ) {
-            if ( remainingSpawns > 15 ) {
-                return ticks > 2 || Random.Range(0, 6 - ticks) == 0;
-            }
-            else if ( remainingSpawns > 10 ) {
-                return ticks > 2 || Random.Range(0, 7 - ticks) == 0;
-            }
-            else {
-                return ticks > 5 || Random.Range(0, 10 - ticks) == 0;
-            }
-        }
-        int NumberOfCustomersToSpawn( int remainingSpawns ) {
-            if ( CM.RemainingSpawns <= 0 ) {
-                return 0;
-            }
-            else if ( remainingSpawns > 10 ) {
-                return Random.Range(1, 3);
-            }
-            else if ( remainingSpawns > 5 ) {
-                return Random.Range(0, 5) == 0 ? 2 : 1;
-            }
-            else {
-                return 1;
             }
         }
     }
@@ -632,6 +406,70 @@ public partial class GameController : MonoBehaviour {
     #region Internal Methods
 
     /// <summary>
+    /// Keyboard event handler
+    /// </summary>
+    private void HandleKeypresses() {
+        // Pressing escape will pause the game
+        if ( Input.GetKeyDown(KeyCode.Escape) ) {
+            ToggleGamePaused();
+        }
+
+        // Camera movement hotkeys
+        if ( Input.GetKeyDown(KeyCode.D) ) {
+            CycleCamera(Orientation.East);
+        }
+        else if ( Input.GetKeyDown(KeyCode.A) ) {
+            CycleCamera(Orientation.West);
+        }
+        else if ( Input.GetKeyDown(KeyCode.S) ) {
+            CycleCamera(Orientation.South);
+        }
+        else if ( Input.GetKeyDown(KeyCode.W) ) {
+            CycleCamera(Orientation.North);
+        }
+    }
+    /// <summary>
+    /// Plays the game automatically for testing purposes.
+    /// <para>Make sure to fix the issue where menu clicks aren't opening the menu first</para>
+    /// </summary>
+    private void StupidIdiotAutoplayThing() {
+        foreach ( Customer customer in CM.Customers ) {
+            if ( customer.AtDestination ) {
+                if ( customer.Location == Location.Bar ) {
+                    customer.Leave();
+                    break;
+                }
+                if ( customer.Location == Location.Hallway ) {
+                    var bathroom = customer.GetCurrentBathroom();
+                    if ( bathroom.Line.IsNextInLine(customer) ) {
+                        if ( bathroom.HasToiletAvailable ) {
+                            customer.MenuOptionGotoToilet();
+                            break;
+                        }
+                        else if ( bathroom.HasUrinalAvailable && Customer.WillUseUrinal(customer) ) {
+                            customer.MenuOptionGotoUrinal();
+                            break;
+                        }
+                        else if ( bathroom.HasSinkForRelief && Customer.WillUseSink(customer) ) {
+                            customer.MenuOptionGotoSink();
+                            break;
+                        }
+                        else if ( bathroom.HasWaitingSpot ) {
+                            customer.MenuOptionGotoWaiting();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        // TODO: Convert this into its own debug toggle
+        foreach ( var seat in Bar.Singleton.Seats ) {
+            if ( seat.OccupiedBy == null && seat.IsSoiled ) {
+                seat.IsSoiled = false;
+            }
+        }
+    }
+    /// <summary>
     /// Fades away the night start screen and eventually disables it.
     /// </summary>
     /// <returns>Returns false if still fading. Returns true when finished fading.</returns>
@@ -675,6 +513,7 @@ public partial class GameController : MonoBehaviour {
     /// Resets static properties between scene reloads
     /// </summary>
     private void ResetStaticMembers() {
+        AID = null;
         GamePaused = false;
         Assets.Scripts.Customers.Navigation.Nodes = new Dictionary<Location, List<NavigationNode>>();
     }
