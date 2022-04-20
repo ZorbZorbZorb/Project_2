@@ -51,6 +51,7 @@ namespace Assets.Scripts.Customers {
                 }
                 else {
                     animator.enabled = false;
+                    bool forceStanding = !customer.AtDestination;
                     renderer.sprite = marshal.GetSprite(customer.DesperationState, customer.CurrentAction, customer.Occupying, !customer.AtDestination, customer.IsWet);
                 }
                 // For debugging, we only have one animation set right now. Change the color of the animation so it matches the gender.
@@ -194,19 +195,23 @@ namespace Assets.Scripts.Customers {
             // Front facing sink
             ActionStateAnimationClipLookup.Add(InteractableType.Sink, new Dictionary<CustomerAction, string>() {
                 { CustomerAction.Peeing, "peeing_sink"},
+                { CustomerAction.PeeingPinchOff, "peeing_sink"},
                 {CustomerAction.WashingHands, "wash"}
             });
             // Front facing toilet
             ActionStateAnimationClipLookup.Add(InteractableType.Toilet, new Dictionary<CustomerAction, string>() {
                 { CustomerAction.Peeing, "peeing_toilet" },
+                { CustomerAction.PeeingPinchOff, "peeing_toilet" },
             });
             // Front facing urinal
             ActionStateAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerAction, string>() {
                 { CustomerAction.Peeing, "peeing_urinal" },
+                { CustomerAction.PeeingPinchOff, "peeing_urinal" },
             });
             // Side facing urinal
             ActionStateSidewaysAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerAction, string>() {
                 { CustomerAction.Peeing, "peeing_urinal_side" },
+                { CustomerAction.PeeingPinchOff, "peeing_urinal_side" },
             });
             // Front facing seat
             ActionStateAnimationClipLookup.Add(InteractableType.Seat, new Dictionary<CustomerAction, string>() {

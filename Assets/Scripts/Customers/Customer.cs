@@ -522,12 +522,17 @@ namespace Assets.Scripts.Customers {
         public void BuyDrink() {
             float drinkAmount = 200f;
             // Move to bar drinks pickup spot
-            var offset = new Vector3(0f, Random.Range(0, 2) * 100f, 0f);
+            var offset = new Vector3(Random.Range(-50f, 50f), Random.Range(-10f, -5f), 0f);
             var vector = offset + Bar.Singleton.DrinkPhantomWaitingSpot.CustomerPositionF;
             MoveTo(Location.Bar, vector);
+            // This is very bad practice but doesnt break anything. If I don't do this they're still occupying their seat, and will
+            //   "sit" down in the phantom waiting spot when they arrive.
+            CustomerInteractable seat = Occupying;
+            Occupying = Bar.Singleton.DrinkPhantomWaitingSpot;
             // Move back to table
             SetNext(4f, () => {
-                MoveTo(Occupying);
+                MoveTo(seat);
+                Occupying = seat;
                 // Drink
                 SetNext(0f, () => {
                     CurrentAction = CustomerAction.Drinking;
@@ -1113,7 +1118,8 @@ namespace Assets.Scripts.Customers {
                 return false;
             }
             bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
-            bool firstInLine = Occupying != null && Occupying is WaitingSpot spot && spot.Bathroom.Line.IsNextInLine(this);
+            bool firstInLine = AtDestination && Occupying != null && Occupying is WaitingSpot spot 
+                && spot.WaitingSpotType != WaitingSpotType.DrinksGhost && spot.Bathroom.Line.IsNextInLine(this);
             bool acting = CurrentAction != CustomerAction.None;
             return AtDestination && !IsWet && !acting && (inBathroom || firstInLine);
         }
