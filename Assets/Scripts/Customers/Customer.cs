@@ -435,9 +435,9 @@ namespace Assets.Scripts.Customers {
                 switch ( DesperationState ) {
                     case CustomerDesperationState.State0:
                         // TODO: Willing to buy a drink?
-                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 2) == 0 ) {
-                            BuyDrink();
-                        }
+                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 2) == 0 ) {
+                        //    BuyDrink();
+                        //}
                         break;
                     case CustomerDesperationState.State1:
                         // Wants to go pee?
@@ -445,9 +445,9 @@ namespace Assets.Scripts.Customers {
                             return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 3) == 0 ) {
-                            BuyDrink();
-                        }
+                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 3) == 0 ) {
+                        //    BuyDrink();
+                        //}
                         break;
                     case CustomerDesperationState.State2:
                         // Wants to go pee?
@@ -455,9 +455,9 @@ namespace Assets.Scripts.Customers {
                             return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 4) == 0 ) {
-                            BuyDrink();
-                        }
+                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 4) == 0 ) {
+                        //    BuyDrink();
+                        //}
                         break;
                     case CustomerDesperationState.State3:
                         // Wants to go pee?
@@ -465,9 +465,9 @@ namespace Assets.Scripts.Customers {
                             return;
                         }
                         // TODO: Willing to buy a drink?
-                        if ( Stomach.Fullness < 0.8f && Random.Range(0, 5) == 0 ) {
-                            BuyDrink();
-                        }
+                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 5) == 0 ) {
+                        //    BuyDrink();
+                        //}
                         break;
                     case CustomerDesperationState.State4:
                         // Losing control?

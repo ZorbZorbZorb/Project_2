@@ -20,7 +20,11 @@ namespace Assets.Scripts {
 
         public Director( CustomerManager CM ) {
             this.CM = CM;
+            enabled = false;
+            SkippedActions = 0;
         }
+
+        #region External Methods
 
         public void Enable() {
             enabled = true;
@@ -37,6 +41,10 @@ namespace Assets.Scripts {
                 CustomerSpawningLogic();
             }
         }
+
+        #endregion
+
+        #region Internal Methods
 
         private void CustomerSpawningLogic() {
 
@@ -168,7 +176,6 @@ namespace Assets.Scripts {
             }
 
         }
-
         /// <summary>
         /// Makes the provided customers go buy a drink
         /// </summary>
@@ -179,7 +186,6 @@ namespace Assets.Scripts {
                 array[i].BuyDrink();
             }
         }
-
         private bool ShouldSpawnCustomerNow( int ticks, int remainingSpawns ) {
             if ( remainingSpawns > 15 ) {
                 return ticks > 2 || Random.Range(0, 6 - ticks) == 0;
@@ -191,7 +197,6 @@ namespace Assets.Scripts {
                 return ticks > 5 || Random.Range(0, 10 - ticks) == 0;
             }
         }
-
         private int NumberOfCustomersToSpawn( int remainingSpawns ) {
             if ( CM.RemainingSpawns <= 0 ) {
                 return 0;
@@ -206,5 +211,8 @@ namespace Assets.Scripts {
                 return 1;
             }
         }
+
+        #endregion
+
     }
 }
