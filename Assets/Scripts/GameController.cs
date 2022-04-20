@@ -25,8 +25,9 @@ public partial class GameController : MonoBehaviour {
     public bool DisplayBuildMenuOnFirstNight = false;
 
     [Header("Settings")]
-    public int NightMaxTime = 30;
-    public int NightMaxCustomerSpawnTime = 20;
+    public int NightMaxTicks = 30;
+    public TimeSpan NightClock;
+    private static readonly TimeSpan OneSecond = new TimeSpan(0, 0, 1);
     [Range(0, 2)]
     public float nightStartDelay = 1f;
 
@@ -111,12 +112,10 @@ public partial class GameController : MonoBehaviour {
     // Save data
     public GameSaveData Game;
 
-    public int timeTicksElapsed = 0;
-    public DateTime barTime;
+    public int TicksElapsed = 0;
+    public int TickEveryXSeconds;
     public Text barTimeDisplay;
     public Text fundsDisplay;
-    public int AdvanceBarTimeEveryXSeconds;
-    public int AdvanceBarTimeByXMinutes;
 
     public int ThinksSinceLastGmAction = 0;
     public double nightStartFunds;
@@ -132,6 +131,9 @@ public partial class GameController : MonoBehaviour {
 
     public Vector2 LastPan;
     public float LastZoom;
+
+    public float totalSecondsPlayedInNight = 0f;
+    public float totalNightTime;
 
     #endregion
 
@@ -214,7 +216,8 @@ public partial class GameController : MonoBehaviour {
         NightText.text = $"Night {Game.Night}";
 
         // initialize bar time
-        barTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 0, 0);
+        NightClock = new TimeSpan(0, 0, TickEveryXSeconds * NightMaxTicks);
+        barTimeDisplay.text = $"{NightClock.Minutes.ToString().PadLeft(2, '0')}:{NightClock.Seconds.ToString().PadLeft(2, '0')}";
 
         // Start build mode if not first night
         if ( DisplayBuildMenuOnFirstNight || Game.Night > 1 ) {
@@ -282,6 +285,7 @@ public partial class GameController : MonoBehaviour {
             }
         }
 
+
         var deltaTime = Time.deltaTime;
         if ( RapidSimulation ) {
             deltaTime *= 10f;
@@ -289,8 +293,12 @@ public partial class GameController : MonoBehaviour {
         runTime += deltaTime;
         timeAcc += deltaTime;
 
+        totalSecondsPlayedInNight += deltaTime;
+
         if ( timeAcc >= 1 ) {
             timeAcc -= 1;
+            NightClock = NightClock.Subtract(OneSecond);
+            barTimeDisplay.text = $"{NightClock.Minutes.ToString().PadLeft(2, '0')}:{NightClock.Seconds.ToString().PadLeft(2, '0')}";
             Think();
             if ( Autoplay ) {
                 StupidIdiotAutoplayThing();
@@ -298,8 +306,6 @@ public partial class GameController : MonoBehaviour {
             if ( SpawnEveryTick ) {
                 SpawnManyCustomers();
             }
-            // Update time and funds display once per second.
-            barTimeDisplay.text = barTime.ToString("hh:mm tt");
         }
 
         void Think() {
@@ -311,11 +317,11 @@ public partial class GameController : MonoBehaviour {
             }
 
             // Stop spawning customers when its too late
-            if ( timeTicksElapsed >= NightMaxCustomerSpawnTime ) {
+            if ( TicksElapsed >= NightMaxTicks ) {
                 SpawningEnabled = false;
 
                 // End game at end time or everyone has left
-                if ( !CM.Customers.Any() || timeTicksElapsed >= NightMaxTime ) {
+                if ( !CM.Customers.Any() || TicksElapsed >= NightMaxTicks + 2) {
                     GameEnd = true;
                     return;
                 }
@@ -326,7 +332,7 @@ public partial class GameController : MonoBehaviour {
             }
 
             // Update the bar time
-            if ( Math.Floor(runTime / AdvanceBarTimeEveryXSeconds) > timeTicksElapsed ) {
+            if ( Math.Floor(runTime / TickEveryXSeconds) > TicksElapsed ) {
                 if ( !FreezeTime ) {
                     AdvanceTime();
                 }
@@ -344,7 +350,7 @@ public partial class GameController : MonoBehaviour {
             float[] BladdersInHallway = CM.CustomersInHallway.GetBladders();
             float AllHoldingAverageFullness = CM.AverageFullness;
             float BarHoldingAvgFullness = CM.CustomersInBar.AverageFullness();
-            Debug.Log($"AllHoldingAvgFullness: {Mathf.RoundToInt(AllHoldingAverageFullness * 100)} BarAvgFullness: {Mathf.RoundToInt(BarHoldingAvgFullness * 100)}");
+            //Debug.Log($"AllHoldingAvgFullness: {Mathf.RoundToInt(AllHoldingAverageFullness * 100)} BarAvgFullness: {Mathf.RoundToInt(BarHoldingAvgFullness * 100)}");
 
             // Not a lot of people in the bar. Game may have just begun. Spawn more customers.
             if ( CM.Customers.Count() < 6 ) {
@@ -369,10 +375,10 @@ public partial class GameController : MonoBehaviour {
             }
 
             void TakeAction() {
-                float averageFullness = CM.CustomersInBar.AverageFullness();
+                float averageFullness = CM.Customers.AverageFullness();
 
                 // Average fullness in bar is very low? We fucked up to get here.
-                if ( averageFullness < 0.5f ) {
+                if ( averageFullness < 0.6f ) {
                     Debug.Log($"GM | Drastic | Average fullness too low. Game is VERY boring!");
                     // Make the most desperate customers get drinks and spawn some customers that are full?
                     var customers = CM.CustomersInBar
@@ -392,7 +398,7 @@ public partial class GameController : MonoBehaviour {
                     Debug.Log($"GM | Drastic | spawned {x} desperate");
                     Debug.Log($"GM | Drastic | made {x} drink");
                 }
-                else if ( averageFullness < 0.7f ) {
+                else if ( averageFullness < 0.8f ) {
                     Debug.Log($"GM | Drastic | Average fullness kinda low. Game is boring!");
                     // Make a few customers drink, and spawn a customer needing to go
                     var customers = CM.CustomersInBar
@@ -408,28 +414,24 @@ public partial class GameController : MonoBehaviour {
                     }
                 }
                 else {
-                    Debug.Log($"GM | Drastic | Lots of customers full but nobodys in the bathroom. Player just kicking everyone?");
+                    Debug.Log($"GM | Lots of customers full but nobodys in the bathroom.");
                     // Okay, Don't panic, everythings going to sort itself out in a sec. Should we be evil?
-                    if ( BladdersInBar.Count(x => x > 0.92f) > 3 ) {
-                        
+                    if ( BladdersInHallway.Length > 3 ) {
                         // No, too many about to lose it
-                        if (CM.RemainingSpawns > 0) {
+                        if ( CM.RemainingSpawns > 0 ) {
                             int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
                             CM.CreateCustomers(x, Random.Range(0.35f, 0.45f));
-                            Debug.Log($"GM | Drastic | Spawned {x} low need customer(s)");
+                            Debug.Log($"GM | Spawned {x} low need customer(s)");
                         }
                         // No, also we cant do much anyways
                         else {
-                            Debug.Log($"GM | Drastic | Spawning low need customer");
                         }
                     }
                     else {
-
                         // Chaos, Chaos!
                         int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
-                        CM.CreateCustomers(x, 0.88f);
-
-                        Debug.Log($"GM | Drastic | spawned {1} desperate");
+                        CM.CreateCustomers(x, 0.6f);
+                        Debug.Log($"GM | spawned {1} full");
                     }
                 }
             }
@@ -553,7 +555,7 @@ public partial class GameController : MonoBehaviour {
             }
         }
         int NumberOfCustomersToSpawn( int remainingSpawns ) {
-            if (CM.RemainingSpawns <= 0) {
+            if ( CM.RemainingSpawns <= 0 ) {
                 return 0;
             }
             else if ( remainingSpawns > 10 ) {
@@ -763,10 +765,7 @@ public partial class GameController : MonoBehaviour {
         UpdateFundsDisplay();
         // TODO: Have a little money emote display above each customer in the bar who generated funds.
         // Advance time
-        timeTicksElapsed++;
-        // Update time related displays
-        barTime = barTime.AddMinutes(AdvanceBarTimeByXMinutes);
-        barTimeDisplay.text = barTime.ToString("hh:mm tt");
+        TicksElapsed++;
     }
 
     #endregion

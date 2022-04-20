@@ -523,7 +523,7 @@ namespace Assets.Scripts.Customers {
             // TODO
             float drinkAmount = 200f;
             Stomach.Add(drinkAmount);
-            Debug.Log($"Drank {DrinkAmount}ml => {Stomach.Fullness}%", this);
+            Debug.Log($"Drank {drinkAmount}ml => {Stomach.Fullness}%", this);
         }
 
         private void PeeLogicUpdate() {

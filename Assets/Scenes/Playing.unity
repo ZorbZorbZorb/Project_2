@@ -3487,10 +3487,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayNightStartSplash: 1
-  DisplayBuildMenuOnFirstNight: 1
-  NightMaxTime: 41
-  NightMaxCustomerSpawnTime: 40
+  DisplayNightStartSplash: 0
+  DisplayBuildMenuOnFirstNight: 0
+  NightMaxTicks: 30
   nightStartDelay: 2
   CameraTolerangeTight: 22
   CameraTolerangeMid: 50
@@ -3550,11 +3549,10 @@ MonoBehaviour:
     bar: []
     Night: 0
     Funds: 0
-  timeTicksElapsed: 0
+  TicksElapsed: 0
+  TickEveryXSeconds: 10
   barTimeDisplay: {fileID: 381911812}
   fundsDisplay: {fileID: 1330818076}
-  AdvanceBarTimeEveryXSeconds: 10
-  AdvanceBarTimeByXMinutes: 10
   ThinksSinceLastGmAction: 0
   nightStartFunds: 0
   GameStarted: 0
@@ -3566,6 +3564,8 @@ MonoBehaviour:
   NightStartOverlay: {fileID: 1001133877}
   LastPan: {x: 0, y: 0}
   LastZoom: 0
+  totalSecondsPlayedInNight: 0
+  totalNightTime: 0
 --- !u!4 &497241816
 Transform:
   m_ObjectHideFlags: 0
