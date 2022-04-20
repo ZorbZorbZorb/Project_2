@@ -90,6 +90,7 @@ namespace Assets.Scripts.Areas {
             return Sinks.FirstOrDefault(x => x.OccupiedBy == null);
         }
         public bool TryEnterQueue(Customer customer) {
+            customer.TimesThoughtsAboutPeeing = 0;
             if ( !Line.HasOpenWaitingSpot() ) {
                 return false;
             }

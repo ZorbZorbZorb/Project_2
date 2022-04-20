@@ -342,31 +342,33 @@ public partial class GameController : MonoBehaviour {
             float[] BladdersInBar = CM.CustomersInBar.GetBladders();
             float[] BladdersInBathroom = CM.CustomersInBathroom.GetBladders();
             float[] BladdersInHallway = CM.CustomersInHallway.GetBladders();
+            float AllHoldingAverageFullness = CM.AverageFullness;
+            float BarHoldingAvgFullness = CM.CustomersInBar.AverageFullness();
+            Debug.Log($"AllHoldingAvgFullness: {Mathf.RoundToInt(AllHoldingAverageFullness * 100)} BarAvgFullness: {Mathf.RoundToInt(BarHoldingAvgFullness * 100)}");
 
             // Not a lot of people in the bar. Game may have just begun. Spawn more customers.
             if ( CM.Customers.Count() < 6 ) {
-                NormalSpawningBehavior();
+                SpawnNormally();
             }
             // Too few people in bathroom and hallway?
             else if ( CM.CountCustomersInBathroom + CM.CountCustomersInHallway <= 3 ) {
                 // Not so fast buddy. These are drastic actions, 
-                if ( ThinksSinceLastGmAction < 3 ) {
-                    Debug.Log("GM | Drastic | Skipped");
+                if ( ThinksSinceLastGmAction < 2 ) {
                     ThinksSinceLastGmAction++;
                     return;
                 }
 
                 // Lots of people in bar?
-                TakeDrasticAction();
+                TakeAction();
 
                 ThinksSinceLastGmAction = 0;
                 return;
             }
             else {
-                NormalSpawningBehavior();
+                SpawnNormally();
             }
 
-            void TakeDrasticAction() {
+            void TakeAction() {
                 float averageFullness = CM.CustomersInBar.AverageFullness();
 
                 // Average fullness in bar is very low? We fucked up to get here.
@@ -422,7 +424,6 @@ public partial class GameController : MonoBehaviour {
                         }
                     }
                     else {
-                        Debug.Log($"GM | Drastic | Making player regret kicking everyone");
 
                         // Chaos, Chaos!
                         int x = NumberOfCustomersToSpawn(CM.RemainingSpawns);
@@ -432,7 +433,7 @@ public partial class GameController : MonoBehaviour {
                     }
                 }
             }
-            void NormalSpawningBehavior() {
+            void SpawnNormally() {
                 // Few customers who are full.
                 if ( CM.CustomersAboveBladderFullness(0.7f) <= 3 ) {
                     for ( int i = 0; i < Math.Min(Random.Range(1, 3), CM.RemainingSpawns); i++ ) {

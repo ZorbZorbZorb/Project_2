@@ -32,15 +32,15 @@ namespace Assets.Scripts.Customers {
         /// </summary>
         public float Fullness => Amount / Max;
         /// <summary>
-        /// Percentage from 1f to 0f representing how much holding strength the bladder has left
-        /// <para>This number sits at 0.01f (1%) while reserve holding time is ticking down</para>
+        /// Percentage from 1f to 0f representing how much holding strength the bladder has left.
+        /// <para>Based on 2:1 holding strength remaining and fullness</para>
         /// </summary>
+        public float Strength =>
+            (MathF.Max(0f, 1f - Fullness) + (HoldingPower / MaxHoldingPower) + (HoldingPower / MaxHoldingPower)) / 3f;
         //public float Strength => HoldingPowerReserve > 0f
         //    ? Math.Max(0.01f, HoldingPower / MaxHoldingPower)
         //    : HoldingPower / MaxHoldingPower;
-        public float Strength => HoldingPowerReserve > 0f
-            ? Math.Max(0.01f, HoldingPower / MaxHoldingPower)
-            : Math.Max(0f, HoldingPower / MaxHoldingPower);
+        public bool NoStrengthLeft => HoldingPowerReserve <= 0f && HoldingPower <= 0f;
         public bool LosingControl => HoldingPower == 0f;
         /// <summary>
         /// Denotes if the bladder is empty or not.
@@ -98,21 +98,21 @@ namespace Assets.Scripts.Customers {
 
                     break;
 
-                default:
+                case CustomerAction.Leaking:
 
+                    var x = DrainRate * DrainMultiplier * Customer.DeltaTime;
+                    IncreaseHoldingPower(x / 3);
+                    Amount -= x;
+
+                    break;
+
+                default:
                     Amount += FillRate * Customer.DeltaTime;
-                    if ( fullness > 1.2f ) {
-                        Debug.LogWarning("Bladder is abnormally full");
-                        DecreaseHoldingPower(10f);
-                    }
-                    else if ( fullness > 1f ) {
-                        DecreaseHoldingPower(3f);
+                    if ( fullness > 1f ) {
+                        DecreaseHoldingPower(2.5f * Mathf.Pow(fullness, 4));
                     }
                     else if ( fullness > 0.80f ) {
-                        DecreaseHoldingPower(1f);
-                    }
-                    else if ( fullness > 0.7f ) {
-                        DecreaseHoldingPower(0.5f);
+                        DecreaseHoldingPower(fullness);
                     }
                     else if ( fullness < 0.5f ) {
                         IncreaseHoldingPower(1f);
@@ -158,7 +158,7 @@ namespace Assets.Scripts.Customers {
         }
         private void DecreaseHoldingPower( float powerPerSecond ) {
             HoldingPower = Mathf.Max(0f, HoldingPower - (powerPerSecond * Customer.DeltaTime));
-            if (HoldingPower <= 0f) {
+            if ( HoldingPower <= 0f ) {
                 HoldingPowerReserve -= Customer.DeltaTime;
             }
         }
