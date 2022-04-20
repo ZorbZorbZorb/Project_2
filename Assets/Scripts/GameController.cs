@@ -434,6 +434,10 @@ public partial class GameController : MonoBehaviour {
                 }
             }
             void SpawnNormally() {
+                if ( CM.RemainingSpawns <= 0 ) {
+                    return;
+                }
+
                 // Few customers who are full.
                 if ( CM.CustomersAboveBladderFullness(0.7f) <= 3 ) {
                     for ( int i = 0; i < Math.Min(Random.Range(1, 3), CM.RemainingSpawns); i++ ) {
@@ -549,7 +553,10 @@ public partial class GameController : MonoBehaviour {
             }
         }
         int NumberOfCustomersToSpawn( int remainingSpawns ) {
-            if ( remainingSpawns > 10 ) {
+            if (CM.RemainingSpawns <= 0) {
+                return 0;
+            }
+            else if ( remainingSpawns > 10 ) {
                 return Random.Range(1, 3);
             }
             else if ( remainingSpawns > 5 ) {

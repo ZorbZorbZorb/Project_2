@@ -3487,8 +3487,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 030a18e5f0208d44a95f7fc41cb0d4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugSliderShakeState3: 0.15
-  DebugSliderShakeState4: 0.1
   DisplayNightStartSplash: 0
   DisplayBuildMenuOnFirstNight: 0
   NightMaxTime: 60
@@ -3557,7 +3555,7 @@ MonoBehaviour:
   fundsDisplay: {fileID: 1330818076}
   AdvanceBarTimeEveryXSeconds: 10
   AdvanceBarTimeByXMinutes: 10
-  ticksSinceLastSpawn: 0
+  ThinksSinceLastGmAction: 0
   nightStartFunds: 0
   GameStarted: 0
   GameLost: 0
@@ -3768,7 +3766,7 @@ MonoBehaviour:
   Locked: 0
   AutoPanning: 0
   PanIntent: {x: 0, y: 0, z: 0}
-  FreeLookSensitivity: 500
+  FreeLookSensitivity: 1000
   ZoomSens: 1000
   ZoomLerp: 100
   zoomIntent: 0
@@ -8278,7 +8276,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
