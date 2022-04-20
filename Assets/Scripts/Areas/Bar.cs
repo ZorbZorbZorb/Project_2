@@ -15,6 +15,7 @@ public class Bar : Area {
     public static double DrinkCost;
     [SerializeField]
     public static double DrinkAmount;
+    public WaitingSpot DrinkPhantomWaitingSpot = null;
 
     [SerializeField] public List<Seat> Seats = new List<Seat>();
 
@@ -36,6 +37,14 @@ public class Bar : Area {
                 tableSeat.Location = table.Location;
                 Seats.Add(tableSeat);
             }
+        }
+        else if (interactable is WaitingSpot spot) {
+            if (DrinkPhantomWaitingSpot != null) {
+                throw new InvalidOperationException("Phantom drinks spot already set");
+            }
+            spot.WaitingSpotType = WaitingSpotType.DrinksGhost;
+            spot.MainSRenderer.enabled = false;
+            DrinkPhantomWaitingSpot = spot;
         }
         else {
             throw new NotImplementedException($"Type {interactable.IType} is not supported.");

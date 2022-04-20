@@ -339,11 +339,11 @@
 			"Y": 1,
 			"Options": [
 				{
-					"Type": "Seat",
-					"Cost": 20
+					"Type": "WaitingSpot",
+					"Cost": 0
 				}
 			],
-			"Current": "None",
+			"Current": "WaitingSpot",
 			"Facing": "South"
 		},
 		{

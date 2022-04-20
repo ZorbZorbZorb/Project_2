@@ -129,6 +129,10 @@ namespace Assets.Scripts.Customers {
             ActionStateSidewaysSpriteLookup.Add(InteractableType.Urinal, new Dictionary<CustomerAction, Sprite>() {
                 { CustomerAction.Peeing, Resources.Load<Sprite>($"{root}/act/peeing_urinal_side") },
             });
+            // Front facing seat
+            ActionStateSpriteLookup.Add(InteractableType.Seat, new Dictionary<CustomerAction, Sprite>() {
+                {CustomerAction.Drinking, Resources.Load<Sprite>($"{root}/act/drink") }
+            });
         }
     }
 }

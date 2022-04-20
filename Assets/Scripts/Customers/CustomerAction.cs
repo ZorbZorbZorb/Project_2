@@ -1,6 +1,7 @@
 ﻿namespace Assets.Scripts.Customers {
     public enum CustomerAction {
         None,
+        Drinking,
         PantsDown,
         PantsUp,
         Leaking,

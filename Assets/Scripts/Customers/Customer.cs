@@ -520,10 +520,25 @@ namespace Assets.Scripts.Customers {
         }
 
         public void BuyDrink() {
-            // TODO
             float drinkAmount = 200f;
-            Stomach.Add(drinkAmount);
-            Debug.Log($"Drank {drinkAmount}ml => {Stomach.Fullness}%", this);
+            // Move to bar drinks pickup spot
+            var offset = new Vector3(0f, Random.Range(0, 2) * 100f, 0f);
+            var vector = offset + Bar.Singleton.DrinkPhantomWaitingSpot.CustomerPositionF;
+            MoveTo(Location.Bar, vector);
+            // Move back to table
+            SetNext(4f, () => {
+                MoveTo(Occupying);
+                // Drink
+                SetNext(0f, () => {
+                    CurrentAction = CustomerAction.Drinking;
+                    // Return to normal behavior
+                    SetNext(3.5f, () => {
+                        Stomach.Add(drinkAmount);
+                        Debug.Log($"Drank {drinkAmount}ml => {Stomach.Fullness}%", this);
+                        CurrentAction = CustomerAction.None;
+                    });
+                }, () => AtDestination);
+            });
         }
 
         private void PeeLogicUpdate() {
@@ -684,6 +699,30 @@ namespace Assets.Scripts.Customers {
             }
             else {
                 Debug.LogWarning("MoveTo(Location) called for location customer is already in", this);
+            }
+        }
+        /// <summary>
+        /// Moves the customer from where they are currently located to the location's point
+        ///   then to the given vector. Movement begins next MoveUpdate.
+        /// <para>
+        ///   Does not change references, only handles movement
+        /// </para>
+        /// </summary>
+        /// <param name="target">
+        /// Interactable destination to move to. Respects male / female
+        /// position properties if available
+        /// </param>
+        public void MoveTo( Location location, Vector2 vector ) {
+            List<Vector2> vectors = Navigation.Navigate(Location, location);
+            if ( vectors.Any() ) {
+                vectors.Insert(0, transform.position);
+                vectors.Add(vector);
+                MoveTo(vectors.ToArray());
+            }
+            else {
+                vectors.Add(transform.position);
+                vectors.Add(vector);
+                MoveTo(vectors.ToArray());
             }
         }
         /// <summary>

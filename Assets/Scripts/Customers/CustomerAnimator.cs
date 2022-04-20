@@ -69,7 +69,7 @@ namespace Assets.Scripts.Customers {
             // Sprite shaking to show desperation
             // TODO: Perhaps shake more or less when shy, maybe have shaking be the true desperation state?
             // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
-            if (customer.CurrentAction == CustomerAction.Leaking) {
+            if ( customer.CurrentAction == CustomerAction.Leaking ) {
                 shakeAccumulator += Time.deltaTime;
                 if ( shakeAccumulator > 0.1f ) {
                     renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2) * 2, 0, 0);
@@ -128,7 +128,7 @@ namespace Assets.Scripts.Customers {
         private static readonly Dictionary<CustomerAction, string> PantsSidewaysAnimationClipLookup;
         private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateAnimationClipLookup;
         private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateSidewaysAnimationClipLookup;
-        
+
         public static string GetAnimation<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
             where T : CustomerInteractable {
             if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
@@ -208,6 +208,11 @@ namespace Assets.Scripts.Customers {
             ActionStateSidewaysAnimationClipLookup.Add(InteractableType.Urinal, new Dictionary<CustomerAction, string>() {
                 { CustomerAction.Peeing, "peeing_urinal_side" },
             });
+            // Front facing seat
+            ActionStateAnimationClipLookup.Add(InteractableType.Seat, new Dictionary<CustomerAction, string>() {
+                {CustomerAction.Drinking, "drink" }
+            });
+
         }
         #endregion
     }
