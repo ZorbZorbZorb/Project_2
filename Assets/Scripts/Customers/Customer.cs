@@ -62,6 +62,7 @@ namespace Assets.Scripts.Customers {
         public bool DesperationStateChangeThisUpdate = false;
         public Stomach Stomach;
         public Bladder Bladder;
+        public int Leaks = 0;
 
         // Times
         public double UrinateStartDelay;
@@ -134,6 +135,10 @@ namespace Assets.Scripts.Customers {
                 MinTimeAtBarNow = 0f;
             }
 
+            // Empty stomach into bladder
+            if (Stomach.Fullness > 0f) {
+                Bladder.Add(CurrentAction, Stomach.Remove(10f + (20f * Stomach.Fullness)));
+            }
             Bladder.Update(CurrentAction);
             UpdateDesperationState();
 
@@ -389,9 +394,8 @@ namespace Assets.Scripts.Customers {
                 }
                 int chance = WillingnessToGoLookup[Bladder.BladderSize][DesperationState];
                 int rng = Random.Range(0, chance - TimesThoughtsAboutPeeing++);
-                string debugMessage = (chance > 0 && rng == 0 ? "T" : "F") +
-                    $" {Gender} {Bladder.BladderSize} {DesperationState} ({Mathf.RoundToInt(Bladder.Fullness * 100)}%) use c=({chance})";
-                Debug.Log(debugMessage, this);
+                //string debugMessage = (chance > 0 && rng == 0 ? "T" : "F") +
+                //    $" {Gender} {Bladder.BladderSize} {DesperationState} ({Mathf.RoundToInt(Bladder.Fullness * 100)}%) use c=({chance})";
                 return chance > 0 && rng == 0;
             }
         }
@@ -519,6 +523,7 @@ namespace Assets.Scripts.Customers {
             // TODO
             float drinkAmount = 200f;
             Stomach.Add(drinkAmount);
+            Debug.Log($"Drank {DrinkAmount}ml => {Stomach.Fullness}%", this);
         }
 
         private void PeeLogicUpdate() {
@@ -1024,10 +1029,10 @@ namespace Assets.Scripts.Customers {
                 return;
             }
 
-            if ( IsRelievingSelf ) {
+            if ( CurrentAction == CustomerAction.Peeing ) {
                 ReliefMenu.Toggle();
             }
-            else {
+            else if ( ReliefType == ReliefType.None ) {
                 BathroomMenu.Toggle();
             }
         }
