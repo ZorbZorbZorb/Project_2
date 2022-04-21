@@ -589,7 +589,7 @@ namespace Assets.Scripts.Customers {
                         else if (Leaks < LeaksLimit && (Bladder.Strength < 0.15f || (Math.Floor(Random.Range(0f, 4f/Time.deltaTime))==0d && Bladder.Fullness > 1f && Bladder.Strength < 0.4f))) {
                             Leaks++;
                             var last = CurrentAction;
-                            Debug.Log($"Performing {Leaks}/{LeaksLimit} leaks!", this);
+                            Debug.Log($"{Leaks}/{LeaksLimit} leaks!", this);
                             CurrentAction = CustomerAction.Leaking;
                             SetNext(3f, () => { CurrentAction = last; }, null);
                         }
@@ -1147,8 +1147,11 @@ namespace Assets.Scripts.Customers {
                 return false;
             }
             bool inBathroom = Location == Location.BathroomM || Location == Location.BathroomF;
-            bool firstInLine = AtDestination && Occupying != null && Occupying is WaitingSpot spot 
-                && spot.WaitingSpotType != WaitingSpotType.DrinksGhost && spot.Bathroom.Line.IsNextInLine(this);
+            bool firstInLine = AtDestination && Occupying != null 
+                && Occupying is WaitingSpot spot 
+                && spot.WaitingSpotType != WaitingSpotType.DrinksGhost 
+                && spot.WaitingSpotType != WaitingSpotType.Sink 
+                && spot.Bathroom.Line.IsNextInLine(this);
             bool acting = CurrentAction != CustomerAction.None;
             return AtDestination && !IsWet && !acting && (inBathroom || firstInLine);
         }

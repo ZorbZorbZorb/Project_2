@@ -2,6 +2,7 @@ using Assets.Scripts.Customers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts.Areas {
     [Serializable]
@@ -50,6 +51,13 @@ namespace Assets.Scripts.Areas {
             return null;
         }
         public void AdvanceQueue() {
+            // Try to find that nasty bug where people can occupy two spots at once
+            for ( int i = 0; i < waitingSpots.Count; i++ ) {
+                if (waitingSpots[i].Occupied && waitingSpots[i].OccupiedBy.Occupying != waitingSpots[i]) {
+                    Debug.LogError("Spot occuptation reference is incorrect!");
+                    waitingSpots[i].OccupiedBy = null;
+                }
+            }
             // Move everyone up to the lowest place in queue
             for ( int i = 0; i++ < waitingSpots.Count - 1; ) {
                 var occupant = waitingSpots[i].OccupiedBy;
