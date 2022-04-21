@@ -580,14 +580,18 @@ namespace Assets.Scripts.Customers {
                     if ( ReliefType == ReliefType.None ) {
                         // Should the customer wet now?
                         if ( Bladder.NoStrengthLeft ) {
-                            if (Leaks < LeaksLimit) {
+                            if ( Leaks < LeaksLimit ) {
                                 Debug.LogWarning("Started wetting with leak points remaining", this);
                             }
                             BeginPeeingSelf();
                         }
-                        // Okay to keep holding?
-                        else if (Bladder.Strength > 0.4f && Bladder.Fullness < 0.9f) {
-                            return;
+                        // Should the customer leak?
+                        else if (Leaks < LeaksLimit && (Bladder.Strength < 0.15f || (Math.Floor(Random.Range(0f, 4f/Time.deltaTime))==0d && Bladder.Fullness > 1f && Bladder.Strength < 0.4f))) {
+                            Leaks++;
+                            var last = CurrentAction;
+                            Debug.Log($"Performing {Leaks}/{LeaksLimit} leaks!", this);
+                            CurrentAction = CustomerAction.Leaking;
+                            SetNext(3f, () => { CurrentAction = last; }, null);
                         }
                         // Should the show thier about to lose it animation?
                         else if ( Bladder.LosingControl && !DisplayedLosingControlAnim && Leaks >= LeaksLimit ) {
@@ -596,18 +600,6 @@ namespace Assets.Scripts.Customers {
                             Debug.Log("Performing lose control freeze!", this);
                             CurrentAction = CustomerAction.LoseControlFreeze;
                             SetNext(6f, () => { CurrentAction = last; });
-                        }
-                        // Should the customer leak?
-                        else if (Leaks < LeaksLimit && (Bladder.Strength < 0.15f || Math.Floor(Random.Range(0f, 4f/Time.deltaTime))==0d)) {
-                            Leaks++;
-                            var last = CurrentAction;
-                            var hp = Bladder.Strength;
-                            if (hp < 0.9f) {
-                                hp = hp + 0.3f;
-                            }
-                            Debug.Log($"Performing {Leaks}/{LeaksLimit} leaks!", this);
-                            CurrentAction = CustomerAction.Leaking;
-                            SetNext(0f, () => { CurrentAction = last; }, () => Bladder.Strength >= hp);
                         }
                     }
                     else {
