@@ -105,7 +105,7 @@ namespace Assets.Scripts.Customers {
                 case CustomerAction.Leaking:
 
                     var x = DrainRate * DrainMultiplier * Customer.DeltaTime;
-                    IncreaseHoldingPower(x / 3);
+                    IncreaseHoldingPower(MaxHoldingPower / 10f);
                     Amount -= x;
 
                     break;

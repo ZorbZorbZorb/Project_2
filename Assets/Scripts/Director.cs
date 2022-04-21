@@ -7,12 +7,14 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts {
+    [Serializable]
     /// <summary>
     /// Ai director class. Controls customer drinking, spawning, and other behaviors regarding game balance and
     ///   general player enjoyment.
     /// </summary>
     public class Director {
 
+        [SerializeField]
         private bool enabled;
         public bool Enabled => enabled;
         public int SkippedActions;
@@ -33,6 +35,10 @@ namespace Assets.Scripts {
             enabled = false;
         }
         public void Act() {
+            if (!enabled) {
+                return;
+            }
+            
             if ( SkippedActions < 2 ) {
                 SkippedActions++;
                 return;

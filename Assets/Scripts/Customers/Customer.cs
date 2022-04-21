@@ -608,7 +608,7 @@ namespace Assets.Scripts.Customers {
                             var last = CurrentAction;
                             Debug.Log("Performing lose control freeze!", this);
                             CurrentAction = CustomerAction.LoseControlFreeze;
-                            SetNext(2f, () => { CurrentAction = last; });
+                            SetNext(4f, () => { CurrentAction = last; });
                         }
                         // Should the customer leak?
                         else if (Leaks < LeaksLimit) {

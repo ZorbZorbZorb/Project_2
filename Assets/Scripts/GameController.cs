@@ -18,7 +18,7 @@ public partial class GameController : MonoBehaviour {
     /// Ai director. Controls customer drinking, spawning, and other behaviors regarding game balance and
     ///   general player enjoyment.
     /// </summary>
-    public static Director AID;
+    public Director AID;
     /// <summary><see cref="CustomerManager"/> singleton. Tracks custromers and handles spawning.</summary>
     [HideInInspector]
     public static CustomerManager CM;
