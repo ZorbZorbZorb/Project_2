@@ -22,6 +22,9 @@ namespace Assets.Scripts.Customers {
         public float HoldingPowerReserve;
         // Leak amount?
 
+        [SerializeField]
+        private float str = 0f;
+
         #endregion
 
         #region Properties
@@ -59,6 +62,7 @@ namespace Assets.Scripts.Customers {
         public void Update( CustomerAction action ) {
 
             float fullness = Fullness;
+            str = Strength;
 
             switch ( action ) {
                 case CustomerAction.Wetting:
