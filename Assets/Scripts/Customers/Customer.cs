@@ -63,6 +63,8 @@ namespace Assets.Scripts.Customers {
         public Stomach Stomach;
         public Bladder Bladder;
         public int Leaks = 0;
+        public int LeaksLimit = 0;
+        public bool DisplayedLosingControlAnim = false;
 
         // Times
         public double UrinateStartDelay;
@@ -203,6 +205,21 @@ namespace Assets.Scripts.Customers {
             Stomach = new Stomach(600f);
             Bladder = new Bladder(this, fullness);
 
+            switch ( Bladder.Size ) {
+                case BladderSize.Small:
+                    LeaksLimit = 0;
+                    break;
+                case BladderSize.Medium:
+                    LeaksLimit = 1;
+                    break;
+                case BladderSize.Large:
+                    LeaksLimit = 2;
+                    break;
+                case BladderSize.Massive:
+                    LeaksLimit = 3;
+                    break;
+            }
+
             UrinateStartDelay = 4d;
             UrinateStopDelay = 6d;
 
@@ -256,11 +273,19 @@ namespace Assets.Scripts.Customers {
         /// <summary>Next will wait to trigger until this function returns true</summary>
         public Func<bool> NextWhenTrue = null;
 
-        public void SetNext( float delay, NextAction d, Func<bool> whenTrue = null ) {
+        /// <summary>
+        /// Sets the next action that the customer will perform.
+        /// <para>Note that if <paramref name="delay"/> and <paramref name="whenTrue"/> are both provided
+        /// <paramref name="delay"/> will tick down to 0f, then <paramref name="whenTrue"/> is awaited</para>
+        /// </summary>
+        /// <param name="delay">Delay to wait for before executing <paramref name="next"/> action, or awaiting <paramref name="whenTrue"/></param>
+        /// <param name="next">Action to perform next</param>
+        /// <param name="whenTrue">Condition to await before performing <paramref name="next"/> action.</param>
+        public void SetNext( float delay, NextAction next, Func<bool> whenTrue = null ) {
             HasNext = true;
             NextDelay = delay;
             NextWhenTrue = whenTrue;
-            Next = d;
+            Next = next;
         }
 
         #endregion
@@ -319,7 +344,7 @@ namespace Assets.Scripts.Customers {
                 return null;
             }
 
-            switch ( Bladder.BladderSize ) {
+            switch ( Bladder.Size ) {
                 case BladderSize.Small:
                     switch ( DesperationState ) {
                         case CustomerDesperationState.State1:
@@ -392,7 +417,7 @@ namespace Assets.Scripts.Customers {
                 if ( WillingnessToGoLookup == null || !WillingnessToGoLookup.Any() ) {
                     SetWillingnessToGoLookup();
                 }
-                int chance = WillingnessToGoLookup[Bladder.BladderSize][DesperationState];
+                int chance = WillingnessToGoLookup[Bladder.Size][DesperationState];
                 int rng = Random.Range(0, chance - TimesThoughtsAboutPeeing++);
                 //string debugMessage = (chance > 0 && rng == 0 ? "T" : "F") +
                 //    $" {Gender} {Bladder.BladderSize} {DesperationState} ({Mathf.RoundToInt(Bladder.Fullness * 100)}%) use c=({chance})";
@@ -569,8 +594,33 @@ namespace Assets.Scripts.Customers {
                     break;
                 case CustomerAction.None:
                     if ( ReliefType == ReliefType.None ) {
+                        // Should the customer wet now?
                         if ( Bladder.NoStrengthLeft ) {
                             BeginPeeingSelf();
+                        }
+                        // Okay to keep holding?
+                        else if (Bladder.Strength > 0.2f) {
+                            return;
+                        }
+                        // Should the show thier about to lose it animation?
+                        else if ( Bladder.LosingControl && !DisplayedLosingControlAnim && Leaks >= LeaksLimit ) {
+                            DisplayedLosingControlAnim = true;
+                            var last = CurrentAction;
+                            Debug.Log("Performing lose control freeze!", this);
+                            CurrentAction = CustomerAction.LoseControlFreeze;
+                            SetNext(2f, () => { CurrentAction = last; });
+                        }
+                        // Should the customer leak?
+                        else if (Leaks < LeaksLimit) {
+                            Leaks++;
+                            var last = CurrentAction;
+                            var hp = Bladder.Strength;
+                            if (hp < 0.9f) {
+                                hp = hp + 0.15f;
+                            }
+                            Debug.Log($"Performing {Leaks}/{LeaksLimit} leaks!", this);
+                            CurrentAction = CustomerAction.Leaking;
+                            SetNext(2f, () => { CurrentAction = last; }, () => Bladder.Strength >= hp);
                         }
                     }
                     else {

@@ -10,7 +10,7 @@ namespace Assets.Scripts.Customers {
 
         [NonSerialized]
         private readonly Customer Customer;
-        public BladderSize BladderSize;  // Internal for keeping track of values and debugging
+        public BladderSize Size;  // Internal for keeping track of values and debugging
         public float Amount;
         public float Max;
         public float FillRate;
@@ -106,6 +106,9 @@ namespace Assets.Scripts.Customers {
 
                     break;
 
+                case CustomerAction.LoseControlFreeze:
+                    break;
+
                 default:
                     Amount += FillRate * Customer.DeltaTime;
                     if ( fullness > 1f ) {
@@ -176,7 +179,7 @@ namespace Assets.Scripts.Customers {
             Customer = customer;
 
             // Set the maximum amount the bladder can expand to hold
-            BladderSize = size;
+            Size = size;
             Max = GetRandomBladderMax(size);
 
             // Determine the starting fullness

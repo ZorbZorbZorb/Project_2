@@ -9,6 +9,8 @@ namespace Assets.Scripts.Customers {
     [Serializable]
     public class CustomerAnimator {
 
+        #region Fields
+
         private readonly Customer customer;
         private readonly SpriteRenderer renderer;
         private readonly Animator animator;
@@ -23,10 +25,40 @@ namespace Assets.Scripts.Customers {
 
         private Color femaleColor = new(1f, 175f / 255f, 175f / 255f);
         private Color maleColor = new(175f / 255f, 175f / 255f, 255f);
-        public Color Color => customer.Gender == 'm' ? maleColor : femaleColor;
 
+        private static readonly Dictionary<CustomerDesperationState, string> DesperationAnimationClipLookup;
+        private static readonly Dictionary<CustomerDesperationState, string> DesperationSeatAnimationClipLookup;
+        private static readonly Dictionary<CustomerAction, string> PantsAnimationClipLookup;
+        private static readonly Dictionary<CustomerAction, string> PantsSidewaysAnimationClipLookup;
+        private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateAnimationClipLookup;
+        private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateSidewaysAnimationClipLookup;
+
+        #endregion
+
+        #region Properties
+
+        public Color Color => customer.Gender == 'm' ? maleColor : femaleColor;
         public string AnimationStateNameLast { get => animationStateNameLast; }
         public string AnimationStateName { get => animationStateName; }
+
+        #endregion
+
+        #region External Methods
+        
+        public static string GetAnimation<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
+            where T : CustomerInteractable {
+            if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
+                if ( interactable.IType == InteractableType.Seat && (actionState == CustomerAction.None || actionState == CustomerAction.Wetting) ) {
+                    return DesperationSeatAnimationClipLookup[desperationState];
+                }
+                else {
+                    return GetActionAnimation(actionState, interactable);
+                }
+            }
+            else {
+                return DesperationAnimationClipLookup[desperationState];
+            }
+        }
         public void Update() {
             animationStateName = GetAnimation(customer.DesperationState, customer.CurrentAction, customer.Occupying, !customer.AtDestination);
 
@@ -41,6 +73,11 @@ namespace Assets.Scripts.Customers {
             // Set order in layer so customers on lower y axis cover customers on higher y axis (nearer takes precidence)
             renderer.sortingOrder = (int)-customer.transform.position.y;
         }
+
+        #endregion
+
+        #region Internal Methods
+
         private void SetAnimationOrSprite() {
             // Set animation or sprite
             if ( animationStateNameLast != animationStateName ) {
@@ -72,25 +109,27 @@ namespace Assets.Scripts.Customers {
             // Notice: The sprite is parented to a customer gameobject and is not a part of it. this.gameObject.transform can be used to re-parent it.
             if ( customer.CurrentAction == CustomerAction.Leaking ) {
                 shakeAccumulator += Time.deltaTime;
-                if ( shakeAccumulator > 0.1f ) {
-                    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2) * 2, 0, 0);
-                    shakeAccumulator -= 0.1f;
+                if ( AccumulatorTrigger(ref shakeAccumulator, 0.1f) ) {
+                    renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2) * 2, Random.Range(-1, 2), 0);
+                }
+            }
+            else if (customer.CurrentAction == CustomerAction.LoseControlFreeze) {
+                if (AccumulatorTrigger(ref shakeAccumulator, 0.1f)) {
+                    renderer.transform.position = customer.gameObject.transform.position + new Vector3(0, Random.Range(-1, 2) * 2, 0);
                 }
             }
             else {
                 switch ( customer.DesperationState ) {
                     case CustomerDesperationState.State4:
                         shakeAccumulator += Time.deltaTime;
-                        if ( shakeAccumulator > 0.1f ) {
+                        if ( AccumulatorTrigger(ref shakeAccumulator, 0.1f) ) {
                             renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), 0);
-                            shakeAccumulator -= 0.1f;
                         }
                         break;
                     case CustomerDesperationState.State3:
                         shakeAccumulator += Time.deltaTime;
-                        if ( shakeAccumulator > 0.15f ) {
+                        if ( AccumulatorTrigger(ref shakeAccumulator, 0.15f) ) {
                             renderer.transform.position = customer.gameObject.transform.position + new Vector3(Random.Range(-1, 2), 0, 0);
-                            shakeAccumulator -= 0.15f;
                         }
                         break;
                     default:
@@ -99,6 +138,39 @@ namespace Assets.Scripts.Customers {
                 }
             }
         }
+        private static string GetActionAnimation<T>( CustomerAction state, T interactable ) where T : CustomerInteractable {
+            Dictionary<CustomerAction, string> lookup;
+            switch ( state ) {
+                case CustomerAction.PantsDown:
+                case CustomerAction.PantsUp:
+                    lookup = interactable.Alignment == Alignment.Vertical
+                        ? PantsAnimationClipLookup
+                        : PantsSidewaysAnimationClipLookup;
+                    break;
+                case CustomerAction.LoseControlFreeze:
+                    return "desp_state_3";
+                default:
+                    lookup = interactable.Alignment == Alignment.Vertical
+                        ? ActionStateAnimationClipLookup[interactable.IType]
+                        : ActionStateSidewaysAnimationClipLookup[interactable.IType];
+                    break;
+            }
+
+            return lookup[state];
+        }
+        private static bool AccumulatorTrigger(ref float acc, float t) {
+            acc += Time.deltaTime;
+            if ( acc > t ) {
+                acc -= t;
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region Constructors
+        
         public CustomerAnimator( Customer _customer, SpriteRenderer _renderer, Animator _animator, CustomerSpriteController _marshal ) {
             customer = _customer;
             renderer = _renderer;
@@ -121,47 +193,6 @@ namespace Assets.Scripts.Customers {
             maleColor.g = Math.Min(maleColor.g * colorMultiplier.y, 1f);
             maleColor.b = Math.Min(maleColor.b * colorMultiplier.z, 1f);
         }
-
-        #region Static methods for looking up animations
-        private static readonly Dictionary<CustomerDesperationState, string> DesperationAnimationClipLookup;
-        private static readonly Dictionary<CustomerDesperationState, string> DesperationSeatAnimationClipLookup;
-        private static readonly Dictionary<CustomerAction, string> PantsAnimationClipLookup;
-        private static readonly Dictionary<CustomerAction, string> PantsSidewaysAnimationClipLookup;
-        private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateAnimationClipLookup;
-        private static readonly Dictionary<InteractableType, Dictionary<CustomerAction, string>> ActionStateSidewaysAnimationClipLookup;
-
-        public static string GetAnimation<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
-            where T : CustomerInteractable {
-            if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
-                if ( interactable.IType == InteractableType.Seat && (actionState == CustomerAction.None || actionState == CustomerAction.Wetting) ) {
-                    return DesperationSeatAnimationClipLookup[desperationState];
-                }
-                else {
-                    return GetActionAnimation(actionState, interactable);
-                }
-            }
-            else {
-                return DesperationAnimationClipLookup[desperationState];
-            }
-        }
-        private static string GetActionAnimation<T>( CustomerAction state, T interactable ) where T : CustomerInteractable {
-            Dictionary<CustomerAction, string> lookup;
-            switch ( state ) {
-                case CustomerAction.PantsDown:
-                case CustomerAction.PantsUp:
-                    lookup = interactable.Alignment == Alignment.Vertical
-                        ? PantsAnimationClipLookup
-                        : PantsSidewaysAnimationClipLookup;
-                    break;
-                default:
-                    lookup = interactable.Alignment == Alignment.Vertical
-                        ? ActionStateAnimationClipLookup[interactable.IType]
-                        : ActionStateSidewaysAnimationClipLookup[interactable.IType];
-                    break;
-            }
-
-            return lookup[state];
-        }
         static CustomerAnimator() {
             DesperationAnimationClipLookup = new Dictionary<CustomerDesperationState, string>() {
                 { CustomerDesperationState.State0, "desp_state_0" },
@@ -170,7 +201,6 @@ namespace Assets.Scripts.Customers {
                 { CustomerDesperationState.State3, "desp_state_3" },
                 { CustomerDesperationState.State4, "desp_state_4" },
                 { CustomerDesperationState.State5, "desp_state_5" },
-                //{ CustomerDesperationState.State6, "desp_state_6" }
             };
             DesperationSeatAnimationClipLookup = new Dictionary<CustomerDesperationState, string>() {
                 { CustomerDesperationState.State0, "desp_state_stool_0" },
@@ -179,7 +209,6 @@ namespace Assets.Scripts.Customers {
                 { CustomerDesperationState.State3, "desp_state_stool_3" },
                 { CustomerDesperationState.State4, "desp_state_stool_4" },
                 { CustomerDesperationState.State5, "desp_state_stool_5" },
-                //{ CustomerDesperationState.State6, "desp_state_stool_6" }
             };
             PantsAnimationClipLookup = new Dictionary<CustomerAction, string>() {
                 { CustomerAction.PantsDown, "pants_down" },
@@ -215,10 +244,13 @@ namespace Assets.Scripts.Customers {
             });
             // Front facing seat
             ActionStateAnimationClipLookup.Add(InteractableType.Seat, new Dictionary<CustomerAction, string>() {
-                {CustomerAction.Drinking, "drink" }
+                {CustomerAction.Drinking, "drink" },
+                {CustomerAction.Leaking, "desp_state_stool_4_leak" }
             });
 
         }
+
         #endregion
+
     }
 }

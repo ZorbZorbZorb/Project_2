@@ -5,6 +5,7 @@
         PantsDown,
         PantsUp,
         Leaking,
+        LoseControlFreeze,
         Wetting,
         Peeing,
         PeeingPinchOff,
