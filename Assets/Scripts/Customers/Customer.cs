@@ -459,40 +459,24 @@ namespace Assets.Scripts.Customers {
                 Bathroom bathroom;
                 switch ( DesperationState ) {
                     case CustomerDesperationState.State0:
-                        // TODO: Willing to buy a drink?
-                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 2) == 0 ) {
-                        //    BuyDrink();
-                        //}
                         break;
                     case CustomerDesperationState.State1:
                         // Wants to go pee?
                         if ( !MaybeEnterBathroom(90f) ) {
                             return;
                         }
-                        // TODO: Willing to buy a drink?
-                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 3) == 0 ) {
-                        //    BuyDrink();
-                        //}
                         break;
                     case CustomerDesperationState.State2:
                         // Wants to go pee?
                         if ( !MaybeEnterBathroom(40f) ) {
                             return;
                         }
-                        // TODO: Willing to buy a drink?
-                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 4) == 0 ) {
-                        //    BuyDrink();
-                        //}
                         break;
                     case CustomerDesperationState.State3:
                         // Wants to go pee?
                         if ( !MaybeEnterBathroom(25f) ) {
                             return;
                         }
-                        // TODO: Willing to buy a drink?
-                        //if ( Stomach.Fullness < 0.8f && Random.Range(0, 5) == 0 ) {
-                        //    BuyDrink();
-                        //}
                         break;
                     case CustomerDesperationState.State4:
                         // Losing control?
@@ -596,10 +580,13 @@ namespace Assets.Scripts.Customers {
                     if ( ReliefType == ReliefType.None ) {
                         // Should the customer wet now?
                         if ( Bladder.NoStrengthLeft ) {
+                            if (Leaks < LeaksLimit) {
+                                Debug.LogWarning("Started wetting with leak points remaining", this);
+                            }
                             BeginPeeingSelf();
                         }
                         // Okay to keep holding?
-                        else if (Bladder.Strength > 0.2f) {
+                        else if (Bladder.Strength > 0.4f && Bladder.Fullness < 0.9f) {
                             return;
                         }
                         // Should the show thier about to lose it animation?
@@ -608,19 +595,19 @@ namespace Assets.Scripts.Customers {
                             var last = CurrentAction;
                             Debug.Log("Performing lose control freeze!", this);
                             CurrentAction = CustomerAction.LoseControlFreeze;
-                            SetNext(4f, () => { CurrentAction = last; });
+                            SetNext(6f, () => { CurrentAction = last; });
                         }
                         // Should the customer leak?
-                        else if (Leaks < LeaksLimit) {
+                        else if (Leaks < LeaksLimit && (Bladder.Strength < 0.15f || Math.Floor(Random.Range(0f, 4f/Time.deltaTime))==0d)) {
                             Leaks++;
                             var last = CurrentAction;
                             var hp = Bladder.Strength;
                             if (hp < 0.9f) {
-                                hp = hp + 0.15f;
+                                hp = hp + 0.3f;
                             }
                             Debug.Log($"Performing {Leaks}/{LeaksLimit} leaks!", this);
                             CurrentAction = CustomerAction.Leaking;
-                            SetNext(2f, () => { CurrentAction = last; }, () => Bladder.Strength >= hp);
+                            SetNext(0f, () => { CurrentAction = last; }, () => Bladder.Strength >= hp);
                         }
                     }
                     else {

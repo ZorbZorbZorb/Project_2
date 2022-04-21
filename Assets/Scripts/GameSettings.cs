@@ -69,10 +69,10 @@ namespace Assets.Scripts {
         public int MassiveUsesBathroomStage3 = 20;
 
         // V2
-        public float SmallUsesBathroom = 50f;
-        public float MediumUsesBathroom = 65f;
-        public float LargeUsesBathroom = 75f;
-        public float MassiveUsesBathroom = 85f;
+        public float SmallHoldingPower = 75f;
+        public float MediumHoldingPower = 100f;
+        public float LargeHoldingPower = 150f;
+        public float MassiveHoldingPower = 250f;
 
         public float PantsDownTime = 2f;
         public float PantsUpTime = 1f;

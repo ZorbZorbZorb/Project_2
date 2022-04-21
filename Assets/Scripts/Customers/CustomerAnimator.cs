@@ -47,7 +47,23 @@ namespace Assets.Scripts.Customers {
         
         public static string GetAnimation<T>( CustomerDesperationState desperationState, CustomerAction actionState, T interactable, bool forceStandingSprite )
             where T : CustomerInteractable {
-            if ( !forceStandingSprite && interactable != null && interactable.ChangesCustomerSprite ) {
+            if ( actionState == CustomerAction.Leaking ) {
+                if (interactable is Seat) {
+                    return "desp_state_stool_4_leak";
+                }
+                else {
+                    return "desp_state_4_leak";
+                }
+            }
+            else if ( actionState == CustomerAction.LoseControlFreeze ) {
+                if ( interactable is Seat ) {
+                    return "desp_state_3_stool";
+                }
+                else {
+                    return "desp_state_3";
+                }
+            }
+            else if ( !forceStandingSprite && (interactable != null && interactable.ChangesCustomerSprite) ) {
                 if ( interactable.IType == InteractableType.Seat && (actionState == CustomerAction.None || actionState == CustomerAction.Wetting) ) {
                     return DesperationSeatAnimationClipLookup[desperationState];
                 }

@@ -105,7 +105,7 @@ namespace Assets.Scripts.Customers {
                 case CustomerAction.Leaking:
 
                     var x = DrainRate * DrainMultiplier * Customer.DeltaTime;
-                    IncreaseHoldingPower(MaxHoldingPower / 10f);
+                    IncreaseHoldingPower(MaxHoldingPower / 5f);
                     Amount -= x;
 
                     break;
@@ -191,7 +191,20 @@ namespace Assets.Scripts.Customers {
             Amount = fullness * Max;
             IsEmpty = false;
 
-            MaxHoldingPower = settings.DefaultHoldingPower;
+            switch ( Size ) {
+                case BladderSize.Small:
+                    MaxHoldingPower = GameSettings.Current.SmallHoldingPower;
+                    break;
+                case BladderSize.Medium:
+                    MaxHoldingPower = GameSettings.Current.MediumHoldingPower;
+                    break;
+                case BladderSize.Large:
+                    MaxHoldingPower = GameSettings.Current.LargeHoldingPower;
+                    break;
+                case BladderSize.Massive:
+                    MaxHoldingPower = GameSettings.Current.MassiveHoldingPower;
+                    break;
+            }
             HoldingPower = MaxHoldingPower;
             HoldingPowerReserve = customer.Gender == 'm'
                 ? settings.DefaultHoldingPowerReserveM

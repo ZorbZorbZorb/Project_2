@@ -257,6 +257,7 @@ public partial class GameController : MonoBehaviour {
                 GameStarted = true;
                 CanPause = true;
                 FC.Locked = false;
+                AID.Enable();
                 CM.CreateCustomer(0.7f);
                 CM.CreateCustomer(0.6f);
                 CM.CreateCustomer(0.6f);
